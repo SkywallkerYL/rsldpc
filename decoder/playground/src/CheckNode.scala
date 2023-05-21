@@ -3,55 +3,24 @@ import chisel3._
 import chisel3.util._
 
 class CheckNode extends Module with COMMON {
-/*
   val io = IO(new Bundle {
-    val data_in = Input(Vec(32, SInt(8.W))) 
-    val abs_min_value = Output(UInt(8.W)) 
-    val second_min_value = Output(UInt(8.W)) 
-    val min_value_index = Output(UInt(5.W)) 
-    val xor_result = Output(Bool()) 
-  })
-
-
-  val abs_data = io.data_in.map(n => Mux(n >= 0.S, n, (-n).asSInt()))
-
-  val min_value = abs_data.reduceOption((a, b) => Mux(a < b, a, b)).getOrElse(0.S)
- 
-  //val second_abs_data = abs_data.filterNot(_ == min_value) 
-  //val second_min_value = second_abs_data.reduceOption((a, b) => Mux(a < b, a, b)).getOrElse(0.S)
-  val second_min_value = abs_data.filter(_ != min_value).min(new Ordering [UInt]{
-    def compare(x : UInt ,y:UInt ) = x < y 
-  })
-
-  val min_value_index = PriorityEncoder(io.data_in.map(x => x === min_value))
-
-
-  val xor_result = io.data_in.map(_.asUInt()(7)).reduce(_ ^ _)
-
-
-  io.abs_min_value := min_value.asUInt()
-  io.second_min_value := second_min_value.asUInt()
-  io.min_value_index := min_value_index.asUInt()
-  io.xor_result := xor_result
-  */
-  val io = IO(new Bundle {
-    val input = Input(Vec(32, UInt(C2VWIDTH.W)))
+    val input = Input(Vec(COLNUM, UInt(V2CWIDTH.W)))
     val minVal = Output(UInt(C2VWIDTH.W))
-    val minIdx = Output(UInt(5.W))
+    val minIdx = Output(UInt(COLADDR.W))
     val subminVal = Output(UInt(C2VWIDTH.W))
-    val subminIdx = Output(UInt(5.W))
+    val subminIdx = Output(UInt(COLADDR.W))
     val xor_result = Output(Bool()) 
   })
 
   val minVal = Wire(UInt(C2VWIDTH.W))
-  val minIdx = Wire(UInt(5.W))
+  val minIdx = Wire(UInt(COLADDR.W))
   val subminVal = Wire(UInt(C2VWIDTH.W))
-  val subminIdx = Wire(UInt(5.W))
+  val subminIdx = Wire(UInt(COLADDR.W))
 
   // Find the minimum value and its index
-  val abs_data = VecInit(Seq.fill(32)(0.U(C2VWIDTH.W)))
-  for (i <- 0 until 32 ){
-    abs_data(i) := io.input(i).asSInt.abs.asUInt // Mux(io.input(i)(31)===1.U,~io.input(i)+1.U,io.input(i) ) 
+  val abs_data = VecInit(Seq.fill(COLNUM)(0.U(C2VWIDTH.W)))
+  for (i <- 0 until COLNUM ){
+    abs_data(i) := Mux(io.input(i).asSInt.abs.asUInt > MAXC2V.U,MAXC2V.U,io.input(i).asSInt.abs.asUInt) // Mux(io.input(i)(31)===1.U,~io.input(i)+1.U,io.input(i) ) 
   }
   //val abs_data = io.input.map(n => Mux(n(32)===1.U,~n+1.U ,n))
   minVal := abs_data.reduceLeft(_ min _)
@@ -64,12 +33,12 @@ class CheckNode extends Module with COMMON {
     //subminInput(i) := Mux( i.U === minIdx,15.U,abs_data(i) )  
   //}
   val subminInput = VecInit(abs_data.zipWithIndex.map { case (data, i) =>
-  Mux(i.U === minIdx, 15.U, data)
-})
+    Mux(i.U === minIdx, MAXC2V.U, data)
+  })
   subminVal := subminInput.reduceLeft(_ min _)
   subminIdx := subminInput.indexWhere(_ === subminVal)
   
-  val xor_result = io.input.map(_.asUInt()(C2VWIDTH-1)).reduce(_ ^ _)
+  val xor_result = io.input.map(_.asUInt()(V2CWIDTH-1)).reduce(_ ^ _)
   // Output the results
   io.minVal := minVal
   io.minIdx := minIdx
