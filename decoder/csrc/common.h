@@ -6,91 +6,156 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <string.h>
+#include <time.h>
+#include <random>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "types.h"
+#include "verilated_vcd_c.h"
+
+#define LLR_INIT_TABLE 2
 
 
-#define word_t uint64_t
-#define paddr_t uint64_t
-#define vaddr_t uint64_t
-//#define CONFIG_DIFFTEST
-//Itrace
-//#define CONFIG_ITRACE
+#define TESTMODULE 1    
+#if TESTMODULE == 1 
+// CheckNode Test 
+#include "VCheckNode.h"
+#include "VCheckNode___024root.h"
+//#include "VCheckNode__Dpi.h"
+VCheckNode* top;
+#endif 
 
-#define ITRACE_BEGIN 0
-#define ITRACE_END   10000
-//Ftrace 跟Itrace一个开关
-#define FTRACE_BEGIN 0
-#define FTRACE_END   1000
+//#define WAVE 
+#define WAVE_BEGIN 0 
+#define WAVE_END   10000
 
-//#define CONFIG_MTRACE
+#define TRACE_CONDITION(a,begin,end) ((a>=begin)&&(a<end))
+int wavecount = 0 ;
 
-#define MTRACE_BEGIN 0
-#define MTRACE_END   10000
 
-#define VGA
 
-//#define WAVE
 
-#define WAVE_BEGIN 1449950
-#define WAVE_END   1455000
 
-//#define LOOKUPINST 10000
+# define __PRI64_PREFIX	"l"
+# define PRIx8		"x"
+# define PRIx16		"x"
+# define PRIx32		"x"
+# define PRIx64		__PRI64_PREFIX "x"
+#define FMT_WORD    "0x%016lx"
 
-#define TRACE_CONDITION(a,begin,end)   ((a>=begin)&&(a<end))
+#define ANSI_FG_BLACK   "\33[1;30m"
+#define ANSI_FG_RED     "\33[1;31m"
+#define ANSI_FG_GREEN   "\33[1;32m"
+#define ANSI_FG_YELLOW  "\33[1;33m"
+#define ANSI_FG_BLUE    "\33[1;34m"
+#define ANSI_FG_MAGENTA "\33[1;35m"
+#define ANSI_FG_CYAN    "\33[1;36m"
+#define ANSI_FG_WHITE   "\33[1;37m"
+#define ANSI_BG_BLACK   "\33[1;40m"
+#define ANSI_BG_RED     "\33[1;41m"
+#define ANSI_BG_GREEN   "\33[1;42m"
+#define ANSI_BG_YELLOW  "\33[1;43m"
+#define ANSI_BG_BLUE    "\33[1;44m"
+#define ANSI_BG_MAGENTA "\33[1;35m"
+#define ANSI_BG_CYAN    "\33[1;46m"
+#define ANSI_BG_WHITE   "\33[1;47m"
+#define ANSI_NONE       "\33[0m"
 
-#define DIFFTEST_REG_SIZE (sizeof(uint64_t) * 41) // GRPs + pc + 8
-#define CONFIG_MBASE 0x80000000
-#define CONFIG_MSIZE 0x8000000
-#define CONFIG_PC_RESET_OFFSET 0x0
+#define ANSI_FMT(str, fmt) fmt str ANSI_NONE
+
+#include <string.h>
+
+// macro stringizing
+#define str_temp(x) #x
+#define str(x) str_temp(x)
+
+// strlen() for string constant
+#define STRLEN(CONST_STR) (sizeof(CONST_STR) - 1)
+
+// calculate the length of an array
+#define ARRLEN(arr) (int)(sizeof(arr) / sizeof(arr[0]))
+
+// macro concatenation
+#define concat_temp(x, y) x ## y
+#define concat(x, y) concat_temp(x, y)
+#define concat3(x, y, z) concat(concat(x, y), z)
+#define concat4(x, y, z, w) concat3(concat(x, y), z, w)
+#define concat5(x, y, z, v, w) concat4(concat(x, y), z, v, w)
+
+// macro testing
+// See https://stackoverflow.com/questions/26099745/test-if-preprocessor-symbol-is-defined-inside-macro
+#define CHOOSE2nd(a, b, ...) b
+#define MUX_WITH_COMMA(contain_comma, a, b) CHOOSE2nd(contain_comma a, b)
+#define MUX_MACRO_PROPERTY(p, macro, a, b) MUX_WITH_COMMA(concat(p, macro), a, b)
+// define placeholders for some property
+#define __P_DEF_0  X,
+#define __P_DEF_1  X,
+#define __P_ONE_1  X,
+#define __P_ZERO_0 X,
+// define some selection functions based on the properties of BOOLEAN macro
+#define MUXDEF(macro, X, Y)  MUX_MACRO_PROPERTY(__P_DEF_, macro, X, Y)
+#define MUXNDEF(macro, X, Y) MUX_MACRO_PROPERTY(__P_DEF_, macro, Y, X)
+#define MUXONE(macro, X, Y)  MUX_MACRO_PROPERTY(__P_ONE_, macro, X, Y)
+#define MUXZERO(macro, X, Y) MUX_MACRO_PROPERTY(__P_ZERO_,macro, X, Y)
+
+// test if a boolean macro is defined
+#define ISDEF(macro) MUXDEF(macro, 1, 0)
+// test if a boolean macro is undefined
+#define ISNDEF(macro) MUXNDEF(macro, 1, 0)
+// test if a boolean macro is defined to 1
+#define ISONE(macro) MUXONE(macro, 1, 0)
+// test if a boolean macro is defined to 0
+#define ISZERO(macro) MUXZERO(macro, 1, 0)
+// test if a macro of ANY type is defined
+// NOTE1: it ONLY works inside a function, since it calls `strcmp()`
+// NOTE2: macros defined to themselves (#define A A) will get wrong results
+#define isdef(macro) (strcmp("" #macro, "" str(macro)) != 0)
+
+// simplification for conditional compilation
+#define __IGNORE(...)
+#define __KEEP(...) __VA_ARGS__
+// keep the code if a boolean macro is defined
+#define IFDEF(macro, ...) MUXDEF(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is undefined
+#define IFNDEF(macro, ...) MUXNDEF(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is defined to 1
+#define IFONE(macro, ...) MUXONE(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+// keep the code if a boolean macro is defined to 0
+#define IFZERO(macro, ...) MUXZERO(macro, __KEEP, __IGNORE)(__VA_ARGS__)
+
+// functional-programming-like macro (X-macro)
+// apply the function `f` to each element in the container `c`
+// NOTE1: `c` should be defined as a list like:
+//   f(a0) f(a1) f(a2) ...
+// NOTE2: each element in the container can be a tuple
+#define MAP(c, f) c(f)
+
+#define BITMASK(bits) ((1ull << (bits)) - 1)
+#define BITS(x, hi, lo) (((x) >> (lo)) & BITMASK((hi) - (lo) + 1)) // similar to x[hi:lo] in verilog
+#define SEXT(x, len) ({ struct { int64_t n : len; } __x = { .n = x }; (uint64_t)__x.n; })
+#define SEXTU(x, len) ({ struct { uint64_t n : len; } __x = { .n = x }; (uint64_t)__x.n; })
+
+#define ROUNDUP(a, sz)   ((((uintptr_t)a) + (sz) - 1) & ~((sz) - 1))
+#define ROUNDDOWN(a, sz) ((((uintptr_t)a)) & ~((sz) - 1))
+
 #define PG_ALIGN __attribute((aligned(4096)))
-static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
-enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
-#define PMEM_LEFT  ((paddr_t)CONFIG_MBASE)
-#define PMEM_RIGHT ((paddr_t)CONFIG_MBASE + CONFIG_MSIZE - 1)
-#define RESET_VECTOR (PMEM_LEFT + CONFIG_PC_RESET_OFFSET)
-#define FMT_PADDR "0x%016lx"
-#define instr_break 0b00000000000100000000000001110011
-#define MSIZE CONFIG_MSIZE  //this should be same with npc 
-//this should be big enough,otherwise some program could not run
-//This is important or it may cause some behavior difficault to understand
-uint32_t instr_mem[10];
-uint8_t p_mem[MSIZE];
+
+#if !defined(likely)
+#define likely(cond)   __builtin_expect(cond, 1)
+#define unlikely(cond) __builtin_expect(cond, 0)
+#endif
+
+// for AM IOE
+#define io_read(reg) \
+  ({ reg##_T __io_param; \
+    ioe_read(reg, &__io_param); \
+    __io_param; })
+
+#define io_write(reg, ...) \
+  ({ reg##_T __io_param = (reg##_T) { __VA_ARGS__ }; \
+    ioe_write(reg, &__io_param); })
 
 
-#define DEVICE_BASE 0xa0000000
-#define MMIO_BASE 0xa0000000
-                //0x01000000
-
-
-#define SERIAL_PORT     (DEVICE_BASE + 0x00003f8)
-#define KBD_ADDR        (DEVICE_BASE + 0x0000060)
-#define RTC_ADDR        (DEVICE_BASE + 0x0000048)
-#define VGACTL_ADDR     (DEVICE_BASE + 0x0000100)
-#define AUDIO_ADDR      (DEVICE_BASE + 0x0000200)
-#define DISK_ADDR       (DEVICE_BASE + 0x0000300)
-#define FB_ADDR         (MMIO_BASE   + 0x1000000)
-#define AUDIO_SBUF_ADDR (MMIO_BASE   + 0x1200000)
-//CLINT
-#define CLINT_BASE    0x02000000
-#define CLINTEND      0x0200BFFF
-#define MTIMECMPADDR  0x02004000
-#define MTIMEADDR     0x0200BFF8
-#define MSIPADDR      0x02000000
-
-/* convert the guest physical address in the guest program to host virtual address in NEMU */
-uint8_t* guest_to_host(paddr_t paddr);
-/* convert the host virtual address in NEMU to guest physical address in the guest program */
-paddr_t host_to_guest(uint8_t *haddr);
-
-static inline bool in_pmem(paddr_t addr) {
-  return addr - CONFIG_MBASE < CONFIG_MSIZE;
-}
-
- 
-#define CONFIG_TARGET_NATIVE_ELF
 
 #define Assert(cond, format, ...) \
   do { \
@@ -135,10 +200,5 @@ static inline bool in_pmem(paddr_t addr) {
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 
-
-
-#define PAGE_SHIFT        12
-#define PAGE_SIZE         (1ul << PAGE_SHIFT)
-#define PAGE_MASK         (PAGE_SIZE - 1)
 
 #endif
