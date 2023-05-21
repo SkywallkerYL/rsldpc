@@ -11,6 +11,7 @@
 #include <ctime>
 #include <cstdlib>
 using namespace std;
+#if TESTMODULE == 1
 void Mux32MinSecmin(int *array , int * minval,int*subminval,int * minidx,int * subminidx){
 	int absarray [32];
 	for(int i=0;i < 32 ; i ++ ){
@@ -63,6 +64,44 @@ void checknodetest(int times){
 	}
 	Log("if there is no other output, it means the module works right");
 }
-
+#elif TESTMODULE == 2
+void variablesim(int *checkin, int llrin, int *checkout, int* appout){
+	int sum = 0;
+	for(int i = 0 ; i < 6;i++){
+		sum+=checkin[i];  
+	}
+	for (int i = 0; i < 6 ; i++){
+		checkout[i] = sum - checkin[i]; 
+	}
+	*appout = llrin + sum; 
+}
+void variablenodetest(int times){
+	srand(time(nullptr));
+	int checkin[6];
+	int checkout[6];
+	int *appout = new int(0);
+	while(times --){
+		for(int i = 0;i < 6; i++){
+			checkin[i] = rand()%(15*2+1)-15;
+		//	printf("i:%d array:%d\n",i,array[i]);
+		}
+		int llrin = rand()%(15*2+1)-15;
+		variablesim(checkin,llrin,checkout,appout);
+#include "../build/Table.h"
+		top->io_LLrin = llrin;
+		clockntimes(1);
+		if((top->io_APPout&0x7f) != (*appout&0x7f)) {
+			printf("ref:%d dut:%d\n",*appout, top->io_APPout);
+		}
+		if((top->io_Checkout_0&0x7f) !=( checkout[0]&0x7f)) printf("1 dut:%x ref:%x\n",top->io_Checkout_0,checkout[0]);
+		if((top->io_Checkout_1&0x7f) !=( checkout[1]&0x7f)) printf("2 dut:%x ref:%x\n",top->io_Checkout_1,checkout[1]);
+		if((top->io_Checkout_2&0x7f) !=( checkout[2]&0x7f)) printf("3 dut:%x ref:%x\n",top->io_Checkout_2,checkout[2]);
+		if((top->io_Checkout_3&0x7f) !=( checkout[3]&0x7f)) printf("4 dut:%x ref:%x\n",top->io_Checkout_3,checkout[3]);
+		if((top->io_Checkout_4&0x7f) !=( checkout[4]&0x7f)) printf("5 dut:%x ref:%x\n",top->io_Checkout_4,checkout[4]);
+		if((top->io_Checkout_5&0x7f) !=( checkout[5]&0x7f)) printf("6 ref:%x ref:%x\n",top->io_Checkout_5,checkout[5]);
+	}
+	Log("if there is no other output, it means the module works right");
+}
+#endif 
 
 #endif

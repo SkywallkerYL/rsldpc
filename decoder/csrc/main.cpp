@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "common.h"
-#include "checknode.h"
+#include "testfunc.h"
 #include "simualte.h"
 int main(int argc , char* argv[]) {
 	sim_init();
@@ -11,6 +11,8 @@ int main(int argc , char* argv[]) {
 	reset(5);
 #if TESTMODULE == 1
 	checknodetest(1000000);
+#elif TESTMODULE == 2 
+	variablenodetest(1000000);
 #endif 
 	sim_exit();
 	return 0;

@@ -16,13 +16,19 @@
 #define LLR_INIT_TABLE 2
 
 
-#define TESTMODULE 1    
+#define TESTMODULE 2    
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
 #include "VCheckNode___024root.h"
 //#include "VCheckNode__Dpi.h"
 VCheckNode* top;
+#elif TESTMODULE == 2
+#include "VVariableNode.h"
+#include "VVariableNode___024root.h"
+//#include "VCheckNode__Dpi.h"
+VVariableNode* top;
+
 #endif 
 
 //#define WAVE 

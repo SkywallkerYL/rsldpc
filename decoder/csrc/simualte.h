@@ -35,6 +35,8 @@ void sim_init(){
 #endif
 #if TESTMODULE == 1
   top = new VCheckNode;
+#elif TESTMODULE == 2
+  top = new VVariableNode;
 #endif 
 #ifdef WAVE
   contextp->traceEverOn(true);
