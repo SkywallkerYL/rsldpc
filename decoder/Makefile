@@ -8,7 +8,7 @@ milltest:
 verilog:
 	$(call git_commit, "generate verilog")
 	mkdir -p $(BUILD_DIR)
-	mill -i __.test.runMain npc.Elaborate -td $(BUILD_DIR)
+	mill -i __.test.runMain decoder.Elaborate -td $(BUILD_DIR)
 
 help:
 	mill -i __.test.runMain Elaborate --help
@@ -32,15 +32,15 @@ sim:
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by yourself."
 
-include ../Makefile
+#include ../Makefile
 # Generate Verilog code sbt
 doit:
 	sbt run
 #Makefile for Verilator
 
 
-TOPNAME?=ysyx_22050550
-TOPNAMETEST?=ysyx_22050550
+TOPNAME?=rsldpc
+TOPNAMETEST?=rsldpc
 #FSM_m #keyboard_top #top
 NXDC_FILES=constr/top.nxdc
 INC_PATH?=
@@ -89,7 +89,7 @@ SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 	
-VSRC = $(shell find $(abspath ./vsrc) -name "*.v")
+VSRC = $(shell find $(abspath ./build) -name "*.v")
 CSRC = $(shell find $(abspath ./csrc) -name "*.c" -or -name "main.cpp" -or -name "*.cc" )
 CSRC += $(SRC_AUTO_BIND)
 #VSRC += $(shell find $(abspath ./generated) -name "*.v")
@@ -163,7 +163,7 @@ run:
 	@echo "-------------------RUN-------------------"
 	@echo $(IMG)
 	@echo $(NPCMODE)
-	./obj_dir/V$(TOPNAMETEST) $(BATCHMODE) $(NPCMODE) $(IMG)
+	./obj_dir/V$(TOPNAMETEST)
 
 #gtkwave wave.vcd
 wave:

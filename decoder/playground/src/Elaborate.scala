@@ -4,7 +4,8 @@ import decoder._
 
 object Elaborate extends App {
   // CheckNode VariableNode ProcessingUnit
-  def top = new ProcessingUnit
+  // V2CMux 
+  def top = new V2CMux
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(

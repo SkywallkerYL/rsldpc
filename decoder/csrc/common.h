@@ -16,7 +16,7 @@
 #define LLR_INIT_TABLE 2
 
 
-#define TESTMODULE 2    
+#define TESTMODULE 3    
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -28,7 +28,10 @@ VCheckNode* top;
 #include "VVariableNode___024root.h"
 //#include "VCheckNode__Dpi.h"
 VVariableNode* top;
-
+#elif TESTMODULE == 3
+#include "VProcessingUnit.h"
+#include "VProcessingUnit___024root.h"
+VProcessingUnit* top;
 #endif 
 
 //#define WAVE 

@@ -51,8 +51,40 @@ void checknodetest(int times){
 		//	printf("i:%d array:%d\n",i,array[i]);
 		}
 		Mux32MinSecmin(array,minval,subminval,minidx,subminidx);
-#include "../build/Table.h"
+		top->io_input_0 = array[0];
+		top->io_input_1 = array[1];
+		top->io_input_2 = array[2];
+		top->io_input_3 = array[3];
+		top->io_input_4 = array[4];
+		top->io_input_5 = array[5];
+		top->io_input_6 = array[6];
+		top->io_input_7 = array[7];
+		top->io_input_8 = array[8];
+		top->io_input_9 = array[9];
+		top->io_input_10 = array[10];
+		top->io_input_11 = array[11];
+		top->io_input_12 = array[12];
+		top->io_input_13 = array[13];
+		top->io_input_14 = array[14];
+		top->io_input_15 = array[15];
+		top->io_input_16 = array[16];
+		top->io_input_17 = array[17];
+		top->io_input_18 = array[18];
+		top->io_input_19 = array[19];
+		top->io_input_20 = array[20];
+		top->io_input_21 = array[21];
+		top->io_input_22 = array[22];
+		top->io_input_23 = array[23];
+		top->io_input_24 = array[24];
+		top->io_input_25 = array[25];
+		top->io_input_26 = array[26];
+		top->io_input_27 = array[27];
+		top->io_input_28 = array[28];
+		top->io_input_29 = array[29];
+		top->io_input_30 = array[30];
+		top->io_input_31 = array[31];	
 		clockntimes(1);
+
 		if(*minval !=top->io_minVal||*minidx !=top->io_minIdx
 		 ||*subminval !=top->io_subminVal||*subminidx !=top->io_subminIdx){
 			printf("minval ref:%d dut:%d\n",*minval,top->io_minVal);
@@ -87,7 +119,12 @@ void variablenodetest(int times){
 		}
 		int llrin = rand()%(15*2+1)-15;
 		variablesim(checkin,llrin,checkout,appout);
-#include "../build/Table.h"
+		top->io_Checkin_0 = checkin[0];
+		top->io_Checkin_1 = checkin[1];
+		top->io_Checkin_2 = checkin[2];
+		top->io_Checkin_3 = checkin[3];
+		top->io_Checkin_4 = checkin[4];
+		top->io_Checkin_5 = checkin[5];
 		top->io_LLrin = llrin;
 		clockntimes(1);
 		if((top->io_APPout&0x7f) != (*appout&0x7f)) {
@@ -102,6 +139,125 @@ void variablenodetest(int times){
 	}
 	Log("if there is no other output, it means the module works right");
 }
+#elif TESTMODULE == 3
+void ProcessUnitTest(int times){
+	srand(time(nullptr));
+	int writedata [6*64];
+	int writecnt = 0 ; 
+	while ( times -- ){
+		//Initial 
+		for(int i = 0 ; i < 384 ; i ++ ){
+			writedata[i] = rand()%(127*2+1)-127; 
+		}
+		top->io_LLrin = 0;
+	//V2C write Test  
+		top->io_V2CWriteEn = 1;
+		top->io_V2CReadEn  = 0;
+		top->io_C2VWriteEn = 0;
+		top->io_C2VReadEn  = 0;
+		while(writecnt < 64) {
+			top->io_V2CWriteAddr_0 = writecnt;
+            top->io_V2CWriteAddr_1 = writecnt;
+            top->io_V2CWriteAddr_2 = writecnt;
+            top->io_V2CWriteAddr_3 = writecnt;
+            top->io_V2CWriteAddr_4 = writecnt;
+            top->io_V2CWriteAddr_5 = writecnt;
+			top->io_V2CWriteData_0 = writedata[writecnt*6+0];
+            top->io_V2CWriteData_1 = writedata[writecnt*6+1];
+            top->io_V2CWriteData_2 = writedata[writecnt*6+2];
+            top->io_V2CWriteData_3 = writedata[writecnt*6+3];
+            top->io_V2CWriteData_4 = writedata[writecnt*6+4];
+            top->io_V2CWriteData_5 = writedata[writecnt*6+5];
+			clockntimes(1);
+			writecnt = writecnt+1;
+		}
+		writecnt = 0;
+	//V2C read  Test 
+		top->io_V2CWriteEn = 0;	
+        top->io_V2CReadEn  = 1;
+        top->io_C2VWriteEn = 0;
+        top->io_C2VReadEn  = 0;
+		while(writecnt < 64){
+			top->io_V2CReadAddr_0 = writecnt ;
+            top->io_V2CReadAddr_1 = writecnt ;
+            top->io_V2CReadAddr_2 = writecnt ;
+            top->io_V2CReadAddr_3 = writecnt ;
+            top->io_V2CReadAddr_4 = writecnt ;
+            top->io_V2CReadAddr_5 = writecnt ;
+			clockntimes(1);
+			if(top->io_V2CReadData_0!=(writedata[writecnt*6+0]&0xff)) printf("V2CRead ref:%x dut:%x\n",top->io_V2CReadData_0,writedata[writecnt*6+0]);
+			if(top->io_V2CReadData_1!=(writedata[writecnt*6+1]&0xff)) printf("V2CRead or Write fail\n");
+			if(top->io_V2CReadData_2!=(writedata[writecnt*6+2]&0xff)) printf("V2CRead or Write fail\n");
+			if(top->io_V2CReadData_3!=(writedata[writecnt*6+3]&0xff)) printf("V2CRead or Write fail\n");
+			if(top->io_V2CReadData_4!=(writedata[writecnt*6+4]&0xff)) printf("V2CRead or Write fail\n");
+			if(top->io_V2CReadData_5!=(writedata[writecnt*6+5]&0xff)) printf("V2CRead or Write fail\n");
+			writecnt = writecnt + 1;
+		}
+		writecnt = 0;
+	//C2V write Test 	
+		top->io_V2CWriteEn = 0;
+		top->io_V2CReadEn  = 0;
+		top->io_C2VWriteEn = 1;
+		top->io_C2VReadEn  = 0;
+		for(int i = 0 ; i < 384 ; i ++ ){
+			writedata[i] = rand()%(15*2+1)-15; 
+		}
+		while(writecnt < 64) {
+			top->io_C2VWriteAddr_0 = writecnt;
+            top->io_C2VWriteAddr_1 = writecnt;
+            top->io_C2VWriteAddr_2 = writecnt;
+            top->io_C2VWriteAddr_3 = writecnt;
+            top->io_C2VWriteAddr_4 = writecnt;
+            top->io_C2VWriteAddr_5 = writecnt;
+			top->io_C2VWriteData_0 = writedata[writecnt*6+0];
+            top->io_C2VWriteData_1 = writedata[writecnt*6+1];
+            top->io_C2VWriteData_2 = writedata[writecnt*6+2];
+            top->io_C2VWriteData_3 = writedata[writecnt*6+3];
+            top->io_C2VWriteData_4 = writedata[writecnt*6+4];
+            top->io_C2VWriteData_5 = writedata[writecnt*6+5];
+			clockntimes(1);
+			writecnt = writecnt+1;
+		}
+		writecnt = 0;
+
+	//C2V read Test  
+		top->io_V2CWriteEn = 0;	
+        top->io_V2CReadEn  = 0;
+        top->io_C2VWriteEn = 0;
+        top->io_C2VReadEn  = 1;
+		while(writecnt < 64){
+			top->io_C2VReadAddr_0 = writecnt ;
+            top->io_C2VReadAddr_1 = writecnt ;
+            top->io_C2VReadAddr_2 = writecnt ;
+            top->io_C2VReadAddr_3 = writecnt ;
+            top->io_C2VReadAddr_4 = writecnt ;
+            top->io_C2VReadAddr_5 = writecnt ;
+			clockntimes(1);
+			int sum = 0;
+			for (int i = 0;i < 6 ;i++){
+				sum+=writedata[writecnt*6+i];
+			}
+			if((sum&0xff) != (top->io_Appout&0xff)) printf("ref:%x dut:%x\n",sum,top->io_Appout);
+			//if(top->io_C2VReadData_0!=writedata[writecnt*6+0]) printf("C2VRead or Write fail\n");
+			//if(top->io_C2VReadData_1!=writedata[writecnt*6+1]) printf("C2VRead or Write fail\n");
+			//if(top->io_C2VReadData_2!=writedata[writecnt*6+2]) printf("C2VRead or Write fail\n");
+			//if(top->io_C2VReadData_3!=writedata[writecnt*6+3]) printf("C2VRead or Write fail\n");
+			//if(top->io_C2VReadData_4!=writedata[writecnt*6+4]) printf("C2VRead or Write fail\n");
+			//if(top->io_C2VReadData_5!=writedata[writecnt*6+5]) printf("C2VRead or Write fail\n");
+			writecnt = writecnt + 1;
+		}
+		writecnt = 0;
+
+		top->io_V2CWriteEn = 0;
+		top->io_V2CReadEn  = 0;
+		top->io_C2VWriteEn = 0;
+		top->io_C2VReadEn  = 0;
+		clockntimes(10);
+	// Varialbe Out
+	}
+	Log("if there is no other output, it means the module works right");
+}
+
 #endif 
 
 #endif

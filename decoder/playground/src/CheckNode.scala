@@ -45,6 +45,6 @@ class CheckNode extends Module with COMMON {
   io.subminVal := subminVal
   io.subminIdx := subminIdx
   io.xor_result := xor_result
-  GenerateIO.Gen()
+  //GenerateIO.Gen()
 }
 
