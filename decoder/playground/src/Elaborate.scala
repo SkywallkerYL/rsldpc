@@ -3,8 +3,8 @@ import circt.stage._
 import decoder._
 
 object Elaborate extends App {
-  // CheckNode VariableNode
-  def top = new VariableNode
+  // CheckNode VariableNode ProcessingUnit
+  def top = new ProcessingUnit
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(

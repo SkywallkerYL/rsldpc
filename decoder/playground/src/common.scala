@@ -8,8 +8,8 @@ trait COMMON{
   val C2VWIDTH = 5
   val APPWIDTH = V2CWIDTH
 
-  val MAXC2V = scala.math.pow(2,C2VWIDTH).toInt-1  
-  val MAXV2C = scala.math.pow(2,V2CWIDTH).toInt-1
+  val MAXC2V = scala.math.pow(2,C2VWIDTH-1).toInt-1  
+  val MAXV2C = scala.math.pow(2,V2CWIDTH-1).toInt-1
 
   val COLNUM = 32
   val ROWNUM = 6
@@ -17,6 +17,7 @@ trait COMMON{
 
   val COLADDR = log2Ceil(COLNUM)
   val ROWADDR = log2Ceil(ROWNUM)
+  val BLKADDR = log2Ceil(BLKSIZE)
 
   val IOTablePath     : String    = "./build/Table.h"
 }

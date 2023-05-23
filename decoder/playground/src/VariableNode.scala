@@ -19,5 +19,5 @@ class VariableNode extends Module with COMMON {
     io.Checkout(i) := sum - Checklocal(i)
   }
   io.APPout := sum + io.LLrin
-  GenerateIO.Gen(1)
+  //GenerateIO.Gen(1)
 }
