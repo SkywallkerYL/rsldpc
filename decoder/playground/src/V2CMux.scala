@@ -8,5 +8,8 @@ class V2CMux extends Module with COMMON {
     val sel         =  Input(UInt(BLKADDR.W))
     val ChooseAddr  =  Output(UInt(BLKADDR.W))
   })
+
   io.ChooseAddr := io.SramAddr(io.sel)
+ // ReadMatrix.ReadM()
+  
 }
