@@ -261,7 +261,7 @@ void ProcessUnitTest(int times){
 #elif TESTMODULE == 4 
 bool decodeonetime(double sigma){
 	top->io_Start = 1;
-	top->io_IterInput = 20;
+	top->io_IterInput = ITERMAX ;
 	clockntimes(1);
 	top->io_Start = 0;
 	for(int i = 0 ; i < 64 ; i ++ ){

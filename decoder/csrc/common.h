@@ -39,8 +39,9 @@ VDecoder* top;
 double sigmastart = 0.55;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
-int maxtime			= 1000;
-int maxerrortime	= 10 ;
+int maxtime			= 10000;
+int maxerrortime	= 100 ;
+int ITERMAX		  = 20 ;
 #endif 
 
 //#define WAVE 

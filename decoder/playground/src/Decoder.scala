@@ -138,7 +138,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
   // c2v sram read addr 
   for (i <- 0 until COLNUM) {
     for (j <- 0 until ROWNUM) {
-      Process(i).io.C2VReadAddr(j) := counter 
+      Process(i).io.C2VReadAddr(j) := Rowmux(i).io.ChooseAddr  
     }
   }
 
@@ -272,6 +272,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
           io.Success := false.B
         }
         currentState := idle 
+        rightreg := 1.U
       }.otherwise{
         when(rightreg === 1.U){
           io.OutValid := true.B
@@ -279,6 +280,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
           currentState := idle 
         }.otherwise{
           Iter := Iter - 1.U 
+          rightreg := 1.U
           currentState := v2c    
         }
       }

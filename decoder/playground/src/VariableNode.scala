@@ -16,7 +16,7 @@ class VariableNode extends Module with COMMON {
   val sum = Wire(UInt(APPWIDTH.W))
   sum := Checklocal.reduce(_+_)
   for(i <- 0 until ROWNUM){
-    io.Checkout(i) := sum - Checklocal(i)
+    io.Checkout(i) := io.LLrin + sum - Checklocal(i)
   }
   io.APPout := sum + io.LLrin
   //GenerateIO.Gen(1)
