@@ -6,7 +6,6 @@ milltest:
 	mill -i __.test
 
 verilog:
-	$(call git_commit, "generate verilog")
 	mkdir -p $(BUILD_DIR)
 	mill -i __.test.runMain decoder.Elaborate -td $(BUILD_DIR)
 
@@ -134,11 +133,6 @@ all: default
 
 
 
-NPCMODE=-d
-BATCHMODE ?= 
-#DIFFTESTNEMUFILE=/home/yangli/ysyx-workbench/nemu/build/riscv64-nemu-interpreter-so
-DIFFTESTNEMUFILE=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
-NPCMODE+=$(DIFFTESTNEMUFILE)
 runnvboard: $(BIN)
 	#for nvboard
 	@$^ $(BATCHMODE) $(NPCMODE) $(IMG)
@@ -161,24 +155,11 @@ run:
 # $(MAKE) -j -C obj_dir -f ../Makefile_obj
 
 	@echo "-------------------RUN-------------------"
-	@echo $(IMG)
-	@echo $(NPCMODE)
 	./obj_dir/V$(TOPNAMETEST)
 
 #gtkwave wave.vcd
 wave:
 	gtkwave wave.vcd
-catVerilog:
-	cat $(VSRC) > ~/ysyx-workbench/ysyxSoC/ysyx/soc/ysyx_22050550.v
-perfrun:
-	perf record -e cpu-clock -g ./obj_dir/V$(TOPNAMETEST) $(BATCHMODE) $(NPCMODE) $(IMG)
-report:
-	perf report -n 
-perfflame:
-	perf script | ~/FlameGraph/stackcollapse-perf.pl | ~/FlameGraph/flamegraph.pl > perf.svg
-	firefox perf.svg
-perfdiff:
-	perf diff perf.data perf.data.old
 #perf script -i perf.data &> perf.unfold
 #sudo ~/FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
 #sudo ~/FlameGraph/flamegraph.pl perf.folded > perf.svg

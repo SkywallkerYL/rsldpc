@@ -17,7 +17,7 @@ double RandomGen(double sigma)
   return nd(channel);
 }
 /************Yn Initial Table*************/
-int YnInitial(double Noise)
+int LLrInitial(double Noise)
 {
   //all zero code
   double llr_init = 1.0 + Noise;
@@ -36,6 +36,24 @@ int YnInitial(double Noise)
   }else{
     return 4;
   }
+#elif LLR_INIT_TABLE == 3
+		if (llr_init < -boundy7)		return -LLR_INIT4bit7;
+		else if (llr_init < -boundy6) 	return -LLR_INIT4bit6;
+		else if (llr_init < -boundy5) 	return -LLR_INIT4bit55;
+		else if (llr_init < -boundy4) 	return -LLR_INIT4bit5;
+		else if (llr_init < -boundy3) 	return -LLR_INIT4bit4;
+		else if (llr_init < -boundy2) 	return -LLR_INIT4bit3;
+		else if (llr_init < -boundy1) 	return -LLR_INIT4bit2;
+		else if (llr_init < 0)        	return -LLR_INIT4bit1;
+		else if (llr_init < boundy1)  	return LLR_INIT4bit1;
+		else if (llr_init < boundy2)  	return LLR_INIT4bit2;
+		else if (llr_init < boundy3)  	return LLR_INIT4bit3;
+		else if (llr_init < boundy4)  	return LLR_INIT4bit4;
+		else if (llr_init < boundy5)  	return LLR_INIT4bit5;
+		else if (llr_init < boundy6)  	return LLR_INIT4bit55;
+		else if (llr_init < boundy7)  	return LLR_INIT4bit6;
+		else                          	return LLR_INIT4bit7;
+
 #endif
 }
 

@@ -15,24 +15,33 @@ class Decoder extends Module with COMMON {
 //32 processing unit 
 val Process = Seq.fill(COLNUM)(Module(new ProcessingUnit))
 // 6 check node 
-val Check   = Seq.fill(ROWNUM)(Module(new CheckNode))
+// 按行做， 一次只做一行，  
+// 读V2C给校验节点，将计算结果写如C2V，
+// 下一个周期读C2V ， 计算写回V2C   。
+// 再下一个周期进入下一行  ，两个周期做一行 
+val Check   = (Module(new CheckNode))
 // 32 * 6 MUX
 val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
+//  6选一 的 addr mux 
+val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
 // EN wire 
   val V2CReadEn   = Wire(Bool())
   val C2VWriteEn  = Wire(Bool())
   val C2VReadEn   = Wire(Bool())
   val V2CWriteEn  = Wire(Bool())
+  val C2VFlush    = Wire(Bool())
   V2CReadEn := false.B 
   C2VWriteEn := false.B
   C2VReadEn := false.B
   V2CWriteEn := false.B
+  C2VFlush   := false.B  
   // to pocess unit 
   for (i <- 0 until COLNUM) {
       Process(i).io.C2VWriteEn := C2VWriteEn 
       Process(i).io.C2VReadEn  := C2VReadEn  
       Process(i).io.V2CReadEn  := V2CReadEn  
       Process(i).io.V2CWriteEn := V2CWriteEn 
+      Process(i).io.C2VFlush   := C2VFlush  
   }
 
 
@@ -65,10 +74,12 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
   // 但是向读C2V，写回V2C的时候，应该是可以这样子的， 因为此时counter就是地址 
   val counter1    = RegInit(0.U((BLKADDR+1).W)) 
   val counter2    = RegNext(counter)
+  val RowCounter  = RegInit(0.U(ROWADDR.W))
   val rightreg    = RegInit(1.U(1.W)) 
   val appoutjudge = VecInit(Seq.fill(COLNUM)(0.U(1.W)))
   for(i <- 0 until COLNUM) {
     appoutjudge(i) := ~Process(i).io.Appout(APPWIDTH-1)
+    Process(i).io.RowCounter := RowCounter 
   }
   val rightdecide = appoutjudge.reduce(_ & _)
 // read Matrix  
@@ -77,7 +88,7 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
 
 // modeule connect   
   //V2C write addr 默认counter   
-  // 在从Vari写回的时候，要改成counter2  
+  // 在从Vari写回的时候，要改成从C2V读的ADDR  
   // 写数据默认LLrin  
   // 从VAR写回的时候 要改成 Variabl 的checkout
   for( i <- 0 until COLNUM) {
@@ -101,27 +112,28 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
       }
     }
   }
-  // V2C Sram ADDR  
-  for (i <- 0 until COLNUM ){
-    for ( j <- 0 until ROWNUM ){
-      Process(i).io.V2CReadAddr(j)  := AddrMux(j)(i).io.ChooseAddr 
-      Process(i).io.C2VWriteAddr(j) := AddrMux(j)(i).io.ChooseAddr 
+  for ( i <- 0 until COLNUM) {
+    for (j <- 0 until ROWNUM) {
+      Rowmux(i).io.V2Caddr(j) := AddrMux(j)(i).io.ChooseAddr    
     }
+    Rowmux(i).io.sel := RowCounter 
+  }
+  // V2C Sram ADDR  
+
+  for (i <- 0 until COLNUM ){
+    Process(i).io.V2CReadAddr  := Rowmux(i).io.ChooseAddr  
+    Process(i).io.C2VWriteAddr := Rowmux(i).io.ChooseAddr  
   }
   // Sram  dataout -> Check Node   
-  for (i <- 0 until ROWNUM) {
-    for(j <- 0 until COLNUM) {
-      Check(i).io.input(j) := Process(j).io.V2CReadData(i)  
-    }
+  for(j <- 0 until COLNUM) {
+      Check.io.input(j) := Process(j).io.V2CReadData
   }
   // check node out -> Sram 
   for (i <- 0 until COLNUM) {
-    for(j <- 0 until ROWNUM) {
-      val minval = Mux(Check(j).io.minIdx === i.U,Check(j).io.subminVal,Check(j).io.minVal) 
-      val sign   = Check(j).io.xor_result === Check(j).io.input(i)(V2CWIDTH-1)
+      val minval = Mux(Check.io.minIdx === i.U,Check.io.subminVal,Check.io.minVal) 
+      val sign   = Check.io.xor_result === Check.io.input(i)(V2CWIDTH-1)
       val scaledmin = (minval.asUInt * 3.U) >> 2.U
-      Process(i).io.C2VWriteData(j) := Mux(sign,scaledmin,~scaledmin + 1.U)
-    }
+      Process(i).io.C2VWriteData := Mux(sign,scaledmin,~scaledmin + 1.U)
   }
   // c2v sram read addr 
   for (i <- 0 until COLNUM) {
@@ -136,7 +148,7 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
  //  
 
 
- val idle :: initial:: check2var :: var2check :: judge :: Nil = Enum(5)
+ val idle :: initial:: v2c :: c2v :: judge :: Nil = Enum(5)
 
 
   val currentState = RegInit(idle)
@@ -152,59 +164,40 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
       when(io.Start) {
         currentState := initial 
         counter := 0.U
+        RowCounter := 0.U 
         counter1 := 0.U
         Iter := io.IterInput 
       }
     }
     is(initial){
       when(counter === (BLKSIZE-1).U){
-        currentState := check2var 
+        currentState := v2c    
         counter := 0.U 
+        RowCounter := 0.U
       }.otherwise{
         counter := counter + 1.U
       }
       V2CWriteEn := true.B 
       LLrWriteEn := true.B
+      C2VFlush   := true.B
+      for(i <- 0 until COLNUM) {
+        Process(i).io.C2VWriteAddr := counter  
+        Process(i).io.C2VWriteData := 0.U
+      }
     }
-    is(check2var){
+    
+    is(v2c){
       // 这是假定下一个周期拿到读数据的代码 
       // 但实际上chisel生成的SyncReadMem 当前周期就能拿到数据 
-      /*
-      when(counter1 === (2*BLKSIZE-1).U){
-        currentState := var2check  
-        counter := 0.U 
-        counter1 := 0.U
-        counter2 := 0.U
-        rightreg := 1.U
-      }.otherwise{
-        counter1 := counter1 + 1.U
-      }
-
-      //V2C读  
-      when(counter1(0) === 0.U){
-        V2CReadEn := true.B
-      }.otherwise{
-        V2CReadEn := true.B
-        C2VWriteEn := true.B
-        counter := counter + 1.U
-      }
-      */
      // 当周期就拿到读数据的代码   
-      when(counter === (BLKSIZE-1).U){
-        currentState := var2check 
-        counter := 0.U 
-        counter1 := 0.U 
-        counter2 := 0.U
-        rightreg := 1.U
-      }.otherwise {
-        counter := counter + 1.U
-      }
       V2CReadEn := true.B 
-      C2VWriteEn := true.B
-
-
+      C2VWriteEn := true.B  
+      currentState := c2v 
     }
-    is(var2check) {
+    
+    // decode  
+    // 完成对V2C的
+    is(c2v ) {
       /*
       when(counter1 === (2*BLKSIZE-1).U){
         currentState := judge 
@@ -245,21 +238,27 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
         }
       }
       */  
-      when ( counter === (BLKSIZE-1).U) {
+      when ( (counter === (BLKSIZE-1).U)&&(RowCounter === (ROWNUM-1).U)) {
         currentState := judge 
         counter := 0.U
-      }.otherwise{
+        RowCounter := 0.U 
+      }.elsewhen((counter === (BLKSIZE-1).U) && RowCounter =/= (ROWNUM-1).U){
+        RowCounter := RowCounter + 1.U 
+        currentState := v2c   
+        counter := 0.U
+      }.otherwise {
         counter := counter + 1.U
+        currentState := v2c  
       } 
       V2CWriteEn := true.B 
       LLrReadEn  := true.B
       C2VReadEn  := true.B  
-      when(V2CWriteEn) {
+      when(V2CWriteEn&& (RowCounter === (ROWNUM-1).U)) {
            rightreg := rightreg & rightdecide 
       }
       for( i <- 0 until COLNUM) {
         for (j <- 0 until ROWNUM) {
-          Process(i).io.V2CWriteAddr(j) := counter
+          Process(i).io.V2CWriteAddr(j) := Rowmux(i).io.ChooseAddr
           Process(i).io.V2CWriteData(j) := Process(i).io.VariableOut(j)
         }
       }
@@ -280,7 +279,7 @@ val AddrMux = Seq.fill(ROWNUM)(Seq.fill(COLNUM)(Module(new V2CMux)))
           currentState := idle 
         }.otherwise{
           Iter := Iter - 1.U 
-          currentState := check2var 
+          currentState := v2c    
         }
       }
     }

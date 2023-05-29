@@ -15,6 +15,8 @@ int main(int argc , char* argv[]) {
 	variablenodetest(1000000);
 #elif TESTMODULE == 3
 	ProcessUnitTest(100000);
+#elif TESTMODULE == 4
+	DecoderTest();
 #endif 
 	sim_exit();
 	return 0;

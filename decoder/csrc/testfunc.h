@@ -7,6 +7,7 @@
 	> Created Time: 2023年05月21日 星期日 11时06分44秒
  ************************************************************************/
 #include "common.h"
+#include "channel.h"
 #include "simualte.h"
 #include <ctime>
 #include <cstdlib>
@@ -256,6 +257,139 @@ void ProcessUnitTest(int times){
 	// Varialbe Out
 	}
 	Log("if there is no other output, it means the module works right");
+}
+#elif TESTMODULE == 4 
+bool decodeonetime(double sigma){
+	top->io_Start = 1;
+	top->io_IterInput = 20;
+	clockntimes(1);
+	top->io_Start = 0;
+	for(int i = 0 ; i < 64 ; i ++ ){
+		top->io_LLrin_0 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_1 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_2 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_3 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_4 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_5 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_6 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_7 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_8 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_9 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_10 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_11 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_12 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_13 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_14 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_15 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_16 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_17 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_18 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_19 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_20 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_21 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_22 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_23 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_24 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_25 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_26 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_27 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_28 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_29 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_30 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_31 = LLrInitial(RandomGen(sigma));
+		clockntimes(1);
+	}
+//	printf("hhh\n");
+	//int i = 0;
+	//for (int i = 0 ; i < 2000; i ++) {
+	//	clockntimes(1);
+	//}
+	//return true;
+	while(!top->io_OutValid) {
+		clockntimes(1);
+	//	i++;
+	}
+    //	printf("i:%d\n",i);
+	bool flag = top->io_Success; 
+//	if(flag) printf("success\n");
+	//printf("Iter remain:%d\n",top->io_IterOut);
+	clockntimes(1);
+	return flag ;
+}
+
+
+
+void DecoderTest(){
+	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
+		int frame = 0 ;
+		int errorframe = 0; 
+		while(frame < maxtime || errorframe < maxerrortime) {
+			bool success = decodeonetime(sigma);
+			if(!success) errorframe++;
+			frame++;
+		}
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+	}
+	//Log("if there is no other output, it means the module works right");
+}
+void Mux32MinSecmin(int *array , int * minval,int*subminval,int * minidx,int * subminidx){
+	int absarray [32];
+	for(int i=0;i < 32 ; i ++ ){
+		absarray[i] = array[i] < 0 ? -array[i]:array[i];
+	}
+	int localminval = 32 ;
+	int localminidx = -1 ;  
+	for(int i=0;i < 32 ; i ++ ){
+		if (absarray[i] < localminval){
+			localminval = absarray[i];
+			localminidx = i			 ;
+		}
+	}
+	int localsubminval = 32;
+	int localsubminidx = -1;
+	for(int i=0;i < 32 ; i ++ ){
+		if (absarray[i] < localsubminval && i !=localminidx){
+			localsubminval = absarray[i];
+			localsubminidx = i			 ;
+		}
+	}
+	*minval = localminval ;
+	*minidx = localminidx ;
+	*subminval = localsubminval ; 
+	*subminidx = localsubminidx ;
+}
+void cppdecodeonetime(double sigma, int Itermax,int c2vind[384][32], int v2cind[2048][6] ){
+	int llrin[2048];
+	int c2vmin1[384];
+	int c2vmin2[384];
+	int c2vaddr[384];
+	int c2v ;
+	bool c2vsign[2048];
+	int v2cmsg[2048*6];
+	int appout[2048];
+	//Initial 与硬件类似的形式 
+	for(int i = 0 ; i < 64;i ++ ){
+		for (int j = 0; j < 32 ; j ++ ){
+			llrin[i*32 + j ] = LLrInitial(RandomGen(sigma)); 
+			for (int k = 0 ; k < 6 ; k ++ ){
+				v2cmsg [i*32+j*6+k] = llrin[i*32+j];
+			}
+		}
+	}
+	int iter = Itermax ;
+	while(iter > 0){
+		// C2V   
+
+		// V2C  
+	
+
+		// appout  decision 
+	
+
+	}
 }
 
 #endif 

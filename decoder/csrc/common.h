@@ -13,10 +13,10 @@
 #include <stdlib.h>
 #include "verilated_vcd_c.h"
 
-#define LLR_INIT_TABLE 2
+#define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 3    
+#define TESTMODULE 4    
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -32,6 +32,15 @@ VVariableNode* top;
 #include "VProcessingUnit.h"
 #include "VProcessingUnit___024root.h"
 VProcessingUnit* top;
+#elif TESTMODULE == 4
+#include "VDecoder.h"
+#include "VDecoder___024root.h"
+VDecoder* top;
+double sigmastart = 0.55;
+double sigmaend   = 0.35;
+double sigmastep  = 0.01; 
+int maxtime			= 1000;
+int maxerrortime	= 10 ;
 #endif 
 
 //#define WAVE 
@@ -42,7 +51,21 @@ VProcessingUnit* top;
 int wavecount = 0 ;
 
 
-
+const double boundy1 = 0.126591786710688;
+const double boundy2 = 0.235418474661616;
+const double boundy3 = 0.346304112688928;
+const double boundy4 = 0.452660297000054;
+const double boundy5 = 0.562194230398888;
+const double boundy6 = 0.696028500882122;
+const double boundy7 = 0.872153396888965;
+const int LLR_INIT4bit1 = 1;//1;
+const int LLR_INIT4bit2 = 3;//2;
+const int LLR_INIT4bit3 = 5;//3;//4 5
+const int LLR_INIT4bit4 = 6;//4;//8 9
+const int LLR_INIT4bit5 = 8;//5;
+const int LLR_INIT4bit55= 10;//5;  
+const int LLR_INIT4bit6 = 12;//7;
+const int LLR_INIT4bit7 = 15;//9;//4 5
 
 
 # define __PRI64_PREFIX	"l"
