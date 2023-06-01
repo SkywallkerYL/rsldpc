@@ -4,10 +4,11 @@ import decoder._
 
 object Elaborate extends App {
   // CheckNode VariableNode ProcessingUnit
-  // V2CMux  Decoder 
-  def top = new Decoder 
+  // V2CMux  Decoder Noisegen gng(RandSeedParams())    
+  // GngWrapper  
+  def top = new GngWrapper
 
-  val useMFC = false // use MLIR-based firrtl compiler
+  val useMFC = true  // use MLIR-based firrtl compiler
   val generator = Seq(
     chisel3.stage.ChiselGeneratorAnnotation(() => top),
     //firrtl.stage.RunFirrtlTransformAnnotation(new AddModulePrefix()),

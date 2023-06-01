@@ -19,6 +19,26 @@ trait COMMON{
   val COLADDR = log2Ceil(COLNUM)
   val ROWADDR = log2Ceil(ROWNUM)
   val BLKADDR = log2Ceil(BLKSIZE)
+  //  噪声发生器的p0  的个数 
+  val PNUM    = 5 
+  //  量化区间的个数   
+  val QuantiNUM   = log2Ceil(PNUM+1)
+  val MAXSPACEIND = scala.math.pow(2,QuantiNUM).toInt-1   
+  //  量化表  
+  val table3 = VecInit(Seq(
+      4.S(APPWIDTH.W),
+      1.S(APPWIDTH.W) ,
+     -1.S(APPWIDTH.W)   ,
+     -4.S(APPWIDTH.W)
+    ))
+  val table5 = VecInit(Seq(
+      7.S(APPWIDTH.W),
+      3.S(APPWIDTH.W),
+      1.S(APPWIDTH.W),
+      -1.S(APPWIDTH.W),
+      -3.S(APPWIDTH.W),
+      -7.S(APPWIDTH.W)
+    ))
 //这个相对路径是根据makefile所在的文件夹决定的
   val IOTablePath     : String    = "./build/Table.h"
   val FilePath        : String    = "../matrix/2048_1723.txt"
