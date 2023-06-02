@@ -54,7 +54,9 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
   val LLrAddr   = Wire(UInt(BLKADDR.W))
   LLrReadEn := false.B 
   LLrWriteEn := false.B
-  val LLRRams = Seq.fill(COLNUM)(SyncReadMem(BLKSIZE,UInt(APPWIDTH.W)))
+  val LLRRams =Seq.fill(COLNUM)(SyncReadMem(BLKSIZE,UInt(APPWIDTH.W))) 
+  //Seq.fill(COLNUM)(SyncReadMem(BLKSIZE,UInt(APPWIDTH.W)))
+  //Seq.fill(COLNUM)(Mem(BLKSIZE,UInt(APPWIDTH.W)))
   when (LLrWriteEn){
     for(i <- 0 until COLNUM) {
         LLRRams(i).write(LLrAddr,io.LLrin(i))

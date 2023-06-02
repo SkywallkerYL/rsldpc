@@ -42,6 +42,7 @@ trait COMMON{
 //这个相对路径是根据makefile所在的文件夹决定的
   val IOTablePath     : String    = "./build/Table.h"
   val FilePath        : String    = "../matrix/2048_1723.txt"
+//RAM的类型 ，是用syncreadmem 或者 mem  
 }
 object COMMON extends COMMON {}
 

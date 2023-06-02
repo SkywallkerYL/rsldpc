@@ -38,8 +38,8 @@ doit:
 #Makefile for Verilator
 
 
-TOPNAME?=rsldpc
-TOPNAMETEST?=rsldpc
+TOPNAME?=Topdecoer
+TOPNAMETEST?=Topdecoder
 #FSM_m #keyboard_top #top
 NXDC_FILES=constr/top.nxdc
 INC_PATH?=

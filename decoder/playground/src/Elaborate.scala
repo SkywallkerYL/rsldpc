@@ -8,7 +8,7 @@ object Elaborate extends App {
   // GngWrapper Topdecoder   
   def top = new Topdecoder
 
-  val useMFC = true  // use MLIR-based firrtl compiler
+  val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
     chisel3.stage.ChiselGeneratorAnnotation(() => top),
     //firrtl.stage.RunFirrtlTransformAnnotation(new AddModulePrefix()),

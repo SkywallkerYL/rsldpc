@@ -83,7 +83,11 @@ class ProcessingUnit extends Module with COMMON {
   })
   //两块RAM 分别存V2C C2V 消息
   val V2CRams = Seq.fill(ROWNUM)(SyncReadMem(BLKSIZE,UInt(V2CWIDTH.W)))
+   // Seq.fill(ROWNUM)(SyncReadMem(BLKSIZE,UInt(V2CWIDTH.W)))
+   // Seq.fill(ROWNUM)(Mem(BLKSIZE,UInt(V2CWIDTH.W)))
   val C2VRams = Seq.fill(ROWNUM)(SyncReadMem(BLKSIZE,UInt(C2VWIDTH.W)))
+  //Seq.fill(ROWNUM)(SyncReadMem(BLKSIZE,UInt(C2VWIDTH.W)))
+  //Seq.fill(ROWNUM)(Mem(BLKSIZE,UInt(C2VWIDTH.W)))
   // V2C写   
   for ( i <- 0 until ROWNUM) {
     when(io.V2CWriteEn){
