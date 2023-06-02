@@ -41,6 +41,10 @@ void sim_init(){
   top = new VProcessingUnit;
 #elif TESTMODULE == 4 
   top = new VDecoder; 
+#elif TESTMODULE == 5
+  top = new VGngWrapper; 
+#elif TESTMODULE == 6 
+  top = new VTopdecoder; 
 #endif 
 #ifdef WAVE
   contextp->traceEverOn(true);

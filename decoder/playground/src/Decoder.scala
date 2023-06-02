@@ -11,6 +11,7 @@ class Decoder extends Module with COMMON {
     val OutValid  = Output(Bool())
     val Success   = Output(Bool())
     val IterOut   = Output(UInt(9.W))
+    val counter   = Output(UInt(BLKADDR.W))
   })
 //32 processing unit 
 val Process = Seq.fill(COLNUM)(Module(new ProcessingUnit))
@@ -66,6 +67,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
 // Wire Connect 
   val counter     = RegInit(0.U(BLKADDR.W))
   LLrAddr := counter 
+  io.counter := counter 
   // conter1 相比counter延后一个周期，这样子
   // counter 是一个addr V2C读   
   // 下一个周期拿到V2C的数据  

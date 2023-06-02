@@ -16,7 +16,7 @@
 #define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 4    
+#define TESTMODULE 6    
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -42,6 +42,16 @@ double sigmastep  = 0.01;
 int maxtime			= 10000;
 int maxerrortime	= 100 ;
 int ITERMAX		  = 20 ;
+#elif TESTMODULE == 5 
+#include "VGngWrapper.h"
+#include "VGngWrapper___024root.h"
+VGngWrapper* top;
+#elif TESTMODULE == 6
+#include "VTopdecoder.h"
+#include "VTopdecoder___024root.h"
+VTopdecoder* top;
+int maxerrortime = 50 ;
+int ITERMAX      = 20 ;
 #endif 
 
 //#define WAVE 
