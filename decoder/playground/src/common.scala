@@ -4,8 +4,8 @@ import chisel3.util._
 import scala.io.{BufferedSource,Source}
 import java.io._
 trait COMMON{
-  val V2CWIDTH = 8
-  val C2VWIDTH = 5
+  val V2CWIDTH = 7
+  val C2VWIDTH = 4
   val APPWIDTH = V2CWIDTH
 
   //有一个符号位
@@ -20,7 +20,7 @@ trait COMMON{
   val ROWADDR = log2Ceil(ROWNUM)
   val BLKADDR = log2Ceil(BLKSIZE)
   //  噪声发生器的p0  的个数 
-  val PNUM    = 5 
+  val PNUM    = 3 
   //  量化区间的个数   
   val QuantiNUM   = log2Ceil(PNUM+1)
   val MAXSPACEIND = scala.math.pow(2,QuantiNUM).toInt-1   
@@ -39,6 +39,9 @@ trait COMMON{
       -3.S(APPWIDTH.W),
       -7.S(APPWIDTH.W)
     ))
+  //ITER 的宽度 
+  val ITERWITH = 5  
+  val FRAMEWITH = 32
 //这个相对路径是根据makefile所在的文件夹决定的
   val IOTablePath     : String    = "./build/Table.h"
   val FilePath        : String    = "../matrix/2048_1723.txt"

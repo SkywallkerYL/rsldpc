@@ -4,18 +4,18 @@ import chisel3.util._
 
 class Topdecoder extends Module with COMMON {
   val io = IO(new Bundle {
-    val IterInput   = Input(UInt(9.W))
-    val maxError    = Input(UInt(64.W))
+    val IterInput   = Input(UInt(ITERWITH.W))
+    val maxError    = Input(UInt(FRAMEWITH.W))
     val start       = Input(Bool())
     val p0          = Input(Vec(PNUM,UInt(64.W))) 
     val Framevalid  = Output(Bool())
-    val totalframe  = Output(UInt(64.W))
-    val errorframe  = Output(UInt(64.W)) 
+    val totalframe  = Output(UInt(FRAMEWITH.W))
+    val errorframe  = Output(UInt(FRAMEWITH.W)) 
   })
   
-  val errorframe = RegInit(0.U(64.W))
-  val maxerror   = RegInit(0.U(64.W))
-  val totalframe = RegInit(0.U(64.W))  
+  val errorframe = RegInit(0.U(FRAMEWITH.W))
+  val maxerror   = RegInit(0.U(FRAMEWITH.W))
+  val totalframe = RegInit(0.U(FRAMEWITH.W))  
   io.totalframe := totalframe 
   io.errorframe := errorframe 
   io.Framevalid := false.B

@@ -180,46 +180,58 @@ void ProcessUnitTest(int times){
         top->io_V2CReadEn  = 1;
         top->io_C2VWriteEn = 0;
         top->io_C2VReadEn  = 0;
-		while(writecnt < 64){
-			top->io_V2CReadAddr_0 = writecnt ;
-            top->io_V2CReadAddr_1 = writecnt ;
-            top->io_V2CReadAddr_2 = writecnt ;
-            top->io_V2CReadAddr_3 = writecnt ;
-            top->io_V2CReadAddr_4 = writecnt ;
-            top->io_V2CReadAddr_5 = writecnt ;
-			clockntimes(1);
-			if(top->io_V2CReadData_0!=(writedata[writecnt*6+0]&0xff)) printf("V2CRead ref:%x dut:%x\n",top->io_V2CReadData_0,writedata[writecnt*6+0]);
-			if(top->io_V2CReadData_1!=(writedata[writecnt*6+1]&0xff)) printf("V2CRead or Write fail\n");
-			if(top->io_V2CReadData_2!=(writedata[writecnt*6+2]&0xff)) printf("V2CRead or Write fail\n");
-			if(top->io_V2CReadData_3!=(writedata[writecnt*6+3]&0xff)) printf("V2CRead or Write fail\n");
-			if(top->io_V2CReadData_4!=(writedata[writecnt*6+4]&0xff)) printf("V2CRead or Write fail\n");
-			if(top->io_V2CReadData_5!=(writedata[writecnt*6+5]&0xff)) printf("V2CRead or Write fail\n");
-			writecnt = writecnt + 1;
+		int rowcounter = 0;
+		while (rowcounter < 6){
+			top->io_RowCounter = rowcounter;
+			writecnt = 0;
+			while(writecnt < 64){
+				top->io_V2CReadAddr = writecnt ;
+    	        //top->io_V2CReadAddr_1 = writecnt ;
+    	        //top->io_V2CReadAddr_2 = writecnt ;
+    	        //top->io_V2CReadAddr_3 = writecnt ;
+    	        //top->io_V2CReadAddr_4 = writecnt ;
+    	        //top->io_V2CReadAddr_5 = writecnt ;
+				clockntimes(1);
+				if(top->io_V2CReadData!=(writedata[writecnt*6+rowcounter]&0xff)) printf("V2CRead ref:%x dut:%x\n",top->io_V2CReadData,writedata[writecnt*6+rowcounter]);
+			//	if(top->io_V2CReadData_1!=(writedata[writecnt*6+1]&0xff)) printf("V2CRead or Write fail\n");
+			//	if(top->io_V2CReadData_2!=(writedata[writecnt*6+2]&0xff)) printf("V2CRead or Write fail\n");
+			//	if(top->io_V2CReadData_3!=(writedata[writecnt*6+3]&0xff)) printf("V2CRead or Write fail\n");
+			//	if(top->io_V2CReadData_4!=(writedata[writecnt*6+4]&0xff)) printf("V2CRead or Write fail\n");
+			//	if(top->io_V2CReadData_5!=(writedata[writecnt*6+5]&0xff)) printf("V2CRead or Write fail\n");
+				writecnt = writecnt + 1;
+			}
+			rowcounter++;
 		}
 		writecnt = 0;
+		rowcounter = 0;
 	//C2V write Test 	
 		top->io_V2CWriteEn = 0;
 		top->io_V2CReadEn  = 0;
 		top->io_C2VWriteEn = 1;
 		top->io_C2VReadEn  = 0;
 		for(int i = 0 ; i < 384 ; i ++ ){
-			writedata[i] = rand()%(15*2+1)-15; 
+			writedata[i] = rand()%(7*2+1)-7; 
 		}
-		while(writecnt < 64) {
-			top->io_C2VWriteAddr_0 = writecnt;
-            top->io_C2VWriteAddr_1 = writecnt;
-            top->io_C2VWriteAddr_2 = writecnt;
-            top->io_C2VWriteAddr_3 = writecnt;
-            top->io_C2VWriteAddr_4 = writecnt;
-            top->io_C2VWriteAddr_5 = writecnt;
-			top->io_C2VWriteData_0 = writedata[writecnt*6+0];
-            top->io_C2VWriteData_1 = writedata[writecnt*6+1];
-            top->io_C2VWriteData_2 = writedata[writecnt*6+2];
-            top->io_C2VWriteData_3 = writedata[writecnt*6+3];
-            top->io_C2VWriteData_4 = writedata[writecnt*6+4];
-            top->io_C2VWriteData_5 = writedata[writecnt*6+5];
-			clockntimes(1);
-			writecnt = writecnt+1;
+		while (rowcounter < 6) {
+			top->io_RowCounter = rowcounter;
+			writecnt = 0 ;
+			while(writecnt < 64) {
+				top->io_C2VWriteAddr = writecnt;
+        	    //top->io_C2VWriteAddr_1 = writecnt;
+        	    //top->io_C2VWriteAddr_2 = writecnt;
+        	    //top->io_C2VWriteAddr_3 = writecnt;
+        	    //top->io_C2VWriteAddr_4 = writecnt;
+        	    //top->io_C2VWriteAddr_5 = writecnt;
+				top->io_C2VWriteData = writedata[writecnt*6+rowcounter];
+        	    //top->io_C2VWriteData_1 = writedata[writecnt*6+1];
+        	    //top->io_C2VWriteData_2 = writedata[writecnt*6+2];
+        	    //top->io_C2VWriteData_3 = writedata[writecnt*6+3];
+        	    //top->io_C2VWriteData_4 = writedata[writecnt*6+4];
+        	    //top->io_C2VWriteData_5 = writedata[writecnt*6+5];
+				clockntimes(1);
+				writecnt = writecnt+1;
+			}
+			rowcounter++;
 		}
 		writecnt = 0;
 
@@ -240,7 +252,7 @@ void ProcessUnitTest(int times){
 			for (int i = 0;i < 6 ;i++){
 				sum+=writedata[writecnt*6+i];
 			}
-			if((sum&0xff) != (top->io_Appout&0xff)) printf("ref:%x dut:%x\n",sum,top->io_Appout);
+			if((sum&0x7f) != (top->io_Appout&0x7f)) printf("ref:%x dut:%x\n",sum,top->io_Appout);
 			//if(top->io_C2VReadData_0!=writedata[writecnt*6+0]) printf("C2VRead or Write fail\n");
 			//if(top->io_C2VReadData_1!=writedata[writecnt*6+1]) printf("C2VRead or Write fail\n");
 			//if(top->io_C2VReadData_2!=writedata[writecnt*6+2]) printf("C2VRead or Write fail\n");

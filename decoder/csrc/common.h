@@ -39,8 +39,8 @@ VDecoder* top;
 double sigmastart = 0.55;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
-int maxtime			= 10000;
-int maxerrortime	= 100 ;
+int maxtime			= 10;
+int maxerrortime	= 10 ;
 int ITERMAX		  = 20 ;
 #elif TESTMODULE == 5 
 #include "VGngWrapper.h"
@@ -50,8 +50,8 @@ VGngWrapper* top;
 #include "VTopdecoder.h"
 #include "VTopdecoder___024root.h"
 VTopdecoder* top;
-int maxerrortime = 50 ;
-int ITERMAX      = 20 ;
+int maxerrortime = 10 ;
+int ITERMAX      = 10 ;
 #endif 
 
 //#define WAVE 

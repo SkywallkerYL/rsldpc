@@ -16,7 +16,7 @@ int main(int argc , char* argv[]) {
 	variablenodetest(1000000);
 #elif TESTMODULE == 3
 	//not use 
-	ProcessUnitTest(100000);
+	ProcessUnitTest(10000);
 #elif TESTMODULE == 4
 	DecoderTest();
 #elif TESTMODULE == 5
