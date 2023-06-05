@@ -68,6 +68,8 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
 
 // Wire Connect 
   val counter     = RegInit(0.U(BLKADDR.W))
+  val counteraddr = Wire(UInt(BLKADDR.W))
+  counteraddr := counter  
   LLrAddr := counter 
   io.counter := counter 
   // conter1 相比counter延后一个周期，这样子
@@ -152,7 +154,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
  //  
 
 
- val idle :: initial:: v2c :: c2v :: judge :: Nil = Enum(5)
+ val idle :: initial:: v2cread :: c2vwrite :: c2vread :: v2cwrite :: judge :: Nil = Enum(7)
 
 
   val currentState = RegInit(idle)
@@ -175,7 +177,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
     }
     is(initial){
       when(counter === (BLKSIZE-1).U){
-        currentState := v2c    
+        currentState := v2cread     
         counter := 0.U 
         RowCounter := 0.U
       }.otherwise{
@@ -190,69 +192,41 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
       }
     }
     
-    is(v2c){
+    is(v2cread){
       // 这是假定下一个周期拿到读数据的代码 
-      // 但实际上chisel生成的SyncReadMem 当前周期就能拿到数据 
+      // chisel 生成的 其实不是当周期拿到数据  其实是地址下一个周期送进去，还是下一个周期拿数据。
+      // 也就是说要提前一个周期发送地址  
      // 当周期就拿到读数据的代码   
       V2CReadEn := true.B 
-      C2VWriteEn := true.B  
-      currentState := c2v 
+      //C2VWriteEn := true.B  
+      currentState := c2vwrite 
+    }
+    is(c2vwrite){
+      V2CReadEn := true.B
+      C2VWriteEn := true.B
+      currentState := c2vread 
+    }
+    is(c2vread){
+      C2VReadEn := true.B 
+      LLrReadEn := true.B 
+      currentState := v2cwrite 
     }
     
     // decode  
     // 完成对V2C的
-    is(c2v ) {
-      /*
-      when(counter1 === (2*BLKSIZE-1).U){
-        currentState := judge 
-        counter := 0.U
-        counter1 := 0.U
-      }.otherwise {
-        counter1 := counter1 + 1.U
-      }
-      when(counter1(0) === 0.U){
-        //C2V读  
-        C2VReadEn := true.B 
-        LLrReadEn := true.B
-      }.otherwise {
-        V2CWriteEn := true.B
-        counter := counter + 1.U
-        rightreg := rightreg & rightdecide
-      }
-      */
-       //V2C延后一个周期写 
-       //同前 这是延迟一个周期拿到数据的写法  
-       /*
-       when ( counter2 =/= (BLKSIZE-1).U) {
-        counter := counter + 1.U
-        C2VReadEn := true.B 
-        LLrReadEn := true.B
-      }.otherwise{
-        currentState := judge 
-        counter := 0.U
-      } 
-      V2CWriteEn := RegNext(C2VReadEn) 
-      when(V2CWriteEn) {
-           rightreg := rightreg & rightdecide 
-      }
-      for( i <- 0 until COLNUM) {
-        for (j <- 0 until ROWNUM) {
-          Process(i).io.V2CWriteAddr(j) := counter2 
-          Process(i).io.V2CWriteData(j) := Process(i).io.VariableOut(j)
-        }
-      }
-      */  
+    is(v2cwrite ) {
+      
       when ( (counter === (BLKSIZE-1).U)&&(RowCounter === (ROWNUM-1).U)) {
         currentState := judge 
         counter := 0.U
         RowCounter := 0.U 
       }.elsewhen((counter === (BLKSIZE-1).U) && RowCounter =/= (ROWNUM-1).U){
         RowCounter := RowCounter + 1.U 
-        currentState := v2c   
+        currentState := v2cread   
         counter := 0.U
       }.otherwise {
         counter := counter + 1.U
-        currentState := v2c  
+        currentState := v2cread 
       } 
       V2CWriteEn := true.B 
       LLrReadEn  := true.B
@@ -285,7 +259,7 @@ val Rowmux  = Seq.fill(COLNUM)(Module(new RowMux))
         }.otherwise{
           Iter := Iter - 1.U 
           rightreg := 1.U
-          currentState := v2c    
+          currentState := v2cread    
         }
       }
     }

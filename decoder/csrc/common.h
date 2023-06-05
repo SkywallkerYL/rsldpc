@@ -16,7 +16,7 @@
 #define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 6    
+#define TESTMODULE 4 
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -39,7 +39,7 @@ VDecoder* top;
 double sigmastart = 0.55;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
-int maxtime			= 10;
+int maxtime			= 100;
 int maxerrortime	= 10 ;
 int ITERMAX		  = 20 ;
 #elif TESTMODULE == 5 
@@ -50,7 +50,7 @@ VGngWrapper* top;
 #include "VTopdecoder.h"
 #include "VTopdecoder___024root.h"
 VTopdecoder* top;
-int maxerrortime = 10 ;
+int maxerrortime = 50 ;
 int ITERMAX      = 10 ;
 #endif 
 

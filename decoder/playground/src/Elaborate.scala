@@ -6,7 +6,7 @@ object Elaborate extends App {
   // CheckNode VariableNode ProcessingUnit
   // V2CMux  Decoder Noisegen gng(RandSeedParams())    
   // GngWrapper Topdecoder   
-  def top = new Topdecoder
+  def top = new Decoder
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
