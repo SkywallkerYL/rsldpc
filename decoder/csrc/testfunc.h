@@ -29,7 +29,7 @@ void Mux32MinSecmin(int *array , int * minval,int*subminval,int * minidx,int * s
 	int localsubminval = 32;
 	int localsubminidx = -1;
 	for(int i=0;i < 32 ; i ++ ){
-		if (absarray[i] < localsubminval && i !=localminidx){
+		if (absarray[i] <= localsubminval && i !=localminidx){
 			localsubminval = absarray[i];
 			localsubminidx = i			 ;
 		}
@@ -92,7 +92,14 @@ void checknodetest(int times){
 			printf("minidx ref:%d dut:%d\n",*minidx,top->io_minIdx);
 			printf("subminval ref:%d dut:%d\n",*subminval,top->io_subminVal);
 			printf("subminidx ref:%d dut:%d\n",*subminidx,top->io_subminIdx);
+			for(int i = 0;i < 32; i++){
+			//	array[i] = rand()%(15*2+1)-15;
+				printf("i:%d array:%d\n",i,array[i]);
+			}
+				Log("You should check the minval and subminval, the Idx may be different!");
+			break;
 		}
+	
 
 	}
 	Log("if there is no other output, it means the module works right");

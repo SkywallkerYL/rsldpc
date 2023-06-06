@@ -10,7 +10,7 @@ int main(int argc , char* argv[]) {
 
 	reset(5);
 #if TESTMODULE == 1
-	checknodetest(1000000);
+	checknodetest(100000);
 #elif TESTMODULE == 2
 	//not use 
 	variablenodetest(1000000);

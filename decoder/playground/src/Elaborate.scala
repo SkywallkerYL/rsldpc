@@ -5,8 +5,9 @@ import decoder._
 object Elaborate extends App {
   // CheckNode VariableNode ProcessingUnit
   // V2CMux  Decoder Noisegen gng(RandSeedParams())    
-  // GngWrapper Topdecoder   
-  def top = new Decoder
+  // GngWrapper Topdecoder  
+  //Muxminandsecmin 
+  def top = new Topdecoder 
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
