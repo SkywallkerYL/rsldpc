@@ -8,9 +8,16 @@ trait COMMON{
   val C2VWIDTH = 4
   val APPWIDTH = V2CWIDTH
 
+  val V2CWIDTHCOL = 7
+  val C2VWIDTHCOL = 4
+  val APPWIDTHCOL = V2CWIDTHCOL
+
   //有一个符号位
   val MAXC2V = scala.math.pow(2,C2VWIDTH-1).toInt-1  
   val MAXV2C = scala.math.pow(2,V2CWIDTH-1).toInt-1
+
+  val MAXC2VCOL = scala.math.pow(2,C2VWIDTHCOL-1).toInt-1  
+  val MAXV2CCOL = scala.math.pow(2,V2CWIDTHCOL-1).toInt-1
 
   val COLNUM = 32
   val ROWNUM = 6

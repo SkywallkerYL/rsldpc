@@ -239,3 +239,40 @@ class CheckNode  extends Module with COMMON {
   io.xor_result := xor_result
   //GenerateIO.Gen()
 }
+class CheckNodeCOL  extends Module with COMMON {
+  val io = IO(new Bundle {
+    val input = Input( UInt(V2CWIDTHCOL.W) )
+    val updatemin = Input(Bool())
+    val inputaddr = Input(UInt(COLADDR.W))
+    //val inputsign = Input(UInt(1.W)) 
+    val minval = Output(UInt(C2VWIDTHCOL.W))
+  })
+  val min = RegInit(MAXC2VCOL.U(C2VWIDTHCOL.W))
+  val minaddr = RegInit(0.U(COLADDR.W))
+  val submin = RegInit(MAXC2VCOL.U(C2VWIDTHCOL.W))
+  val sign  = RegInit(0.U(1.W))
+  val inputsign = io.input(V2CWIDTHCOL-1)
+  val absdata = Mux(inputsign === 1.U,~io.input+1.U ,io.input)
+  when(io.updatemin) {
+    when(inputsign === 1.U) {
+      sign := sign ^ 1.U 
+    }
+    // updata min 
+    when(absdata <= MAXC2VCOL.U) {
+      when (absdata < min) {
+        min := absdata 
+        minaddr := io.inputaddr 
+      }.elsewhen(absdata < submin) {
+        submin := absdata 
+      }
+    }
+    
+  }
+  val c2v = Mux(io.inputaddr === minaddr , submin ,min) 
+
+  val scaledc2v =( c2v * 3.U) >> 2.U 
+
+  val c2vval = Mux(sign === inputsign , scaledc2v , ~scaledc2v+1.U )
+
+  io.minval := c2vval 
+}

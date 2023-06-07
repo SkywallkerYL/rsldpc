@@ -7,7 +7,7 @@ object Elaborate extends App {
   // V2CMux  Decoder Noisegen gng(RandSeedParams())    
   // GngWrapper Topdecoder  
   //Muxminandsecmin 
-  def top = new Topdecoder 
+  def top = new CheckNodeCOL 
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
