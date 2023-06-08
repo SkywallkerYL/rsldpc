@@ -243,8 +243,9 @@ class CheckNodeCOL  extends Module with COMMON {
   val io = IO(new Bundle {
     val input = Input( UInt(V2CWIDTHCOL.W) )
     val updatemin = Input(Bool())
+    val initial   = Input(Bool())
     val inputaddr = Input(UInt(COLADDR.W))
-    //val inputsign = Input(UInt(1.W)) 
+    val inputsign = Input(UInt(1.W))//来自Ram里存的信号 
     val minval = Output(UInt(C2VWIDTHCOL.W))
   })
   val min = RegInit(MAXC2VCOL.U(C2VWIDTHCOL.W))
@@ -254,7 +255,7 @@ class CheckNodeCOL  extends Module with COMMON {
   val inputsign = io.input(V2CWIDTHCOL-1)
   val absdata = Mux(inputsign === 1.U,~io.input+1.U ,io.input)
   when(io.updatemin) {
-    when(inputsign === 1.U) {
+    when(((inputsign === 1.U)&&(io.initial) )||(io.inputsign =/= inputsign) ) {
       sign := sign ^ 1.U 
     }
     // updata min 
@@ -272,7 +273,7 @@ class CheckNodeCOL  extends Module with COMMON {
 
   val scaledc2v =( c2v * 3.U) >> 2.U 
 
-  val c2vval = Mux(sign === inputsign , scaledc2v , ~scaledc2v+1.U )
+  val c2vval = Mux(sign === io.inputsign , scaledc2v , ~scaledc2v+1.U )
 
   io.minval := c2vval 
 }

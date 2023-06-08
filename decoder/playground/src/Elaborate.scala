@@ -7,7 +7,8 @@ object Elaborate extends App {
   // V2CMux  Decoder Noisegen gng(RandSeedParams())    
   // GngWrapper Topdecoder  
   //Muxminandsecmin 
-  def top = new CheckNodeCOL 
+  //CheckNodeCOL  DecoderCol
+  def top = new DecoderCol  
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
@@ -17,7 +18,7 @@ object Elaborate extends App {
   )
   if (useMFC) {
     (new ChiselStage).execute(args, generator :+ CIRCTTargetAnnotation(CIRCTTarget.Verilog))
-  } else {
+  } else{
     (new chisel3.stage.ChiselStage).execute(args, generator)
   }
 }

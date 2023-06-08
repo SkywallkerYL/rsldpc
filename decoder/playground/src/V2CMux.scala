@@ -86,4 +86,43 @@ class RowMux extends Module with COMMON {
  // ReadMatrix.ReadM()
   
 }
-
+class Mux32to1(width : Int = 7) extends Module with COMMON {
+  val io = IO(new Bundle {
+    val input       =  Input(Vec(COLNUM,UInt(width.W)))
+    val sel         =  Input(UInt(COLADDR.W))
+    val output      =  Output(UInt(width.W))
+  })
+ // io.ChooseAddr := MuxLookup(io.sel,0.U,( 0 until 64).map(i => (i.U -> io.SramAddr(i))))
+//  io.ChooseAddr := io.SramAddr(io.sel)
+ // ReadMatrix.ReadM()
+  //原来直接按sel的写法延迟太高，会有64个逻辑门的延迟   
+  //将64个输入 分成4组 每组16个    再分成4组 ，每组4个  ，这样子就3个4选1  一个12个逻辑门延迟
+  //val Group1 =Seq.fill(4)(Seq.fill(4)(VecInit(Seq.fill(4)(0.U(BLKADDR.W)))))
+  //for (i <- 0 until 4 ) {
+  //  for (j <- 0 until 4) {
+  //    for( k <- 0 until 4) {
+  //      Group1(i)(j)(k) := io.SramAddr(i.U*16.U+j.U*4.U+k.U)
+  //    }
+  //    ///Group1(i)(j) := io.SramAddr(i.U*16.U+j.U)
+  //  }
+  //}
+  
+  val MuxLayer1 = Seq.fill(8)(Module (new Mux4to1)) 
+  val sel1 = io.sel(1,0)
+  for (i <- 0 until 8) {
+    for ( j <- 0 until 4) {
+      MuxLayer1(i).io.addr(j) := io.input(i*4+j)  
+    }
+    MuxLayer1(i).io.sel := sel1 
+  }
+  val MuxLayer2 = Seq.fill(2)(Module (new Mux4to1)) 
+  val sel2 = io.sel(3,2) 
+  for (i <- 0 until 2) {
+    for (j <- 0 until 4) {
+      MuxLayer2(i).io.addr(j) := MuxLayer1(i*4+j).io.chooseaddr  
+    }
+    MuxLayer2(i).io.sel := sel2 
+  } 
+  val sel3 = io.sel(4)
+  io.output := Mux(sel3 === 0.U,MuxLayer2(0).io.chooseaddr, MuxLayer2(1).io.chooseaddr)
+}
