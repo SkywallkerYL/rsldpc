@@ -30,6 +30,9 @@ int main(int argc , char* argv[]) {
 	gngwrappertest(10000,0.05,p0,p1,p2,p3,p4);
 #elif TESTMODULE == 6
 	toptest();
+#elif TESTMODULE == 7
+	DecoderTest();
+
 #endif 
 	sim_exit();
 	return 0;

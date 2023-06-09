@@ -243,31 +243,77 @@ class CheckNodeCOL  extends Module with COMMON {
   val io = IO(new Bundle {
     val input = Input( UInt(V2CWIDTHCOL.W) )
     val updatemin = Input(Bool())
+    val signreset  = Input(Bool())
     val initial   = Input(Bool())
     val inputaddr = Input(UInt(COLADDR.W))
     val inputsign = Input(UInt(1.W))//来自Ram里存的信号 
     val minval = Output(UInt(C2VWIDTHCOL.W))
   })
   val min = RegInit(MAXC2VCOL.U(C2VWIDTHCOL.W))
-  val minaddr = RegInit(0.U(COLADDR.W))
+  val minaddr = RegInit(32.U((COLADDR+1).W))
   val submin = RegInit(MAXC2VCOL.U(C2VWIDTHCOL.W))
+  val subminaddr = RegInit(32.U((COLADDR+1).W))
   val sign  = RegInit(0.U(1.W))
   val inputsign = io.input(V2CWIDTHCOL-1)
   val absdata = Mux(inputsign === 1.U,~io.input+1.U ,io.input)
   when(io.updatemin) {
-    when(((inputsign === 1.U)&&(io.initial) )||(io.inputsign =/= inputsign) ) {
-      sign := sign ^ 1.U 
+    //when(((inputsign === 1.U)&&(io.initial) )||(io.inputsign =/= inputsign) ) {
+    //  sign := sign ^ 1.U 
+    //}
+    when(io.initial) {
+      when(inputsign === 1.U) {
+        sign := sign ^ 1.U 
+      }
+    }.elsewhen(io.inputsign =/= inputsign){
+      sign := sign ^ 1.U
     }
     // updata min 
+  
     when(absdata <= MAXC2VCOL.U) {
+      when(io.inputaddr === minaddr) {
+        when(absdata <= submin) {
+          min := absdata  
+        }.otherwise{
+          min := submin 
+          minaddr := subminaddr 
+          submin := absdata 
+          subminaddr := io.inputaddr  
+        }
+      }.elsewhen(io.inputaddr === subminaddr){
+        when(absdata <= min){
+          submin := min 
+          subminaddr := minaddr  
+          min := absdata 
+          minaddr := io.inputaddr 
+        }.otherwise {
+          submin := io.input 
+        }
+      }.otherwise{
+        when(absdata <= min) {
+          submin := min 
+          subminaddr := minaddr 
+          min := absdata 
+          minaddr := io.inputaddr 
+        }.elsewhen(absdata <= submin){
+          submin := absdata 
+          subminaddr := io.inputaddr
+        }
+      }
+      /*
       when (absdata < min) {
         min := absdata 
         minaddr := io.inputaddr 
       }.elsewhen(absdata < submin) {
         submin := absdata 
-      }
+      }*/
     }
-    
+  }
+  when (io.signreset) {
+    sign := 0.U 
+    min := MAXC2VCOL.U
+    submin := MAXC2VCOL.U
+    minaddr := 32.U  
+    subminaddr := 32.U
   }
   val c2v = Mux(io.inputaddr === minaddr , submin ,min) 
 
@@ -275,5 +321,5 @@ class CheckNodeCOL  extends Module with COMMON {
 
   val c2vval = Mux(sign === io.inputsign , scaledc2v , ~scaledc2v+1.U )
 
-  io.minval := c2vval 
+  io.minval := Mux(io.initial,0.U,c2vval) 
 }

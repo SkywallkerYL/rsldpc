@@ -544,6 +544,121 @@ void toptest(){
 	}
   
 }
+#elif TESTMODULE == 7 
+bool decodeonetime(double sigma){
+	top->io_Start = 1;
+	top->io_IterInput = ITERMAX ;
+	clockntimes(1);
+	top->io_Start = 0;
+	//printf("hhh\n");
+	for(int i = 0 ; i < 32 ; i ++ ){
+		top->io_LLrin_0 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_1 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_2 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_3 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_4 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_5 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_6 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_7 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_8 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_9 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_10 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_11 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_12 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_13 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_14 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_15 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_16 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_17 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_18 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_19 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_20 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_21 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_22 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_23 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_24 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_25 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_26 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_27 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_28 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_29 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_30 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_31 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_32 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_33 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_34 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_35 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_36 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_37 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_38 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_39 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_40 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_41 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_42 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_43 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_44 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_45 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_46 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_47 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_48 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_49 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_50 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_51 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_52 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_53 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_54 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_55 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_56 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_57 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_58 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_59 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_60 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_61 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_62 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_63 = LLrInitial(RandomGen(sigma));
+		clockntimes(1);
+	}
+//	printf("hhh\n");
+	//int i = 0;
+	//for (int i = 0 ; i < 2000; i ++) {
+	//	clockntimes(1);
+	//}
+	//return true;
+	while(!top->io_OutValid) {
+		clockntimes(1);
+		//printf("jjj\n");
+	//	i++;
+	}
+    //	printf("i:%d\n",i);
+	bool flag = top->io_Success; 
+//	if(flag) printf("success\n");
+	//printf("Iter remain:%d\n",top->io_IterOut);
+	clockntimes(1);
+	return flag ;
+}
+
+
+
+void DecoderTest(){
+	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
+		int frame = 0 ;
+		int errorframe = 0; 
+		while(frame < maxtime || errorframe < maxerrortime) {
+			bool success = decodeonetime(sigma);
+			if(!success) errorframe++;
+			frame++;
+		}
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+	}
+
+	//Log("if there is no other output, it means the module works right");
+}
+
+
+
 #endif 
 
 #endif

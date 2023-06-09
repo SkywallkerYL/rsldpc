@@ -1,11 +1,11 @@
 package decoder 
 import chisel3._
 import chisel3.util._
-class Mux4to1 extends Module with COMMON {
+class Mux4to1(width : Int = COMMON.BLKADDR ) extends Module with COMMON {
   val io = IO(new Bundle {
-    val addr = Input(Vec(4,UInt(BLKADDR.W)))
+    val addr = Input(Vec(4,UInt(width.W)))
     val sel  = Input(UInt(2.W))
-    val chooseaddr = Output(UInt(BLKADDR.W)) 
+    val chooseaddr = Output(UInt(width.W)) 
   })
   io.chooseaddr := io.addr(io.sel)
 }
@@ -107,7 +107,7 @@ class Mux32to1(width : Int = 7) extends Module with COMMON {
   //  }
   //}
   
-  val MuxLayer1 = Seq.fill(8)(Module (new Mux4to1)) 
+  val MuxLayer1 = Seq.fill(8)(Module (new Mux4to1(width))) 
   val sel1 = io.sel(1,0)
   for (i <- 0 until 8) {
     for ( j <- 0 until 4) {
@@ -115,7 +115,7 @@ class Mux32to1(width : Int = 7) extends Module with COMMON {
     }
     MuxLayer1(i).io.sel := sel1 
   }
-  val MuxLayer2 = Seq.fill(2)(Module (new Mux4to1)) 
+  val MuxLayer2 = Seq.fill(2)(Module (new Mux4to1(width))) 
   val sel2 = io.sel(3,2) 
   for (i <- 0 until 2) {
     for (j <- 0 until 4) {
@@ -124,5 +124,10 @@ class Mux32to1(width : Int = 7) extends Module with COMMON {
     MuxLayer2(i).io.sel := sel2 
   } 
   val sel3 = io.sel(4)
+  val aaa = io.input(io.sel) 
   io.output := Mux(sel3 === 0.U,MuxLayer2(0).io.chooseaddr, MuxLayer2(1).io.chooseaddr)
+  //assert(io.output === aaa)
+  //when(aaa =/= io.output) {
+  //  printf("aaaa\n")
+  //}
 }
