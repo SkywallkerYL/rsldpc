@@ -32,6 +32,8 @@ int main(int argc , char* argv[]) {
 	toptest();
 #elif TESTMODULE == 7
 	DecoderTest();
+//	cppDecoderTest();
+//	diffDecoderTest();
 
 #endif 
 	sim_exit();

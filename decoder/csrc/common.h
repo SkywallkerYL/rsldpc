@@ -8,6 +8,7 @@
 #include <string.h>
 #include <time.h>
 #include <random>
+#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -62,8 +63,17 @@ double sigmastep  = 0.01;
 int maxtime			= 1000;
 int maxerrortime	= 50 ;
 int ITERMAX		  = 20 ;
-
+int APPWIDTH = 7 ;
+int V2CWIDTH = APPWIDTH ; 
+int C2VWIDTH = 4 ; 
+int APPMAX = pow(2,APPWIDTH-1)-1;
+int V2CMAX = pow(2,V2CWIDTH-1)-1;
+int C2VMAX = pow(2,C2VWIDTH-1)-1;
+const char BASE_MATRIX_FILENAME[] = "/home/yangli/rsldpc/matrix/2048_1723.txt";
 #endif 
+
+#define DIFFTEST 
+
 
 //#define WAVE 
 #define WAVE_BEGIN 0 
@@ -119,9 +129,9 @@ const int LLR_INIT4bit7 = 15;//9;//4 5
 
 #include <string.h>
 
-// macro stringizing
-#define str_temp(x) #x
-#define str(x) str_temp(x)
+//// macro stringizing
+//#define str_temp(x) #x
+//#define str(x) str_temp(x)
 
 // strlen() for string constant
 #define STRLEN(CONST_STR) (sizeof(CONST_STR) - 1)

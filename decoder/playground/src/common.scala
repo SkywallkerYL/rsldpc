@@ -77,7 +77,38 @@ object GenerateIO extends COMMON{
        else if (module == 2) {
          for(i <- 0 until COLNUM){
             writer.println("top->io_LLrin_"+i+" = LLrInital(RandomGen(sigma));")
+         } 
+       }
+       else if(module ==3) {
+         //for(i <- 0 until COLNUM){
+         //   writer.println("top->io_LLrin_"+i+" = LLrInital(RandomGen(sigma));")
+         //}
+         for (i <- 0 until BLKSIZE) {
+           writer.println("appout[i*64+"+i+"] = top->io_appout_"+i+";")  
          }
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("c2v["+i+"] = top->io_c2v_"+i+";")  
+         }
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("min["+i+"] = top->io_min_"+i+";")  
+         }
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("submin["+i+"] = top->io_submin_"+i+";")  
+         }
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("minaddr["+i+"] = top->io_minaddr_"+i+";")  
+         } 
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("subminaddr["+i+"] = top->io_subminaddr_"+i+";")  
+         }   
+         for (i <- 0 until BLKSIZE*ROWNUM) {
+           writer.println("sign["+i+"] = top->io_sign_"+i+";")  
+         } 
+         for (i <- 0 until BLKSIZE*COLNUM) {
+           for (j <- 0  until ROWNUM){
+             writer.println("v2c["+i+"]["+j+"] = top->io_v2csign_"+i+"_"+j+";")  
+           }
+         } 
        }
         writer.close()
     }

@@ -10,6 +10,9 @@
 #include "channel.h"
 #include "simualte.h"
 #include <ctime>
+#include <fstream>
+#include <string>
+#include <sstream>
 #include <cstdlib>
 using namespace std;
 #if TESTMODULE == 1
@@ -656,9 +659,520 @@ void DecoderTest(){
 
 	//Log("if there is no other output, it means the module works right");
 }
+void update_min_vss(int &min1, int &min2,int & min1_addr , int & min2_addr ,int val ,int addr ){
+	if(addr == min1_addr) {
+		if(val <= min2) {
+			min1 = val ; 
+		}else {
+			min1 = min2 ; 
+			min1_addr = min2_addr ;
+			min2 = val <= C2VMAX ? val : C2VMAX ; 
+			min2_addr = addr ;
+		}
+	}else if (addr == min2_addr) {
+		if (val <= min1) {
+			min2 = min1 ;
+			min2_addr = min1_addr ;
+			min1 = val ; 
+			min1_addr =addr;
+		}else {
+			min2 = val <= C2VMAX ? val : C2VMAX; 
+		}
+	}else {
+		if(val <= min1) {
+			min2 = min1 ; 
+			min2_addr = min1_addr ; 
+			min1 = val ;
+			min1_addr = addr ;
+		}else if(val <= min2) {
+			min2 = val ;
+			min2_addr = addr ;
+		}
+	}
+
+}
+bool cppdecodekernel(int H[384][2048], int * llrin, int * appout , bool v2c[2048][6], 
+		int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v 
+		){
+	// Initialization   
+	for(int i = 0; i < 384; i ++) {
+		min1[i] = min2[i] = C2VMAX; 
+		min1_addr[i] = min2_addr[i] = -1 ;
+		sign[i]  = 0;
+	}
+	for(int i = 0; i < 2048; i ++) {
+		//update checknode min1 min2   
+		for( int j = 0 ; j < 384 ; j ++) {
+			if(H[j][i] == 1) {
+				if(llrin[i] < 0) {
+					sign[j] = sign[j]^1;
+				}
+				int llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
+				v2c[i][j/64] = llrin[i] < 0;
+				update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],llr_abs,i/64);
+			}
+		}
+		appout[i] = llrin[i];
+	}
+	//Iteration 
+	bool success = 1; 
+	for(int iter = 0 ; iter < ITERMAX; iter++) {
+		for (int i = 0; i < 2048; i ++) {
+			//CNU 
+			int appval = llrin[i];
+			for ( int j = 0 ; j < 384; j ++) {
+				if(H[j][i] == 1) {
+					c2v[j] = i/64 == min1_addr[j] ? min2[j] : min1[j];
+
+					c2v[j] = c2v[j] * 3/4;
+					c2v[j] = c2v[j] <= C2VMAX ? c2v[j] : C2VMAX ;
+					if(sign[j] != v2c[i][j/64]){
+						c2v[j] = -c2v[j];	
+					}		
+					appval += c2v[j];
+				}
+			}
+			//VNU   update v2c 
+			for (int j = 0 ; j < 384; j ++) {
+				if(H[j][i] == 1) {
+					int v2c_abs = appval - c2v[j];
+					int v2csign = 0 ; 
+					if(v2c_abs < 0 ) {
+						v2c_abs = -v2c_abs ;
+						v2csign = 1; 
+					}
+					v2c_abs = v2c_abs <= V2CMAX ? v2c_abs : V2CMAX ;
+					if(v2csign != v2c[i][j/64]) {
+						sign[j] = sign[j] ^ 1; 
+					}
+					v2c[i][j/64] = v2csign ; 
+					update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],v2c_abs,i/64);
+				}
+			}
+			appout[i] = appval;
+		}
+		success = 1; 
+		for (int i = 0 ; i < 2048 ; i ++) {
+			if(appout[i] < 0 ){
+				success = 0 ;
+				break;
+			}
+		}
+		if(success) {
+			return success ; 
+		}
+	}
+	return success ;
+}
+void cppDecoderTest(){
+	int H[384][2048];
+	ifstream inr(BASE_MATRIX_FILENAME);
+	if(!inr) {
+		Log("No file %s",BASE_MATRIX_FILENAME) ;
+		return ; 
+	}
+	string r ;
+	for(int i = 0 ; i < 384; i ++) {
+		string number ; 
+		getline(inr,r);
+		istringstream stream(r);
+		for (int j = 0 ; j < 2048 ; j ++) {
+			stream >> number ; 
+			H[i][j] = stoi(number);
+		}
+	}
+	//printf("aaa\n");
+	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
+		int frame = 0 ;
+		int errorframe = 0; 
+		while(frame < maxtime || errorframe < maxerrortime) {
+			int llrin[2048]; 
+			int appout[2048];
+			bool v2c[2048][6]; 
+			int min1 [384];
+			int min2 [384];
+			int min1_addr[384];
+			int min2_addr[384]; 
+			bool sign[384] ;
+			int c2v[384] ;
+			for (int i = 0 ; i < 2048;i++ ){
+				llrin[i] = LLrInitial(RandomGen(sigma)); 
+			}
+			bool success = cppdecodekernel(H,llrin, appout , v2c, 
+		min1, min2,min1_addr, min2_addr,sign , c2v 
+		);
+			//printf("aaa\n");
+			if(!success) errorframe++;
+			frame++;
+		}
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+	}
+
+	//Log("if there is no other output, it means the module works right");
+}
+#ifdef DIFFTEST 
+#include "difftest.h"
+bool diffall(int counter,bool &diffin,  int * appout , bool v2c[2048][6], 
+	int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v ,
+	 int * dutappout , bool dutv2c[2048][6], 
+	int *dutmin1, int *dutmin2,int * dutmin1_addr, int *dutmin2_addr, bool * dutsign , int * dutc2v
+	) {
+	
+
+	AppoutFetch(dutappout,counter);
+	bool diff = 1; 
+	diff = AppOutdiff(appout,dutappout,0) ;
+	diffin = diff ;
+	if(!diff) return false ;
+	minfetch(dutmin1);
+	subminfecth(dutmin2);
+	minaddrfetch(dutmin1_addr) ;
+	subminaddrfetch(dutmin2_addr);
+	signfetch(dutsign) ;
+	v2csignfetch(dutv2c);
+
+	diff = mindiff(min1,dutmin1) ;
+	diffin = diff ;
+	if(!diff) return false ; 
+	//Log("mindifftest pass");
+	diff = submindiff(min2,dutmin2); 
+	diffin = diff ;
+	if(!diff) return false ;
+	//Log("submindifftest pass");
+	diff = minaddrdiff(min1_addr,dutmin1_addr);
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = subminaddrdiff(min2_addr,dutmin2_addr); 
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = signdiff(sign,dutsign) ;
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = v2csigndiff(v2c,dutv2c);
+	diffin = diff ;
+	if(!diff) return false ;
+}
+bool diffdecodekernel(int H[384][2048], int * llrin, int * appout , bool v2c[2048][6], 
+		int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v 
+		, bool &diffin){
+	int dutllrin[2048]; 
+	int dutappout[2048];
+	bool dutv2c[2048][6]; 
+	int dutmin1 [384];
+	int dutmin2 [384];
+	int dutmin1_addr[384];
+	int dutmin2_addr[384]; 
+	bool dutsign[384] ;
+	int dutc2v[384] ;
 
 
+	// cppInitialization   
+	for(int i = 0; i < 384; i ++) {
+		min1[i] = min2[i] = C2VMAX; 
+		min1_addr[i] = min2_addr[i] = 32 ;
+		sign[i]  = 0;
+	}
+	for(int i = 0; i < 2048; i ++) {
+		//update checknode min1 min2   
+		for( int j = 0 ; j < 384 ; j ++) {
+			if(H[j][i] == 1) {
+				if(llrin[i] < 0) {
+					sign[j] = sign[j]^1;
+				}
+				int llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
+				v2c[i][j/64] = llrin[i] < 0;
+				update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],llr_abs,i/64);
+			}
+		}
+		appout[i] = llrin[i];
+	}
+	// DecoderInitialization  
+	top->io_Start = 1;
+	top->io_IterInput = ITERMAX ;
+	clockntimes(1);
+	top->io_Start = 0;
+	//printf("hhh\n");
+	for(int i = 0 ; i < 32 ; i ++ ){
+		top->io_LLrin_0  = llrin[i*64+0 ];
+		top->io_LLrin_1  = llrin[i*64+1 ];
+		top->io_LLrin_2  = llrin[i*64+2 ];
+		top->io_LLrin_3  = llrin[i*64+3 ];
+		top->io_LLrin_4  = llrin[i*64+4 ];
+		top->io_LLrin_5  = llrin[i*64+5 ];
+		top->io_LLrin_6  = llrin[i*64+6 ];
+		top->io_LLrin_7  = llrin[i*64+7 ];
+		top->io_LLrin_8  = llrin[i*64+8 ];
+		top->io_LLrin_9  = llrin[i*64+9 ];
+		top->io_LLrin_10 = llrin[i*64+10];
+		top->io_LLrin_11 = llrin[i*64+11];
+		top->io_LLrin_12 = llrin[i*64+12];
+		top->io_LLrin_13 = llrin[i*64+13];
+		top->io_LLrin_14 = llrin[i*64+14];
+		top->io_LLrin_15 = llrin[i*64+15];
+		top->io_LLrin_16 = llrin[i*64+16];
+		top->io_LLrin_17 = llrin[i*64+17];
+		top->io_LLrin_18 = llrin[i*64+18];
+		top->io_LLrin_19 = llrin[i*64+19];
+		top->io_LLrin_20 = llrin[i*64+20];
+		top->io_LLrin_21 = llrin[i*64+21];
+		top->io_LLrin_22 = llrin[i*64+22];
+		top->io_LLrin_23 = llrin[i*64+23];
+		top->io_LLrin_24 = llrin[i*64+24];
+		top->io_LLrin_25 = llrin[i*64+25];
+		top->io_LLrin_26 = llrin[i*64+26];
+		top->io_LLrin_27 = llrin[i*64+27];
+		top->io_LLrin_28 = llrin[i*64+28];
+		top->io_LLrin_29 = llrin[i*64+29];
+		top->io_LLrin_30 = llrin[i*64+30];
+		top->io_LLrin_31 = llrin[i*64+31];
+		top->io_LLrin_32 = llrin[i*64+32];
+		top->io_LLrin_33 = llrin[i*64+33];
+		top->io_LLrin_34 = llrin[i*64+34];
+		top->io_LLrin_35 = llrin[i*64+35];
+		top->io_LLrin_36 = llrin[i*64+36];
+		top->io_LLrin_37 = llrin[i*64+37];
+		top->io_LLrin_38 = llrin[i*64+38];
+		top->io_LLrin_39 = llrin[i*64+39];
+		top->io_LLrin_40 = llrin[i*64+40];
+		top->io_LLrin_41 = llrin[i*64+41];
+		top->io_LLrin_42 = llrin[i*64+42];
+		top->io_LLrin_43 = llrin[i*64+43];
+		top->io_LLrin_44 = llrin[i*64+44];
+		top->io_LLrin_45 = llrin[i*64+45];
+		top->io_LLrin_46 = llrin[i*64+46];
+		top->io_LLrin_47 = llrin[i*64+47];
+		top->io_LLrin_48 = llrin[i*64+48];
+		top->io_LLrin_49 = llrin[i*64+49];
+		top->io_LLrin_50 = llrin[i*64+50];
+		top->io_LLrin_51 = llrin[i*64+51];
+		top->io_LLrin_52 = llrin[i*64+52];
+		top->io_LLrin_53 = llrin[i*64+53];
+		top->io_LLrin_54 = llrin[i*64+54];
+		top->io_LLrin_55 = llrin[i*64+55];
+		top->io_LLrin_56 = llrin[i*64+56];
+		top->io_LLrin_57 = llrin[i*64+57];
+		top->io_LLrin_58 = llrin[i*64+58];
+		top->io_LLrin_59 = llrin[i*64+59];
+		top->io_LLrin_60 = llrin[i*64+60];
+		top->io_LLrin_61 = llrin[i*64+61];
+		top->io_LLrin_62 = llrin[i*64+62];
+		top->io_LLrin_63 = llrin[i*64+63];
+		if(i >= 2) {
+			if(top->io_counter != (i-2)) {
+				Log("something wrong counter:%d i:%d",top->io_counter,i-2);
+				exit(0);
+			}
+		//跳入initial 两个周期后，可以拿到 appout  
+			AppoutFetch(dutappout,i-2);
+		}
+		clockntimes(1);
+	
+	}
+	//clockntimes(1);
+ 	//Log("counter:%d ",top->io_counter);
+	AppoutFetch(dutappout,30);
+	clockntimes(1);
+	AppoutFetch(dutappout,31);
+	clockntimes(1);
+	bool diff = 1; 
+	diff = AppOutdiff(appout,dutappout,0) ;
+	diffin = diff ;
+	if(!diff) return false ;
+	minfetch(dutmin1);
+	subminfecth(dutmin2);
+	minaddrfetch(dutmin1_addr) ;
+	subminaddrfetch(dutmin2_addr);
+	signfetch(dutsign) ;
+	v2csignfetch(dutv2c);
 
+	diff = mindiff(min1,dutmin1) ;
+	diffin = diff ;
+	if(!diff) return false ; 
+	//Log("mindifftest pass");
+	diff = submindiff(min2,dutmin2); 
+	diffin = diff ;
+	if(!diff) return false ;
+	//Log("submindifftest pass");
+	diff = minaddrdiff(min1_addr,dutmin1_addr);
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = subminaddrdiff(min2_addr,dutmin2_addr); 
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = signdiff(sign,dutsign) ;
+	diffin = diff ;
+	if(!diff) return false ; 
+	diff = v2csigndiff(v2c,dutv2c);
+	diffin = diff ;
+	if(!diff) return false ;
+	// 
+	//Iteration 
+	Log("start Iteration ");
+	bool success = 1; 
+	for(int iter = 0 ; iter < ITERMAX; iter++) {
+		//CPP UPDATE 
+		for (int i = 0; i < 2048; i ++) {
+			//CNU 
+			int appval = llrin[i];
+			for ( int j = 0 ; j < 384; j ++) {
+				if(H[j][i] == 1) {
+					c2v[j] = i/64 == min1_addr[j] ? min2[j] : min1[j];
+					c2v[j] = c2v[j] * 3/4;
+					c2v[j] = c2v[j] <= C2VMAX ? c2v[j] : C2VMAX ;
+					if(sign[j] != v2c[i][j/64]){
+						c2v[j] = -c2v[j];	
+					}		
+					appval += c2v[j];
+				}
+			}
+			if(i%64 == 63) {
+				// 此时做完了一大列，更新完了c2v   
+				// 先对比c2v
+				Log("col %d",i/64);
+				c2vfetch(dutc2v);  
+				diff = c2vdiff(c2v,dutc2v);  
+				diffin = diff ; 
+				if(!diff) return false ;
+			}
+			//VNU   update v2c 
+			for (int j = 0 ; j < 384; j ++) {
+				if(H[j][i] == 1) {
+					int v2c_abs = appval - c2v[j];
+					int v2csign = 0 ; 
+					if(v2c_abs < 0 ) {
+						v2c_abs = -v2c_abs ;
+						v2csign = 1; 
+					}
+					v2c_abs = v2c_abs <= V2CMAX ? v2c_abs : V2CMAX;
+					if(v2csign != v2c[i][j/64]) {
+						sign[j] = sign[j] ^ 1; 
+					}
+					v2c[i][j/64] = v2csign ; 
+					update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],v2c_abs,i/64);
+				}
+			}
+			appout[i] = appval;
+			// 接着校验其他的信号值
+			if(i%64 == 63 ){
+				Log("col %d",i/64);
+				AppoutFetch(dutappout,i/64);
+				if(top->io_counter != i/64){
+					Log("something wrong counter%d i%d",top->io_counter,i/64);
+				}
+				diff = AppOutdiff(appout,dutappout,1);  
+				diffin = diff ; 
+				if(!diff) return false ;
+		
+				clockntimes(1);
+				minfetch(dutmin1);
+				subminfecth(dutmin2);
+				minaddrfetch(dutmin1_addr) ;
+				subminaddrfetch(dutmin2_addr);
+				signfetch(dutsign) ;
+
+				diff = mindiff(min1,dutmin1) ;
+				diffin = diff ;
+				if(!diff) return false ; 
+				diff = submindiff(min2,dutmin2); 
+				diffin = diff ;
+				if(!diff) return false ; 
+				diff = minaddrdiff(min1_addr,dutmin1_addr);
+				diffin = diff ;
+				if(!diff) return false ; 
+				diff = subminaddrdiff(min2_addr,dutmin2_addr); 
+				diffin = diff ;
+				if(!diff) return false ; 
+				diff = signdiff(sign,dutsign) ;
+				diffin = diff ;
+				if(!diff) return false ; 
+				v2csignfetch(dutv2c);
+				diff = v2csigndiff(v2c,dutv2c);
+				diffin = diff ;
+				if(!diff) return false ; 
+			}
+			
+		}
+		//DECODER UPDATE  
+
+	
+		bool decodersuccess = top->io_Success ;
+		
+		success = 1; 
+		for (int i = 0 ; i < 2048 ; i ++) {
+			if(appout[i] < 0 ){
+				success = 0 ;
+				break;
+			}
+		}
+		if(success != top->io_Success) {
+			Log("success diff ref %d dut %d",success,decodersuccess);
+		}
+		clockntimes(1);
+		if(success) {
+			break ; 
+		}
+	}
+	//if(top->io_OutValid){
+	//	clockntimes(1);
+	//}
+	return success ;
+}
+void diffDecoderTest(){
+	int H[384][2048];
+	ifstream inr(BASE_MATRIX_FILENAME);
+	if(!inr) {
+		Log("No file %s",BASE_MATRIX_FILENAME) ;
+		return ; 
+	}
+	string r ;
+	for(int i = 0 ; i < 384; i ++) {
+		string number ; 
+		getline(inr,r);
+		istringstream stream(r);
+		for (int j = 0 ; j < 2048 ; j ++) {
+			stream >> number ; 
+			H[i][j] = stoi(number);
+		}
+	}
+	//printf("aaa\n");
+	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
+		int frame = 0 ;
+		int errorframe = 0; 
+		while(frame < maxtime || errorframe < maxerrortime) {
+			int llrin[2048]; 
+			int appout[2048];
+			bool v2c[2048][6]; 
+			int min1 [384];
+			int min2 [384];
+			int min1_addr[384];
+			int min2_addr[384]; 
+			bool sign[384] ;
+			int c2v[384] ;
+			for (int i = 0 ; i < 2048;i++ ){
+				llrin[i] = LLrInitial(RandomGen(sigma)); 
+			}
+			bool diffin = 1; 
+			bool success = diffdecodekernel(H,llrin, appout , v2c, 
+		min1, min2,min1_addr, min2_addr,sign , c2v 
+		,diffin);
+			if(!diffin) return ;
+			//printf("aaa\n");
+			if(!success) errorframe++;
+			frame++;
+		}
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+	}
+
+	//Log("if there is no other output, it means the module works right");
+}
+
+#endif  
 #endif 
 
 #endif
