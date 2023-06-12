@@ -38,7 +38,7 @@ doit:
 #Makefile for Verilator
 
 
-TOP?=Topdecoder
+TOP?=rsdecoder
 TOPNAME?=$(TOP)
 TOPNAMETEST?=$(TOP)
 #FSM_m #keyboard_top #top

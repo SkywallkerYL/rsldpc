@@ -1173,6 +1173,56 @@ void diffDecoderTest(){
 }
 
 #endif  
+#elif TESTMODULE == 8 
+void toptest(){
+	uint64_t p_table[11][5] = {
+    {0x00F6DE59DA609D40, 0x03D8972667FFD320, 0x08D62EDC6F866400, 0x123A4AC0DA34DA00, 0x2AE15EECABCB0000},
+    {0x00D4C6F967D95498, 0x0378FF6FC977A6E0, 0x0832B202D6961F80, 0x114CE6ADF916BC00, 0x29BE9DB8C1EDA000},
+    {0x00B5EF2F3C2BA5D8, 0x031E5FFD9697D1E0, 0x07937AFFCE63FD00, 0x106088159C106300, 0x28963B58EF860200},
+    {0x009A3B0E7A344CD8, 0x02C8D9C2F5A5AEE0, 0x06F8E2BFE25A4640, 0x0F75935D7D441100, 0x2768358ADCF0CC00},
+    {0x00818A4B91FA10C8, 0x027888440213C440, 0x066342AD1E391000, 0x0E8C74A939941900, 0x26348F382605D600},
+    {0x006BB86D7E965E34, 0x022D80CE2913B4C0, 0x05D2F3E0B2761640, 0x0DA5A00395E54C00, 0x24FB51500C437400},
+    {0x00589D178E071C04, 0x01E7D1AFAB37FF30, 0x05484E31CBDD5180, 0x0CC191717C245180, 0x23BC8BBDB73F7400},
+    {0x00480C6D08D793E0, 0x01A781736CABADE0, 0x04C3A71F8E22AA40, 0x0BE0CCE87A553580, 0x2278567E19FCAC00},
+    {0x0039D78F447547B6, 0x016C8E27681DABA0, 0x04455094D8222CC0, 0x0B03DE21828A1900, 0x212ED2D8B793B400},
+    {0x002DCD35A4BF3130, 0x0136ECB54E6E5210, 0x03CD9785821A3AE0, 0x0A2B583F8CB28D80, 0x1FE02CBE92C1AA00},
+	{0x0023BA5DD079D4D0, 0x010688560D870250, 0x035CC266342E88C0, 0x0957D54093BBD180, 0x1E8C9C528874BA00},
+
+};
+	double  rbertable[11] = {
+    0.034520,0.032020,0.029600,0.027240,0.024960,0.022760,0.020640,0.018620,0.016680,0.014860,
+0.013140};
+	double  sigmatable[11] = {
+    0.55,0.54,0.53,0.52,0.51,0.50,0.49,0.48,0.47,0.46,0.45
+  };
+	for (int i = 0; i < 11 ; i ++) {
+		double sigma = sigmatable[i];
+		top->io_IterInput = ITERMAX;
+		top->io_maxError  = maxerrortime; 
+		top->io_p0_0 = p_table[i][4];
+		top->io_p0_1 = p_table[i][3];
+		top->io_p0_2 = p_table[i][2];
+		top->io_p0_3 = p_table[i][1];
+		top->io_p0_4 = p_table[i][0];
+		top->io_start = 1;
+		clockntimes(1); 
+		top->io_start = 0;
+		while(!top->io_Framevalid) {
+			clockntimes(1); 
+		}
+		int frame =(int) top->io_totalframe ;
+		int errorframe = (int )top->io_errorframe ; 
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+		clockntimes(10);
+	}
+  
+}
+
+
+
 #endif 
 
 #endif

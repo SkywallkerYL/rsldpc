@@ -14,15 +14,15 @@ class DecoderCol extends Module with COMMON {
     val counter   = Output(UInt(BLKADDR.W))
 
     // for difftest  
-    val appout    = Output(Vec(BLKSIZE,UInt(APPWIDTH.W))) 
-    val c2v       = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W)))
+   // val appout    = Output(Vec(BLKSIZE,UInt(APPWIDTH.W))) 
+   // val c2v       = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W)))
   
-    val min       = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val submin    = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val minaddr   = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val subminaddr= Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val sign      = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
-    val v2csign   = Output(Vec(BLKSIZE*COLNUM,Vec(ROWNUM,UInt(1.W))))
+   // val min       = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+   // val submin    = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+   // val minaddr   = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+   // val subminaddr= Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+   // val sign      = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
+   // val v2csign   = Output(Vec(BLKSIZE*COLNUM,Vec(ROWNUM,UInt(1.W))))
 
   })
   // 按列作，一次作一列。 
@@ -136,6 +136,8 @@ class DecoderCol extends Module with COMMON {
     }
   }
 // Check input addr and data  
+  // 这个信号在顶层是根dinvalid一块的，   可能会一直拉高，要限制一个处于idle态
+  val start = Wire(Bool()) 
   for (i <- 0 until BLKSIZE) {
     for (j <- 0 until ROWNUM) {
      CheckGroup(i)(j).io.input :=  VartoCheckMux(i)(j).io.output//VarGroup(i).io.Checkout(j)  
@@ -143,7 +145,7 @@ class DecoderCol extends Module with COMMON {
      CheckGroup(i)(j).io.inputsign := SigntoCheckMux(i)(j).io.output  
      CheckGroup(i)(j).io.updatemin := updateen  
      CheckGroup(i)(j).io.initial   := initialen  
-     CheckGroup(i)(j).io.signreset := io.Start
+     CheckGroup(i)(j).io.signreset := start///io.Start
     }
   }
 //   VartoCheckMux 连线  一个有32个输入   来自32个变量节点的对应行的输出  选一个送给校验节点。
@@ -224,7 +226,7 @@ for( i <- 0 until ROWNUM) {
   //第一个周期V2C读，然后第二个周期
   //拿到数据，向V2C写回  
   val Iter    = RegInit(0.U(ITERWITH.W))
-
+  start := currentState === idle && io.Start
   switch(currentState){
     is(idle){
       when(io.Start) {
@@ -298,54 +300,54 @@ for( i <- 0 until ROWNUM) {
     }
   }
   io.IterOut := Iter
- //io.appout    =
-  for(i <- 0 until BLKSIZE) {
-    io.appout(i) := VarGroup(i).io.APPout   
-  }
- //io.c2v       =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.c2v(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval    
-    } 
-  }
- //io.min       =
- for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.min(i+j*BLKSIZE) := CheckGroup(i)(j).io.min   
-    } 
-  }
- //io.submin    =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.submin(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin    
-    } 
-  }
-  //io.minaddr   =
- for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.minaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr    
-    } 
-  }
-  //io.subminaddr=
-  for(i <- 0 until BLKSIZE) {
-   for ( j <- 0 until ROWNUM) {
-     io.subminaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr    
-   } 
-  } 
-  //io.sign      =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.sign(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign   
-    } 
-  }
- //io.v2csign   =
- for(i <- 0 until BLKSIZE*COLNUM) {
-   for (j <- 0 until ROWNUM) {
-
-    io.v2csign(i)(j):= SignRams(i%BLKSIZE).read((i/BLKSIZE).U)(j)
- 
-   }
-
- }
+// //io.appout    =
+//  for(i <- 0 until BLKSIZE) {
+//    io.appout(i) := VarGroup(i).io.APPout   
+//  }
+// //io.c2v       =
+//  for(i <- 0 until BLKSIZE) {
+//    for ( j <- 0 until ROWNUM) {
+//      io.c2v(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval    
+//    } 
+//  }
+// //io.min       =
+// for(i <- 0 until BLKSIZE) {
+//    for ( j <- 0 until ROWNUM) {
+//      io.min(i+j*BLKSIZE) := CheckGroup(i)(j).io.min   
+//    } 
+//  }
+// //io.submin    =
+//  for(i <- 0 until BLKSIZE) {
+//    for ( j <- 0 until ROWNUM) {
+//      io.submin(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin    
+//    } 
+//  }
+//  //io.minaddr   =
+// for(i <- 0 until BLKSIZE) {
+//    for ( j <- 0 until ROWNUM) {
+//      io.minaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr    
+//    } 
+//  }
+//  //io.subminaddr=
+//  for(i <- 0 until BLKSIZE) {
+//   for ( j <- 0 until ROWNUM) {
+//     io.subminaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr    
+//   } 
+//  } 
+//  //io.sign      =
+//  for(i <- 0 until BLKSIZE) {
+//    for ( j <- 0 until ROWNUM) {
+//      io.sign(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign   
+//    } 
+//  }
+// //io.v2csign   =
+// for(i <- 0 until BLKSIZE*COLNUM) {
+//   for (j <- 0 until ROWNUM) {
+//
+//    io.v2csign(i)(j):= SignRams(i%BLKSIZE).read((i/BLKSIZE).U)(j)
+// 
+//   }
+//
+// }
  //GenerateIO.Gen(3)
 }

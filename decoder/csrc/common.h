@@ -17,7 +17,7 @@
 #define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 7 
+#define TESTMODULE 8 
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -70,9 +70,15 @@ int APPMAX = pow(2,APPWIDTH-1)-1;
 int V2CMAX = pow(2,V2CWIDTH-1)-1;
 int C2VMAX = pow(2,C2VWIDTH-1)-1;
 const char BASE_MATRIX_FILENAME[] = "/home/yangli/rsldpc/matrix/2048_1723.txt";
+#elif TESTMODULE == 8
+#include "Vrsdecoder.h"
+#include "Vrsdecoder___024root.h"
+Vrsdecoder* top;
+int maxerrortime = 50 ;
+int ITERMAX      = 20 ;
 #endif 
 
-#define DIFFTEST 
+//#define DIFFTEST 
 
 
 //#define WAVE 
@@ -261,6 +267,9 @@ const int LLR_INIT4bit7 = 15;//9;//4 5
 
 #define Log(format, ...) \
     _Log(ANSI_FMT("[%s:%d %s] " format, ANSI_FG_BLUE) "\n", \
+        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#define LogG(format, ...) \
+    _Log(ANSI_FMT("[%s:%d %s] " format, ANSI_FG_GREEN) "\n", \
         __FILE__, __LINE__, __func__, ## __VA_ARGS__)
 
 
