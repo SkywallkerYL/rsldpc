@@ -1205,6 +1205,7 @@ void toptest(){
 		top->io_p0_3 = p_table[i][1];
 		top->io_p0_4 = p_table[i][0];
 		top->io_start = 1;
+		top->io_nextready = 0;
 		clockntimes(1); 
 		top->io_start = 0;
 		while(!top->io_Framevalid) {
@@ -1216,7 +1217,11 @@ void toptest(){
 		double rate = (double)1723/(double)2048;
 		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
 		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+		
 		clockntimes(10);
+		top->io_nextready = 1; 
+		clockntimes(10);
+		top->io_nextready = 0;
 	}
   
 }

@@ -7,6 +7,7 @@ class rsdecoder extends Module with COMMON {
     val IterInput   = Input(UInt(ITERWITH.W))
     val maxError    = Input(UInt(FRAMEWITH.W))
     val start       = Input(Bool())
+    val nextready   = Input(Bool())
     val p0          = Input(Vec(PNUM,UInt(64.W))) 
     val Framevalid  = Output(Bool())
     val totalframe  = Output(UInt(FRAMEWITH.W))
@@ -90,7 +91,10 @@ class rsdecoder extends Module with COMMON {
     }
     is(frameend) {
       io.Framevalid := true.B 
-      currentState := idle 
+      //currentState := idle
+      when(io.nextready) {
+        currentState := idle 
+      }
     }
 
   }
