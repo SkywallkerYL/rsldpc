@@ -100,3 +100,38 @@ class rsdecoder extends Module with COMMON {
   }
 
 }
+
+
+
+class rsdecodertop extends Module with COMMON {
+  val io = IO(new Bundle {
+    val IterInput   = Input(UInt(ITERWITH.W))
+    val maxError    = Input(UInt(FRAMEWITH.W))
+    val start       = Input(Bool())
+    val nextready   = Input(Bool())
+    val p0          = Input(Vec(PNUM,UInt(64.W))) 
+    val Framevalid  = Output(Bool())
+    val totalframe  = Output(UInt(FRAMEWITH.W))
+    val errorframe  = Output(UInt(FRAMEWITH.W)) 
+  })
+  val DecoderGroup = Seq.fill(PARRELNUM)(Module(new rsdecoder)) 
+  for ( i <- 0 until PARRELNUM) {
+    DecoderGroup(i).io.start := io.start 
+    DecoderGroup(i).io.IterInput := io.IterInput
+    DecoderGroup(i).io.nextready := io.nextready 
+    DecoderGroup(i).io.maxError  := io.maxError  
+    DecoderGroup(i).io.p0        := io.p0     
+  }
+  io.Framevalid := DecoderGroup(0).io.Framevalid 
+  val totalframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
+  val errorframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
+  
+  for( i <- 0 until PARRELNUM) {
+    totalframenum(i) := DecoderGroup(i).io.totalframe 
+    errorframenum(i) := DecoderGroup(i).io.errorframe 
+  }
+  io.totalframe := totalframenum.reduce(_+_)
+  io.errorframe := errorframenum.reduce(_+_)
+
+
+} 

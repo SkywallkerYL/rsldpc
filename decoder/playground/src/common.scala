@@ -27,7 +27,7 @@ trait COMMON{
   val ROWADDR = log2Ceil(ROWNUM)
   val BLKADDR = log2Ceil(BLKSIZE)
   //  噪声发生器的p0  的个数 
-  val PNUM    = 3 
+  val PNUM    = 5 
   //  量化区间的个数   
   val QuantiNUM   = log2Ceil(PNUM+1)
   val MAXSPACEIND = scala.math.pow(2,QuantiNUM).toInt-1   
@@ -48,11 +48,14 @@ trait COMMON{
     ))
   //ITER 的宽度 
   val ITERWITH = 5  
-  val FRAMEWITH = 32
+  val FRAMEWITH = 64
 //这个相对路径是根据makefile所在的文件夹决定的
   val IOTablePath     : String    = "./build/Table.h"
   val FilePath        : String    = "../matrix/2048_1723.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
+//并行路数
+  val PARRELNUM  = 10 
+
 }
 object COMMON extends COMMON {}
 

@@ -49,6 +49,8 @@ void sim_init(){
   top = new VDecoderCol; 
 #elif TESTMODULE == 8
   top = new Vrsdecoder;
+#elif TESTMODULE == 9
+  top = new Vrsdecodertop ;
 #endif 
 #ifdef WAVE
   contextp->traceEverOn(true);

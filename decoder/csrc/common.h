@@ -17,7 +17,7 @@
 #define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 8 
+#define TESTMODULE 9 
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -76,8 +76,13 @@ const char BASE_MATRIX_FILENAME[] = "/home/yangli/rsldpc/matrix/2048_1723.txt";
 Vrsdecoder* top;
 int maxerrortime = 50 ;
 int ITERMAX      = 20 ;
-#endif 
-
+#elif TESTMODULE == 9
+#include "Vrsdecodertop.h"
+#include "Vrsdecodertop___024root.h"
+Vrsdecodertop* top;
+int maxerrortime = 50 ;
+int ITERMAX      = 20 ;
+#endif
 //#define DIFFTEST 
 
 

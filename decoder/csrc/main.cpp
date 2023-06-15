@@ -36,6 +36,8 @@ int main(int argc , char* argv[]) {
 //	diffDecoderTest();
 #elif TESTMODULE == 8
 	toptest();
+#elif TESTMODULE == 9 
+	toptest();
 #endif 
 	sim_exit();
 	return 0;

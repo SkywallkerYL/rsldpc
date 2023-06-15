@@ -8,8 +8,8 @@ object Elaborate extends App {
   // GngWrapper Topdecoder  
   //Muxminandsecmin 
   //CheckNodeCOL  DecoderCol
-  //rsdecoder
-  def top = new rsdecoder 
+  //rsdecoder  rsdecodertop 
+  def top = new rsdecodertop 
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
