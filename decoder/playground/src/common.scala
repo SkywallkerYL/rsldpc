@@ -4,13 +4,14 @@ import chisel3.util._
 import scala.io.{BufferedSource,Source}
 import java.io._
 trait COMMON{
-  val V2CWIDTH = 7
+  val V2CWIDTH = 4
   val C2VWIDTH = 4
-  val APPWIDTH = V2CWIDTH
+  val APPWIDTH = 7
 
-  val V2CWIDTHCOL = 7
+  val V2CWIDTHCOL = 4
   val C2VWIDTHCOL = 4
-  val APPWIDTHCOL = V2CWIDTHCOL
+  val APPWIDTHCOL = 7
+
 
   //有一个符号位
   val MAXC2V = scala.math.pow(2,C2VWIDTH-1).toInt-1  
@@ -54,7 +55,7 @@ trait COMMON{
   val FilePath        : String    = "../matrix/2048_1723.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
-  val PARRELNUM  = 10 
+  val PARRELNUM  = 1 
 
 }
 object COMMON extends COMMON {}

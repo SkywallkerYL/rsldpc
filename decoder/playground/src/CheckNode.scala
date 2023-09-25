@@ -263,6 +263,7 @@ class CheckNodeCOL  extends Module with COMMON {
   val sign  = RegInit(0.U(1.W))
   val inputsign = io.input(V2CWIDTHCOL-1)
   val absdata = Mux(inputsign === 1.U,~io.input+1.U ,io.input)
+  //val absdata = Mux(absdata <= MAXC2VCOL.U,absdata,MAXC2VCOL)
   when(io.updatemin) {
     //when(((inputsign === 1.U)&&(io.initial) )||(io.inputsign =/= inputsign) ) {
     //  sign := sign ^ 1.U 
@@ -283,7 +284,7 @@ class CheckNodeCOL  extends Module with COMMON {
         }.otherwise{
           min := submin 
           minaddr := subminaddr 
-          submin := Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+          submin := absdata //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
           subminaddr := io.inputaddr  
         }
       }.elsewhen(io.inputaddr === subminaddr){
@@ -293,7 +294,7 @@ class CheckNodeCOL  extends Module with COMMON {
           min := absdata 
           minaddr := io.inputaddr 
         }.otherwise {
-          submin := Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+          submin :=  absdata//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
         }
       }.otherwise{
         when(absdata <= min) {
@@ -325,7 +326,10 @@ class CheckNodeCOL  extends Module with COMMON {
   val c2v = Wire(UInt(C2VWIDTHCOL.W)) 
   c2v := Mux(io.inputaddr === minaddr , submin ,min) 
 
-  val scaledc2v =( c2v * 3.U) >> 2.U 
+  val c2vext = Wire(UInt((C2VWIDTHCOL+2).W))
+  c2vext := Fill(2,0.U)##c2v 
+
+  val scaledc2v =( c2vext+c2vext+c2vext) >> 2.U 
 
   val c2vval = Mux(sign === io.inputsign , scaledc2v , ~scaledc2v+1.U )
 

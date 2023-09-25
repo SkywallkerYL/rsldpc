@@ -38,7 +38,7 @@ doit:
 #Makefile for Verilator
 
 
-TOP?=rsdecoder
+TOP?=rsdecodertop
 TOPNAME?=$(TOP)
 TOPNAMETEST?=$(TOP)
 #FSM_m #keyboard_top #top
@@ -59,7 +59,8 @@ VERILATOR_FLAGS += -Wno-fatal
 VERILATOR_CFLAGS += -cc --exe --noassert
 #-Os -x-assign 0 --trace --coverage
 VERILATOR_CFLAGS +=	--x-assign fast --x-initial fast 
-#VERILATOR_CFLAGS +=  --trace --coverage 
+#VERILATOR_CFLAGS +=  --trace 
+#--coverage 
 VERILATOR_CFLAGS +=  --build 
 VERILATOR_CFLAGS += -Wno-fatal -O3 
 VERILATOR_CFLAGS += -DVL_DEBUG

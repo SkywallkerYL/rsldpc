@@ -1260,8 +1260,9 @@ void toptest(){
 		top->io_nextready = 0;
 		clockntimes(1); 
 		top->io_start = 0;
-		while(top->io_errorframe <= maxerrortime) {
-			clockntimes(1); 
+		while(top->io_errorframe < maxerrortime) {
+			clockntimes(1);
+		//	printf("error:%d\n",top->io_errorframe);
 		}
 		int frame =(int) top->io_totalframe ;
 		int errorframe = (int )top->io_errorframe ; 
