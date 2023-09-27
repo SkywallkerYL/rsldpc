@@ -82,6 +82,12 @@ int ITERMAX      = 20 ;
 Vrsdecodertop* top;
 int maxerrortime = 50 ;
 int ITERMAX      = 20 ;
+#elif TESTMODULE == 10
+#include "VErrorbits.h"
+#include "VErrorbits___024root.h"
+VErrorbits* top;
+int maxerrortime = 50 ;
+int ITERMAX      = 20 ;
 #endif
 //#define DIFFTEST 
 

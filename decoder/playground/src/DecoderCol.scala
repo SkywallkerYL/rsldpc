@@ -12,6 +12,8 @@ class DecoderCol extends Module with COMMON {
     val Success   = Output(Bool())
     val IterOut   = Output(UInt(ITERWITH.W))
     val counter   = Output(UInt(BLKADDR.W))
+    val appvalid  = Output(Bool())
+    val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
 
     // for difftest  
    // val appout    = Output(Vec(BLKSIZE,UInt(APPWIDTH.W))) 
@@ -53,6 +55,7 @@ class DecoderCol extends Module with COMMON {
   C2VReadEn := false.B
   V2CWriteEn := false.B
   C2VFlush   := false.B  
+  io.appvalid := false.B
   io.Success := false.B
   updateen := false.B 
   initialen := false.B
@@ -273,6 +276,9 @@ for( i <- 0 until ROWNUM) {
         updateen  := true.B  
         signWriteEn := true.B 
         rightreg := rightreg & rightdecide  
+        when(!rightdecide) {
+          io.appvalid := true.B
+        }
       }
     }
     is(judge) {
@@ -299,7 +305,19 @@ for( i <- 0 until ROWNUM) {
       }
     }
   }
-  io.IterOut := Iter
+  io.IterOut := Iter 
+  for(i <- 0 until BLKSIZE) {
+    io.appout(i) := VarGroup(i).io.APPout(APPWIDTHCOL-1)
+  }
+  //new Module 
+  //记录每次译码出错的错误比特    
+  //记录时译码器应该处于 decode 态，并且Iter = 1 并且counter2 <=31 >=0
+  // 
+ // val appouterrornum = VecInit(Seq.fill(BLKSIZE)(0.U(BLKADDR.W)))
+ // for(i <- 0 until BLKSIZE) {
+ //   appouterrornum(i) := VarGroup(i).io.APPout(APPWIDTHCOL-1)
+ // } 
+ // val wrongnum = appouterrornum.reduce(_+_)
 // //io.appout    =
 //  for(i <- 0 until BLKSIZE) {
 //    io.appout(i) := VarGroup(i).io.APPout   

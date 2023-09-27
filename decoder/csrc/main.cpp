@@ -38,6 +38,10 @@ int main(int argc , char* argv[]) {
 	toptest();
 #elif TESTMODULE == 9 
 	toptest();
+#elif TESTMODULE == 10 
+	//printf("jjjjj\n");
+	toptest();
+	
 #endif 
 	sim_exit();
 	return 0;

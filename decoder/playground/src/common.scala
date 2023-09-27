@@ -56,13 +56,14 @@ trait COMMON{
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
   val PARRELNUM  = 1 
-
+// 最多记录的错误比特的个数   
+  val MAXERRORNUM = 10
 }
 object COMMON extends COMMON {}
 
 object GenerateIO extends COMMON{
     def Gen(module : Int = 0) : Unit  = {
-        val writer = new PrintWriter(new File(IOTablePath))
+        val  writer = new PrintWriter(new File(IOTablePath))
         //writer.println("VLDPC *top;")
         
         //writer.println("for (size_t i = 0; i < "+VNum+"; i++) {")
@@ -70,8 +71,8 @@ object GenerateIO extends COMMON{
          for(i <- 0 until COLNUM){
             //writer.println("#define io_YnInit("+i+")"+" io_YnInit_ ## "+i)
            //for checknode  
-            writer.println("top->io_input_"+i+" = array["+i+"];")
-         }
+             writer.println("top->io_input_"+i+" = array["+i+"];")
+         } 
        }
        else if (module == 1){
          for(i <- 0 until ROWNUM){
@@ -113,6 +114,15 @@ object GenerateIO extends COMMON{
              writer.println("v2c["+i+"]["+j+"] = top->io_v2csign_"+i+"_"+j+";")  
            }
          } 
+       }
+       else if (module == 4) {
+         for (i <- 0 until BLKSIZE) {
+           writer.println("top->io_appin_"+i+"= appin["+i+"];")
+         }
+         for (i <- 0 until MAXERRORNUM) {
+           writer.println("errorcol["+i+"] = top->io_Errorcol_"+i+";")
+           writer.println("errorblk["+i+"] = top->io_Errorblk_"+i+";")
+         }
        }
         writer.close()
     }

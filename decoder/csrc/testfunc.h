@@ -1279,6 +1279,137 @@ void toptest(){
 	}
   
 }
+#elif TESTMODULE == 10 
+void IOupdate(int* appin , int * errorblk,int* errorcol){
+	top->io_appin_0= appin[0];
+	top->io_appin_1= appin[1];
+	top->io_appin_2= appin[2];
+	top->io_appin_3= appin[3];
+	top->io_appin_4= appin[4];
+	top->io_appin_5= appin[5];
+	top->io_appin_6= appin[6];
+	top->io_appin_7= appin[7];
+	top->io_appin_8= appin[8];
+	top->io_appin_9= appin[9];
+	top->io_appin_10= appin[10];
+	top->io_appin_11= appin[11];
+	top->io_appin_12= appin[12];
+	top->io_appin_13= appin[13];
+	top->io_appin_14= appin[14];
+	top->io_appin_15= appin[15];
+	top->io_appin_16= appin[16];
+	top->io_appin_17= appin[17];
+	top->io_appin_18= appin[18];
+	top->io_appin_19= appin[19];
+	top->io_appin_20= appin[20];
+	top->io_appin_21= appin[21];
+	top->io_appin_22= appin[22];
+	top->io_appin_23= appin[23];
+	top->io_appin_24= appin[24];
+	top->io_appin_25= appin[25];
+	top->io_appin_26= appin[26];
+	top->io_appin_27= appin[27];
+	top->io_appin_28= appin[28];
+	top->io_appin_29= appin[29];
+	top->io_appin_30= appin[30];
+	top->io_appin_31= appin[31];
+	top->io_appin_32= appin[32];
+	top->io_appin_33= appin[33];
+	top->io_appin_34= appin[34];
+	top->io_appin_35= appin[35];
+	top->io_appin_36= appin[36];
+	top->io_appin_37= appin[37];
+	top->io_appin_38= appin[38];
+	top->io_appin_39= appin[39];
+	top->io_appin_40= appin[40];
+	top->io_appin_41= appin[41];
+	top->io_appin_42= appin[42];
+	top->io_appin_43= appin[43];
+	top->io_appin_44= appin[44];
+	top->io_appin_45= appin[45];
+	top->io_appin_46= appin[46];
+	top->io_appin_47= appin[47];
+	top->io_appin_48= appin[48];
+	top->io_appin_49= appin[49];
+	top->io_appin_50= appin[50];
+	top->io_appin_51= appin[51];
+	top->io_appin_52= appin[52];
+	top->io_appin_53= appin[53];
+	top->io_appin_54= appin[54];
+	top->io_appin_55= appin[55];
+	top->io_appin_56= appin[56];
+	top->io_appin_57= appin[57];
+	top->io_appin_58= appin[58];
+	top->io_appin_59= appin[59];
+	top->io_appin_60= appin[60];
+	top->io_appin_61= appin[61];
+	top->io_appin_62= appin[62];
+	top->io_appin_63= appin[63];
+	errorcol[0] = top->io_Errorcol_0;
+	errorblk[0] = top->io_Errorblk_0;
+	errorcol[1] = top->io_Errorcol_1;
+	errorblk[1] = top->io_Errorblk_1;
+	errorcol[2] = top->io_Errorcol_2;
+	errorblk[2] = top->io_Errorblk_2;
+	errorcol[3] = top->io_Errorcol_3;
+	errorblk[3] = top->io_Errorblk_3;
+	errorcol[4] = top->io_Errorcol_4;
+	errorblk[4] = top->io_Errorblk_4;
+	errorcol[5] = top->io_Errorcol_5;
+	errorblk[5] = top->io_Errorblk_5;
+	errorcol[6] = top->io_Errorcol_6;
+	errorblk[6] = top->io_Errorblk_6;
+	errorcol[7] = top->io_Errorcol_7;
+	errorblk[7] = top->io_Errorblk_7;
+	errorcol[8] = top->io_Errorcol_8;
+	errorblk[8] = top->io_Errorblk_8;
+	errorcol[9] = top->io_Errorcol_9;
+	errorblk[9] = top->io_Errorblk_9;
+}
+void toptest(){
+	int appin[64];
+	int errorblk[10];
+	int errorcol[10];
+	//printf("aaaaa\n");
+	for(int i = 0 ; i < 64;i++) {
+		appin[i] = 0;  
+	}
+	for(int i = 0 ; i < 10 ; i++){
+		errorblk[i] =0;
+		errorcol[i] = 0;
+	}
+	int time = 0 ;
+	int testtime = 20; 
+	//printf("jjjjj\n");
+	while(time < testtime) {
+		time ++ ;
+		for(int i = 0; i < 32;i++) {
+			top->io_coladdr = i ;
+			top->io_appvalid =   1 ;
+			if(i>=14)appin[i+10] = 1;
+			IOupdate(appin,errorblk,errorcol);
+			clockntimes(1);
+			appin[i+10] = 0 ; 
+		}
+		while(!top->io_outvalid){
+			clockntimes(1);
+		}
+		IOupdate(appin,errorblk,errorcol);
+		printf("errorbitlocation\n");
+		for(int i = 0; i < 10 ;i ++ ){
+			printf("ind:%d errorcol:%d errorblk:%d\n",i,errorcol[i],errorblk[i]);
+		}
+		for(int i = 0;i < 64;i++) {
+			appin[i] = 0 ;
+		}
+		top->io_appvalid = 0;
+		top->io_updatevalid = 1;
+		clockntimes(1);
+		top->io_updatevalid = 0;
+	}
+}
+
+
 
 
 

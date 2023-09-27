@@ -12,6 +12,14 @@ class rsdecoder extends Module with COMMON {
     val Framevalid  = Output(Bool())
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
+
+    //错误比特记录 
+    val updatevalid = Input(Bool())
+    val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
+    val Errorblk    = Output(Vec(MAXERRORNUM,UInt((BLKADDR).W))) 
+    val Errornum    = Output(UInt(COLADDR.W))                      
+    val outvalid    = Output(Bool())
+
   })
   
   val errorframe = RegInit(0.U(FRAMEWITH.W))
@@ -23,6 +31,8 @@ class rsdecoder extends Module with COMMON {
 
   // 模块例化
   val decoder   = Module(new DecoderCol)  
+
+  val errorbit  = Module(new Errorbits)
   val Gaussgen  = Module(new GngWrapper(BLKSIZE)) 
   val dinvalid  = Wire(Bool())
   dinvalid := false.B
@@ -36,6 +46,18 @@ class rsdecoder extends Module with COMMON {
   decoder.io.LLrin     := Gaussgen.io.dout 
   decoder.io.Start     := dinvalid  
   decoder.io.IterInput := io.IterInput 
+
+  //错误比特记录相关模块 
+  errorbit.io.appin := decoder.io.appout
+  errorbit.io.appvalid := decoder.io.appvalid  
+  errorbit.io.coladdr := decoder.io.counter 
+
+  errorbit.io.updatevalid := io.updatevalid 
+
+  io.Errorcol := errorbit.io.Errorcol 
+  io.Errorblk := errorbit.io.Errorblk 
+  io.Errornum := errorbit.io.Errornum 
+  io.outvalid := errorbit.io.outvalid
 
   val idle :: framestart :: frameinitial :: decode :: framevalid :: frameend :: Nil = Enum(6)
   // idle         : 等待   
@@ -113,6 +135,15 @@ class rsdecodertop extends Module with COMMON {
     val Framevalid  = Output(Bool())
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
+
+    val updatevalid = Input(Bool())
+    val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
+    val Errorblk    = Output(Vec(MAXERRORNUM,UInt((BLKADDR).W))) 
+    val Errornum    = Output(UInt(COLADDR.W))                      
+    val outvalid    = Output(Bool())
+
+
+
   })
   val DecoderGroup = Seq.fill(PARRELNUM)(Module(new rsdecoder)) 
   for ( i <- 0 until PARRELNUM) {
@@ -125,13 +156,27 @@ class rsdecodertop extends Module with COMMON {
   io.Framevalid := DecoderGroup(0).io.Framevalid 
   val totalframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
   val errorframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
-  
+  val outvalidnum   = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
+  //val outvalidsign  = Wire(UInt(PARRELNUM.W))
   for( i <- 0 until PARRELNUM) {
     totalframenum(i) := DecoderGroup(i).io.totalframe 
     errorframenum(i) := DecoderGroup(i).io.errorframe 
+    outvalidnum(i)   := DecoderGroup(i).io.outvalid
+    DecoderGroup(i).io.updatevalid := io.updatevalid  
+    //outvalidsign(i)  := DecoderGroup(i).io.outvalid 
   }
   io.totalframe := totalframenum.reduce(_+_)
   io.errorframe := errorframenum.reduce(_+_)
+  io.outvalid   := outvalidnum.reduce(_|_) 
+  io.Errorcol := MuxCase(VecInit(Seq.fill(MAXERRORNUM)(0.U(COLADDR.W))),Seq.tabulate(PARRELNUM){
+    i => (outvalidnum(i) === 1.U) ->DecoderGroup(i).io.Errorcol 
 
+  })
+  io.Errorblk := MuxCase(VecInit(Seq.fill(MAXERRORNUM)(0.U(BLKADDR.W))),Seq.tabulate(PARRELNUM){
+    i => (outvalidnum(i) === 1.U) ->DecoderGroup(i).io.Errorblk 
+  })
+   io.Errornum := MuxCase(0.U(COLADDR.W),Seq.tabulate(PARRELNUM){
+    i => (outvalidnum(i) === 1.U) ->DecoderGroup(i).io.Errornum 
+  })
 
 } 
