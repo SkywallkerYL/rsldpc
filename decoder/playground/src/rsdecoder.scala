@@ -14,6 +14,7 @@ class rsdecoder extends Module with COMMON {
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
 
     //错误比特记录 
+    val localvalid  = Input(Bool())
     val updatevalid = Input(Bool())
     val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
     val Errorblk    = Output(Vec(MAXERRORNUM,UInt((BLKADDR).W))) 
@@ -52,6 +53,7 @@ class rsdecoder extends Module with COMMON {
   errorbit.io.appvalid := decoder.io.appvalid  
   errorbit.io.coladdr := decoder.io.counter 
 
+  errorbit.io.localvalid := io.localvalid
   errorbit.io.updatevalid := io.updatevalid 
 
   io.Errorcol := errorbit.io.Errorcol 
@@ -136,6 +138,7 @@ class rsdecodertop extends Module with COMMON {
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
 
+    val localvalid  = Input(Bool())
     val updatevalid = Input(Bool())
     val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
     val Errorblk    = Output(Vec(MAXERRORNUM,UInt((BLKADDR).W))) 
@@ -163,6 +166,7 @@ class rsdecodertop extends Module with COMMON {
     errorframenum(i) := DecoderGroup(i).io.errorframe 
     outvalidnum(i)   := DecoderGroup(i).io.outvalid
     DecoderGroup(i).io.updatevalid := io.updatevalid  
+    DecoderGroup(i).io.localvalid := io.localvalid 
     //outvalidsign(i)  := DecoderGroup(i).io.outvalid 
   }
   io.totalframe := totalframenum.reduce(_+_)

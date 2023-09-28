@@ -276,14 +276,14 @@ for( i <- 0 until ROWNUM) {
         updateen  := true.B  
         signWriteEn := true.B 
         rightreg := rightreg & rightdecide  
-        when(!rightdecide) {
+        when(!rightdecide && (Iter===1.U)) {
           io.appvalid := true.B
         }
       }
     }
     is(judge) {
       when(Iter === 1.U){
-        io.OutValid := true.B
+        io.OutValid := true.B 
         when(rightreg === 1.U ){
           io.Success := true.B
         }.otherwise {
@@ -292,8 +292,8 @@ for( i <- 0 until ROWNUM) {
         currentState := idle 
         rightreg := 1.U
       }.otherwise{
-        when(rightreg === 1.U){
-          io.OutValid := true.B
+        when(rightreg === 1.U) {
+          io.OutValid := true.B 
           io.Success  := true.B
           currentState := idle 
         }.otherwise{
