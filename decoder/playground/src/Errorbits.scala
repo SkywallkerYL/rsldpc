@@ -128,8 +128,12 @@ class Errorbits extends Module with COMMON {
       } 
       readen:= true.B
       when(readdata === 1.U && (wrongIndexcounter < MAXERRORNUM.U)) {
-        wrongIndexcounter := wrongIndexcounter + 1.U 
+        //wrongIndexcounter := wrongIndexcounter + 1.U 
         wrongIndex(wrongIndexcounter) := colnext ## blknext 
+      }
+      when(readdata === 1.U) {
+        wrongIndexcounter := wrongIndexcounter + 1.U 
+        //wrongIndex(wrongIndexcounter) := colnext ## blknext 
       }
     }
     is(update) {

@@ -344,3 +344,182 @@ class CheckNodeCOL  extends Module with COMMON {
 
 
 }
+class CheckNode2Col  extends Module with COMMON {
+  val io = IO(new Bundle {
+    val input = Input(Vec(2, UInt(V2CWIDTHCOL.W)) )
+    val updatemin = Input(Bool())
+    val signreset  = Input(Bool())
+    val initial   = Input(Bool())
+    val inputaddr = Input(UInt((COLADDR-1).W))
+    val inputsign = Input(Vec(2,UInt(1.W)))//来自Ram里存的信号 
+    val minval = Output(Vec(2,UInt(C2VWIDTHCOL.W)))
+    
+    // for difftest 
+    //val min         = Output(UInt((C2VWIDTHCOL-1).W)) 
+    //val submin      = Output(UInt((C2VWIDTHCOL-1).W)) 
+    //val minaddr     = Output(UInt(COLADDR.W)) 
+    //val subminaddr  = Output(UInt(COLADDR.W))  
+    //val sign        = Output(UInt(1.W)) 
+  })
+  val min0 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
+  val minaddr0 = RegInit(0.U((COLADDR).W))
+  val submin0 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
+  val subminaddr0 = RegInit(0.U((COLADDR).W))
+  val sign0  = RegInit(0.U(1.W))
+  val inputsign0 = io.input(0)(V2CWIDTHCOL-1)
+  val absdata0 = Mux(inputsign0 === 1.U,~io.input(0)+1.U ,io.input(0))
+  val inputaddr0 = Wire(UInt(COLADDR.W))
+  inputaddr0 := io.inputaddr##0.U  
+  val min1 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
+  val minaddr1 = RegInit(0.U((COLADDR).W))
+  val submin1 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
+  val subminaddr1 = RegInit(0.U((COLADDR).W))
+  val sign1  = RegInit(0.U(1.W))
+  val inputsign1 = io.input(1)(V2CWIDTHCOL-1)
+  val absdata1 = Mux(inputsign1 === 1.U,~io.input(1)+1.U ,io.input(1))
+  val inputaddr1 = Wire(UInt(COLADDR.W))
+  inputaddr1 := io.inputaddr##1.U  
+ 
+  //val absdata = Mux(absdata <= MAXC2VCOL.U,absdata,MAXC2VCOL)
+  when(io.updatemin) {
+    //when(((inputsign === 1.U)&&(io.initial) )||(io.inputsign =/= inputsign) ) {
+    //  sign := sign ^ 1.U 
+    //}
+    when(io.initial) {
+      when(inputsign1 === 1.U) {
+        sign1 := sign1 ^ 1.U 
+      }
+    }.elsewhen(io.inputsign(1) =/= inputsign1){
+      sign1 := sign1 ^ 1.U
+    }
+    when(io.initial) {
+      when(inputsign0 === 1.U) {
+        sign0 := sign0 ^ 1.U 
+      }
+    }.elsewhen(io.inputsign(0) =/= inputsign0){
+      sign0 := sign0 ^ 1.U
+    }
+    // updata min 
+  
+   // when(absdata <= MAXC2VCOL.U) {
+      when(inputaddr0 === minaddr0) {
+        when(absdata0 <= submin0 ) {
+          min0 := absdata0  
+        }.otherwise{
+          min0 := submin0 
+          minaddr0 := subminaddr0 
+          submin0 := absdata0 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+          subminaddr0 := inputaddr0  
+        }
+      }.elsewhen(inputaddr0 === subminaddr0){
+        when(absdata0 <= min0  ){
+          submin0 := min0 
+          subminaddr0 := minaddr0  
+          min0 := absdata0 
+          minaddr0 := inputaddr0 
+        }.otherwise {
+          submin0 :=  absdata0//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+        }
+      }.otherwise{
+        when(absdata0 <= min0) {
+          submin0 := min0 
+          subminaddr0 := minaddr0 
+          min0 := absdata0 
+          minaddr0 := inputaddr0 
+        }.elsewhen(absdata0 <= submin0){
+          submin0 := absdata0 
+          subminaddr0 := inputaddr0
+        }
+      }
+      when(inputaddr1 === minaddr1) {
+        when(absdata1 <= submin1 ) {
+          min1 := absdata1  
+        }.otherwise{
+          min1 := submin1 
+          minaddr1 := subminaddr1 
+          submin1 := absdata1 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+          subminaddr1 := inputaddr1  
+        }
+      }.elsewhen(inputaddr1 === subminaddr1){
+        when(absdata1 <= min1  ){
+          submin1 := min1 
+          subminaddr1 := minaddr1  
+          min1 := absdata1 
+          minaddr1 := inputaddr1 
+        }.otherwise {
+          submin1 :=  absdata1//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+        }
+      }.otherwise{
+        when(absdata1 <= min1) {
+          submin1 := min1 
+          subminaddr1 := minaddr1 
+          min1 := absdata1 
+          minaddr1 := inputaddr1 
+        }.elsewhen(absdata1 <= submin1){
+          submin1 := absdata1 
+          subminaddr1 := inputaddr1
+        }
+      }     
+  }
+  when (io.signreset) {
+    sign0 := 0.U 
+    min0 := MAXC2VCOL.U
+    submin0 := MAXC2VCOL.U
+    minaddr0 := 0.U  
+    subminaddr0 := 0.U
+    sign1 := 0.U 
+    min1 := MAXC2VCOL.U
+    submin1 := MAXC2VCOL.U
+    minaddr1 := 0.U  
+    subminaddr1 := 0.U
+  }
+  // choose mux  
+  //val minmux = 
+  val minmux = (Module(new Muxminandsecmin)) 
+  minmux.io.input(0) := min0 
+  minmux.io.input(1) := min1 
+  minmux.io.input(2) := submin0 
+  minmux.io.input(3) := submin1 
+  minmux.io.inputindex(0) := minaddr0 
+  minmux.io.inputindex(1) := minaddr1 
+  minmux.io.inputindex(2) := subminaddr0 
+  minmux.io.inputindex(3) := subminaddr1 
+
+  val min = minmux.io.minVal 
+  val minaddr = minmux.io.minIdx 
+  val submin = minmux.io.subminVal 
+  val subminaddr = minmux.io.subminIdx
+// scale  
+  val c2v0 = Wire(UInt(C2VWIDTHCOL.W)) 
+  c2v0 := Mux(inputaddr0 === minaddr , submin ,min) 
+
+  val c2vext0 = Wire(UInt((C2VWIDTHCOL+2).W))
+  c2vext0 := Fill(2,0.U)##c2v0 
+
+  val scaledc2v0 =( c2vext0+c2vext0+c2vext0) >> 2.U 
+
+  val c2vval0 = Mux(sign0 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
+
+  io.minval(0) := Mux(io.initial,0.U,c2vval0) 
+  
+  val c2v1 = Wire(UInt(C2VWIDTHCOL.W)) 
+  c2v1 := Mux(inputaddr1 === minaddr , submin ,min) 
+
+  val c2vext1 = Wire(UInt((C2VWIDTHCOL+2).W))
+  c2vext1 := Fill(2,0.U)##c2v1
+
+  val scaledc2v1 =( c2vext1+c2vext1+c2vext1) >> 2.U 
+
+  val c2vval1 = Mux(sign1 === io.inputsign(1) , scaledc2v1 , ~scaledc2v1+1.U )
+
+  io.minval(1) := Mux(io.initial,0.U,c2vval1) 
+ 
+
+  //io.min := min 
+  //io.submin := submin 
+  //io.minaddr := minaddr 
+  //io.subminaddr := subminaddr 
+  //io.sign := sign 
+
+
+}

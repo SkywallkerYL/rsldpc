@@ -9,7 +9,9 @@ object Elaborate extends App {
   //Muxminandsecmin 
   //CheckNodeCOL  DecoderCol
   //rsdecoder  rsdecodertop 
+  //CheckNode2Col
   //Errorbits   
+  //Decoder2Col  
   def top = new rsdecodertop 
 
   val useMFC = false // use MLIR-based firrtl compiler
