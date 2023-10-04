@@ -46,7 +46,7 @@ void sim_init(){
 #elif TESTMODULE == 6 
   top = new VTopdecoder;
 #elif TESTMODULE == 7 
-  top = new VDecoderCol; 
+  top = new VDecoder2Col; 
 #elif TESTMODULE == 8
   top = new Vrsdecoder;
 #elif TESTMODULE == 9

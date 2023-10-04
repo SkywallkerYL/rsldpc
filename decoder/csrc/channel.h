@@ -7,7 +7,7 @@
 	> Created Time: 2023年05月21日 星期日 14时26分51秒
  ************************************************************************/
 #include "common.h"
-#include<iostream>
+#include<iostream> 
 using namespace std;
 
 static default_random_engine channel(static_cast<unsigned>(time(NULL)));
@@ -53,7 +53,20 @@ int LLrInitial(double Noise)
 		else if (llr_init < boundy6)  	return LLR_INIT4bit55;
 		else if (llr_init < boundy7)  	return LLR_INIT4bit6;
 		else                          	return LLR_INIT4bit7;
-
+#elif LLR_INIT_TABLE == 4
+  if(llr_init < -0.496752656){
+    return -7;
+  }else if(llr_init < -0.13206355){
+    return -4;
+  }else if (llr_init < 0){
+    return -1;
+  }else if (llr_init < 0.13206355){
+    return 1;
+  }else if (llr_init < 0.496752656){
+    return 4;
+  }else{
+    return 7;
+  }
 #endif
 }
 

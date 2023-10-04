@@ -31,7 +31,8 @@ int main(int argc , char* argv[]) {
 #elif TESTMODULE == 6
 	toptest();
 #elif TESTMODULE == 7
-	DecoderTest();
+	//DecoderTest();
+	cppDiffDecoderTest();
 //	cppDecoderTest();
 //	diffDecoderTest();
 #elif TESTMODULE == 8

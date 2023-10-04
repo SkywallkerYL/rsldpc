@@ -17,7 +17,7 @@
 #define LLR_INIT_TABLE 3
 
 
-#define TESTMODULE 9 
+#define TESTMODULE 7 
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -52,23 +52,28 @@ VGngWrapper* top;
 #include "VTopdecoder___024root.h"
 VTopdecoder* top;
 int maxerrortime = 50 ;
-int ITERMAX      = 20 ;
+int ITERMAX      = 6 ;
 #elif TESTMODULE == 7
-#include "VDecoderCol.h"
-#include "VDecoderCol___024root.h"
-VDecoderCol* top;
-double sigmastart = 0.55;
+#include "VDecoder2Col.h"
+#include "VDecoder2Col___024root.h"
+VDecoder2Col* top;
+double sigmastart = 0.60;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
 int maxtime			= 1000;
 int maxerrortime	= 50 ;
-int ITERMAX		  = 20 ;
+int ITERMAX		  = 6 ;
 int APPWIDTH = 7 ;
 int V2CWIDTH = 4; 
 int C2VWIDTH = 4 ; 
 int APPMAX = pow(2,APPWIDTH-1)-1;
 int V2CMAX = pow(2,V2CWIDTH-1)-1;
 int C2VMAX = pow(2,C2VWIDTH-1)-1;
+double alpha = 0.75;
+int COLNUMBER = 2048;
+int ROWNUMBER = 384;
+int BLKSIZE   = 64;
+#define Message int
 const char BASE_MATRIX_FILENAME[] = "/home/yangli/rsldpc/matrix/2048_1723.txt";
 #elif TESTMODULE == 8
 #include "Vrsdecoder.h"
@@ -81,7 +86,7 @@ int ITERMAX      = 20 ;
 #include "Vrsdecodertop___024root.h"
 Vrsdecodertop* top;
 int maxerrortime = 50 ;
-int ITERMAX      = 20 ;
+int ITERMAX      = 6 ;
 #elif TESTMODULE == 10
 #include "VErrorbits.h"
 #include "VErrorbits___024root.h"
@@ -89,7 +94,7 @@ VErrorbits* top;
 int maxerrortime = 50 ;
 int ITERMAX      = 20 ;
 #endif
-//#define DIFFTEST 
+#define DIFFTEST 
 
 
 //#define WAVE 

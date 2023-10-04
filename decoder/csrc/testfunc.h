@@ -554,7 +554,7 @@ bool decodeonetime(double sigma){
 	clockntimes(1);
 	top->io_Start = 0;
 	//printf("hhh\n");
-	for(int i = 0 ; i < 32 ; i ++ ){
+	for(int i = 0 ; i < 16 ; i ++ ){
 		top->io_LLrin_0 = LLrInitial(RandomGen(sigma));
 		top->io_LLrin_1 = LLrInitial(RandomGen(sigma));
 		top->io_LLrin_2 = LLrInitial(RandomGen(sigma));
@@ -619,6 +619,71 @@ bool decodeonetime(double sigma){
 		top->io_LLrin_61 = LLrInitial(RandomGen(sigma));
 		top->io_LLrin_62 = LLrInitial(RandomGen(sigma));
 		top->io_LLrin_63 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_64 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_65 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_66 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_67 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_68 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_69 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_70 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_71 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_72 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_73 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_74 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_75 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_76 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_77 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_78 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_79 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_80 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_81 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_82 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_83 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_84 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_85 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_86 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_87 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_88 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_89 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_90 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_91 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_92 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_93 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_94 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_95 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_96 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_97 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_98 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_99 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_100 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_101 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_102 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_103 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_104 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_105 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_106 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_107 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_108 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_109 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_110 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_111 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_112 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_113 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_114 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_115 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_116 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_117 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_118 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_119 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_120 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_121 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_122 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_123 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_124 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_125 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_126 = LLrInitial(RandomGen(sigma));
+		top->io_LLrin_127 = LLrInitial(RandomGen(sigma));
+	
 		clockntimes(1);
 	}
 //	printf("hhh\n");
@@ -659,14 +724,14 @@ void DecoderTest(){
 
 	//Log("if there is no other output, it means the module works right");
 }
-void update_min_vss(int &min1, int &min2,int & min1_addr , int & min2_addr ,int val ,int addr ){
+void update_min_vss(Message &min1, Message &min2,int & min1_addr , int & min2_addr ,Message val ,int addr ){
 	if(addr == min1_addr) {
 		if(val <= min2) {
 			min1 = val ; 
 		}else {
 			min1 = min2 ; 
 			min1_addr = min2_addr ;
-			min2 = val <= C2VMAX ? val : C2VMAX ; 
+			min2 = val ;//<= C2VMAX ? val : C2VMAX ; 
 			min2_addr = addr ;
 		}
 	}else if (addr == min2_addr) {
@@ -676,7 +741,7 @@ void update_min_vss(int &min1, int &min2,int & min1_addr , int & min2_addr ,int 
 			min1 = val ; 
 			min1_addr =addr;
 		}else {
-			min2 = val <= C2VMAX ? val : C2VMAX; 
+			min2 = val ;//<= C2VMAX ? val : C2VMAX; 
 		}
 	}else {
 		if(val <= min1) {
@@ -691,68 +756,225 @@ void update_min_vss(int &min1, int &min2,int & min1_addr , int & min2_addr ,int 
 	}
 
 }
-bool cppdecodekernel(int H[384][2048], int * llrin, int * appout , bool v2c[2048][6], 
-		int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v 
+void choose_true_min(Message &min1, Message &min2,
+					 Message &submin1, Message &submin2,
+		int & min_addr1 , int & min_addr2 ,
+		int & submin_addr1 , int & submin_addr2 ,
+		Message &minval ,Message & subminval,
+		int &minaddr,int &subminaddr ){
+
+	bool mindecide[6];
+	mindecide[0] = min1<min2 ;
+	mindecide[1] = min1<submin1 ;
+	mindecide[2] = min1<submin2 ;
+	mindecide[3] = min2<submin1 ;
+	mindecide[4] = min2<submin2 ;
+	mindecide[5] = submin1<submin2 ;
+	subminval = submin2;
+	subminaddr = submin_addr2;
+	if(mindecide[0] & mindecide[1]&mindecide[2]){
+		minval = min1;
+		minaddr = min_addr1;
+		if(mindecide[3]&mindecide[4]){
+			subminval = min2;
+			subminaddr = min_addr2;
+		}else if(mindecide[5]){
+			subminval = submin1;
+			subminaddr = submin_addr1;
+		}
+	}else if(mindecide[3]&mindecide[4]){
+		minval = min2;
+		minaddr = min_addr2;
+		if(mindecide[1]&mindecide[2]){
+			subminval = min1;
+			subminaddr = min_addr1;
+		}else if(mindecide[5]){
+			subminval = submin1;
+			subminaddr = submin_addr1;
+		}
+	}else if(mindecide[5]){
+		minval = submin1;
+		minaddr = submin_addr1;
+		if(mindecide[0]&mindecide[2]){
+			subminval = min1;
+			subminaddr = min_addr1;
+		}else if(mindecide[4]){
+			subminval = submin2;
+			subminaddr = submin_addr2;
+		}
+	}else {
+		minval = submin2;
+		minaddr = submin_addr2;
+		if(mindecide[0]&mindecide[1]){
+			subminval = min1;
+			subminaddr = min_addr1;
+		}else if(mindecide[3]){
+			subminval = min2;
+			subminaddr = min_addr2;
+		}else {
+			subminval = submin1;
+			subminaddr = submin_addr1;
+		}
+	}
+
+}
+bool cppdecodekernelFast2col(vector<vector<int>> VofC,vector<vector<int>> CofV, Message * llrin, Message * appout , vector<vector<bool>> v2c, 
+		Message *min1, Message *submin1,int * min_addr1, int *submin_addr1, 
+		Message *min2, Message *submin2,int * min_addr2, int *submin_addr2, 
+		bool * sign , bool * sign0 ,Message * c2v,Message * c2v0 
 		){
 	// Initialization   
-	for(int i = 0; i < 384; i ++) {
+	for(int i = 0; i < ROWNUMBER; i ++) {
 		min1[i] = min2[i] = C2VMAX; 
-		min1_addr[i] = min2_addr[i] = -1 ;
+		submin1[i] = submin2[i] = C2VMAX;
+		min_addr1[i] = min_addr2[i] = 0 ;
+		submin_addr1[i] = submin_addr2[i] = 0 ;
 		sign[i]  = 0;
+		sign0[i]  = 0;
 	}
-	for(int i = 0; i < 2048; i ++) {
+	for(int i = 0; i < COLNUMBER; i ++) {
 		//update checknode min1 min2   
-		for( int j = 0 ; j < 384 ; j ++) {
-			if(H[j][i] == 1) {
+		for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+			//if(H[j][i] == 1) {
+				int j = CofV[i][jindex];
+				
 				if(llrin[i] < 0) {
-					sign[j] = sign[j]^1;
+					if((i/BLKSIZE)%2==0){	
+						sign[j] = sign[j]^1;
+					}else {
+						sign0[j] = sign0[j]^1;
+					}
+										
 				}
-				int llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
-				v2c[i][j/64] = llrin[i] < 0;
-				update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],llr_abs,i/64);
-			}
+				Message llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
+				//if(llr_abs > C2VMAX) printf("aaaaa\n");
+//#if TYPE
+				llr_abs = (llr_abs <= C2VMAX ? llr_abs : C2VMAX) ;
+//#endif
+				v2c[i][j] = llrin[i] < 0;
+				//update_min(min1[j],min2[j],min1_addr[j],llr_abs,i);
+				//两列同时做  相当于偶数列存min1  奇数列存Min2  从0开始
+				if((i/BLKSIZE)%2 == 0){
+					update_min_vss(min1[j],submin1[j],min_addr1[j],submin_addr1[j],llr_abs,i/BLKSIZE);
+				}else {
+					update_min_vss(min2[j],submin2[j],min_addr2[j],submin_addr2[j],llr_abs,i/BLKSIZE);
+				}
+			//}
 		}
 		appout[i] = llrin[i];
 	}
 	//Iteration 
 	bool success = 1; 
 	for(int iter = 0 ; iter < ITERMAX; iter++) {
-		for (int i = 0; i < 2048; i ++) {
+		
+		for (int iindex = 0; iindex < 16; iindex ++) {
 			//CNU 
-			int appval = llrin[i];
-			for ( int j = 0 ; j < 384; j ++) {
-				if(H[j][i] == 1) {
-					c2v[j] = i/64 == min1_addr[j] ? min2[j] : min1[j];
-
-					c2v[j] = c2v[j] * 3/4;
-					c2v[j] = c2v[j] <= C2VMAX ? c2v[j] : C2VMAX ;
-					if(sign[j] != v2c[i][j/64]){
-						c2v[j] = -c2v[j];	
-					}		
-					appval += c2v[j];
+			for (int id = 0 ; id < 128 ; id++ ){
+				int i = iindex*128+id;
+				Message appval = llrin[i];
+				for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+					//if(H[j][i] == 1) {
+						int j = CofV[i][jindex];
+						Message minval ;Message subminval;
+						int minaddr;int subminaddr;
+						//if(min1_addr[j] == -1) exit(0);
+						choose_true_min(min1[j],min2[j],submin1[j],submin2[j],
+						min_addr1 [j],min_addr2[j] ,submin_addr1[j] ,submin_addr2[j] ,
+						minval ,subminval,
+							minaddr,subminaddr );
+						//printf("minval:%d minaddr:%d\n",minval,minaddr);
+						Message c2v_val = ((i/BLKSIZE == minaddr) ? subminval : minval);
+						//if(c2v[j]>=1000) 
+						//{
+						//printf("iter:%d j:%d c2v:%f min1:%f min2:%f \n",iter,j,c2v[j],min1[j],min2[j]);
+						//printf("addr:%d col:%d c2v_val:%f\n",min1_addr[j],i,c2v_val);
+						////	exit(0);
+						//}
+						c2v_val = c2v_val * 0.75;//3/4;
+						//c2v_val = (c2v_val+c2v_val+c2v_val) / 4;
+						if((i/BLKSIZE)%2==0){	
+							if(sign[j] != v2c[i][j]){
+								c2v_val = -c2v_val;	
+							}	
+							c2v[j] = c2v_val;
+						}else {
+							if(sign0[j] != v2c[i][j]){
+								c2v_val = -c2v_val;	
+							}	
+							c2v0[j] = c2v_val;
+						}
+						//c2v[j] = c2v[j] <= C2VMAX ? c2v[j] : C2VMAX ;	
+						//c2v[j] = c2v_val;
+						appval += c2v_val;
+					//}
 				}
+				appout[i] = appval;
 			}
+			//appout[i] = appval;
+			//if(appval<=-10) 
+			//{
+			//	printf("/********app check*********/\n");
+			//	printf("iter:%d app:%f llr:%f\n",iter,appval,llrin[i] );
+			//	for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+			//	//if(H[j][i] == 1) {
+			//		int j = CofV[i][jindex];
+			//		printf("iter:%d j:%d c2v:%f min1:%f min2:%f \n",iter,j,c2v[j],min1[j],min2[j]);
+			//	}
+			////	exit(0);
+			//}
 			//VNU   update v2c 
-			for (int j = 0 ; j < 384; j ++) {
-				if(H[j][i] == 1) {
-					int v2c_abs = appval - c2v[j];
-					int v2csign = 0 ; 
-					if(v2c_abs < 0 ) {
-						v2c_abs = -v2c_abs ;
-						v2csign = 1; 
-					}
-					v2c_abs = v2c_abs <= V2CMAX ? v2c_abs : V2CMAX ;
-					if(v2csign != v2c[i][j/64]) {
-						sign[j] = sign[j] ^ 1; 
-					}
-					v2c[i][j/64] = v2csign ; 
-					update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],v2c_abs,i/64);
+			for (int id = 0 ; id < 128 ; id++ ){
+				int i = iindex*128+id;
+				Message appval = appout[i];
+				for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+					//if(H[j][i] == 1) {
+						int j = CofV[i][jindex];
+						Message v2c_abs;
+						if((i/BLKSIZE)%2==0){
+							v2c_abs = appval - c2v[j];
+						}else{
+							v2c_abs = appval - c2v0[j];
+						}
+						int v2csign = 0 ; 
+						if(v2c_abs < 0 ) {
+							v2c_abs = -v2c_abs ;
+							v2csign = 1; 
+						}
+						//if(v2c_abs>=40) 
+						//{
+						//	printf("/********v2c_abs check*********/\n");
+						//	printf("iter:%d app:%f llr:%f v2c:%f c2v:%f sign:%d\n",iter,appval,llrin[i],v2c_abs,c2v[j],v2csign );
+						//}
+
+//#if TYPE
+						v2c_abs = v2c_abs <= C2VMAX ? v2c_abs : C2VMAX ;
+//#endif
+						if((i/BLKSIZE)%2==0){	
+							if(v2csign != v2c[i][j]) {
+								sign[j] = sign[j] ^ 1; 
+							}
+						}else {
+							if(v2csign != v2c[i][j]) {
+								sign0[j] = sign0[j] ^ 1; 
+							}	
+						}
+						v2c[i][j] = v2csign ;
+						if((i/BLKSIZE)%2 == 0){
+							//printf("%d\n",i);
+							update_min_vss(min1[j],submin1[j],min_addr1[j],submin_addr1[j],v2c_abs,i/BLKSIZE);
+						}else {
+							//printf("hhh%d\n",i);
+							update_min_vss(min2[j],submin2[j],min_addr2[j],submin_addr2[j],v2c_abs,i/BLKSIZE);
+						} 
+						//update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],v2c_abs,i);
+						//update_min(min1[j],min2[j],min1_addr[j],v2c_abs,i);
+					//}
 				}
 			}
-			appout[i] = appval;
+			
 		}
 		success = 1; 
-		for (int i = 0 ; i < 2048 ; i ++) {
+		for (int i = 0 ; i < COLNUMBER ; i ++) {
 			if(appout[i] < 0 ){
 				success = 0 ;
 				break;
@@ -765,406 +987,631 @@ bool cppdecodekernel(int H[384][2048], int * llrin, int * appout , bool v2c[2048
 	return success ;
 }
 void cppDecoderTest(){
-	int H[384][2048];
+
+	//int H[ROWNUMBER][COLNUMBER];
+	//这里直接定义这个大矩阵会超内存
+	//导致C程序错误退出  
+	//用vector动态分配
+	vector<vector<int>> H;
+	H.resize(ROWNUMBER);
+	for (int i = 0 ; i < ROWNUMBER; i ++ ){
+		H[i].resize(COLNUMBER);
+	}
 	ifstream inr(BASE_MATRIX_FILENAME);
 	if(!inr) {
 		Log("No file %s",BASE_MATRIX_FILENAME) ;
 		return ; 
 	}
 	string r ;
-	for(int i = 0 ; i < 384; i ++) {
+	for(int i = 0 ; i < ROWNUMBER; i ++) {
 		string number ; 
 		getline(inr,r);
 		istringstream stream(r);
-		for (int j = 0 ; j < 2048 ; j ++) {
+		for (int j = 0 ; j < COLNUMBER ; j ++) {
 			stream >> number ; 
 			H[i][j] = stoi(number);
 		}
+	}
+
+	vector<vector<int>> VofC ;
+	VofC.resize(ROWNUMBER);
+	for(int i = 0; i < ROWNUMBER; i++){
+		VofC[i].resize(COLNUMBER/BLKSIZE);
+		for(int j = 0 ; j < COLNUMBER; j ++) {
+			if(H[i][j]==1) {
+				VofC[i][j/BLKSIZE] = j ;
+			}
+		}
+
+	}
+	vector<vector<int>> CofV ;
+	CofV.resize(COLNUMBER);
+	for(int i = 0; i < COLNUMBER; i++){
+		CofV[i].resize(ROWNUMBER/BLKSIZE);
+		for(int j = 0 ; j < ROWNUMBER; j ++) {
+			if(H[j][i]==1) {
+				CofV[i][j/BLKSIZE] = j ;
+			}
+		}
+
 	}
 	//printf("aaa\n");
 	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
 		int frame = 0 ;
 		int errorframe = 0; 
-		while(frame < maxtime || errorframe < maxerrortime) {
-			int llrin[2048]; 
-			int appout[2048];
-			bool v2c[2048][6]; 
-			int min1 [384];
-			int min2 [384];
-			int min1_addr[384];
-			int min2_addr[384]; 
-			bool sign[384] ;
-			int c2v[384] ;
-			for (int i = 0 ; i < 2048;i++ ){
-				llrin[i] = LLrInitial(RandomGen(sigma)); 
+		//Log("hhhh");
+		while((frame < maxtime) || (errorframe < maxerrortime)) {
+			Message llrin[COLNUMBER]; 
+			Message appout[COLNUMBER];
+			//bool v2c[COLNUMBER][6]; 
+
+			vector<vector<bool>> v2c;
+			v2c.resize(COLNUMBER);
+			for (int i = 0 ; i < COLNUMBER; i ++ ){
+				v2c[i].resize(ROWNUMBER);
 			}
-			bool success = cppdecodekernel(H,llrin, appout , v2c, 
-		min1, min2,min1_addr, min2_addr,sign , c2v 
+			Message c2v[ROWNUMBER] ;
+
+			Message min1 [ROWNUMBER];
+			Message min2 [ROWNUMBER]; 
+			bool sign[ROWNUMBER] ;
+			
+			//Log("hhhh");
+			for (int i = 0 ; i < COLNUMBER;i++ ){
+				llrin[i] = LLrInitial((sigma)); 
+//#if TYPE
+				llrin[i] = llrin[i] <= -APPMAX ? -APPMAX : llrin[i] >= APPMAX ? APPMAX : llrin[i];
+//#endif
+			}
+
+		Message submin1 [ROWNUMBER];
+		Message submin2 [ROWNUMBER];
+		int min_addr1[ROWNUMBER];
+		int min_addr2[ROWNUMBER]; 
+		int submin_addr1[ROWNUMBER];
+		int submin_addr2[ROWNUMBER];
+		bool sign0[ROWNUMBER] ;
+		Message c2v0[ROWNUMBER] ;
+		bool success = cppdecodekernelFast2col(VofC, CofV,  llrin, appout ,v2c, 
+		 min1, submin1,min_addr1, submin_addr1, 
+		 min2, submin2,min_addr2, submin_addr2, 
+				sign ,sign0, c2v,c2v0 
 		);
 			//printf("aaa\n");
-			if(!success) errorframe++;
+			if(!success) {
+				errorframe++;
+				//Log("fail frame %d",errorframe);
+			}
+			//else Log("success frame%d",frame);
 			frame++;
 		}
 		double fer = (double) errorframe / (double) frame;
-		double rate = (double)1723/(double)2048;
+		double rate = (double)1723/(double)COLNUMBER;
 		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
 		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
 	}
 
 	//Log("if there is no other output, it means the module works right");
 }
+
 #ifdef DIFFTEST 
 #include "difftest.h"
-bool diffall(int counter,bool &diffin,  int * appout , bool v2c[2048][6], 
-	int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v ,
-	 int * dutappout , bool dutv2c[2048][6], 
-	int *dutmin1, int *dutmin2,int * dutmin1_addr, int *dutmin2_addr, bool * dutsign , int * dutc2v
-	) {
-	
-
-	AppoutFetch(dutappout,counter);
-	bool diff = 1; 
-	diff = AppOutdiff(appout,dutappout,0) ;
-	diffin = diff ;
-	if(!diff) return false ;
-	minfetch(dutmin1);
-	subminfecth(dutmin2);
-	minaddrfetch(dutmin1_addr) ;
-	subminaddrfetch(dutmin2_addr);
-	signfetch(dutsign) ;
-	v2csignfetch(dutv2c);
-
-	diff = mindiff(min1,dutmin1) ;
-	diffin = diff ;
-	if(!diff) return false ; 
-	//Log("mindifftest pass");
-	diff = submindiff(min2,dutmin2); 
-	diffin = diff ;
-	if(!diff) return false ;
-	//Log("submindifftest pass");
-	diff = minaddrdiff(min1_addr,dutmin1_addr);
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = subminaddrdiff(min2_addr,dutmin2_addr); 
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = signdiff(sign,dutsign) ;
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = v2csigndiff(v2c,dutv2c);
-	diffin = diff ;
-	if(!diff) return false ;
+//更新除了appout以外的所有值
+void valuefetch(int *dutmin1,int *dutmin2,int *dutsubmin1,int *dutsubmin2,
+	int* dutminaddr1,int * dutsubminaddr1,int * dutminaddr2,int* dutsubminaddr2,
+	bool* dutsign , bool * dutsign0,int * dutc2v,int* dutc2v0,bool dutv2c[2048][6]
+){
+	c2vfetch (dutc2v,dutc2v0)  ; 
+	minfetch(dutmin1, dutmin2) ;
+	subminfecth(dutsubmin1 ,dutsubmin1) ;
+	minaddrfetch(dutminaddr1 ,dutminaddr2) ;
+	subminaddrfetch(dutsubminaddr1 ,dutsubminaddr2) ;
+	signfetch(dutsign,dutsign0) ; 
+	v2csignfetch(dutv2c) ;
 }
-bool diffdecodekernel(int H[384][2048], int * llrin, int * appout , bool v2c[2048][6], 
-		int *min1, int *min2,int * min1_addr, int *min2_addr, bool * sign , int * c2v 
-		, bool &diffin){
-	int dutllrin[2048]; 
+//比较除了appout,c2v以外的所有数值
+bool valuediff(int *dutmin1,int *dutmin2,int *dutsubmin1,int *dutsubmin2,
+	int* dutminaddr1,int * dutsubminaddr1,int * dutminaddr2,int* dutsubminaddr2,
+	bool* dutsign , bool * dutsign0,//int * dutc2v,int* dutc2v0,
+	bool dutv2c[2048][6],
+	bool v2c[2048][6], 
+	Message *min1, Message *submin1,int * min_addr1, int *submin_addr1, 
+	Message *min2, Message *submin2,int * min_addr2, int *submin_addr2, 
+	bool * sign , bool * sign0 //,Message * c2v,Message * c2v0 
+){
+	bool diff = 1;
+	// min 
+	diff = mindiff(min1,dutmin1);
+	if(!diff) return false ;
+	diff = mindiff(min2,dutmin2);
+	if(!diff) return false ;
+	//submin 
+	diff = submindiff(submin1,dutsubmin1);
+	if(!diff) return false ;
+	diff = submindiff(submin2,dutsubmin2);
+	if(!diff) return false ;
+	//minaddr 
+	diff = minaddrdiff(min_addr1,dutminaddr1);
+	if(!diff) return false ;
+	diff = minaddrdiff(min_addr2,dutminaddr2);
+	if(!diff) return false ;
+	diff = minaddrdiff(submin_addr1,dutsubminaddr1);
+	if(!diff) return false ;
+	diff = minaddrdiff(submin_addr2,dutsubminaddr2);
+	if(!diff) return false ;
+	diff = signdiff(sign,dutsign) ;
+	if(!diff) return false ;
+	diff = signdiff(sign0,dutsign0) ;
+	if(!diff) return false ;
+	diff = v2csigndiff(v2c,dutv2c) ;
+	if(!diff) return false ;
+	return diff;
+}
+
+bool cppdecodekernelFast2coldiff(vector<vector<int>> VofC,vector<vector<int>> CofV, Message * llrin, Message * appout , bool v2c[2048][6], 
+		Message *min1, Message *submin1,int * min_addr1, int *submin_addr1, 
+		Message *min2, Message *submin2,int * min_addr2, int *submin_addr2, 
+		bool * sign , bool * sign0 ,Message * c2v,Message * c2v0 
+		){
+	// dut array 
+	//int dutllrin[2048]; 
 	int dutappout[2048];
 	bool dutv2c[2048][6]; 
-	int dutmin1 [384];
-	int dutmin2 [384];
-	int dutmin1_addr[384];
-	int dutmin2_addr[384]; 
-	bool dutsign[384] ;
-	int dutc2v[384] ;
-
-
-	// cppInitialization   
-	for(int i = 0; i < 384; i ++) {
+	int dutmin1 [384];int dutsubmin1 [384];
+	int dutmin2 [384];int dutsubmin2 [384];
+	int dutminaddr1[384];int dutsubminaddr1[384];
+	int dutminaddr2[384];int dutsubminaddr2[384]; 
+	bool dutsign[384] ;bool dutsign0[384] ;
+	int dutc2v[384] ; int dutc2v0[384] ;
+	//
+	// Initialization   
+	for(int i = 0; i < ROWNUMBER; i ++) {
 		min1[i] = min2[i] = C2VMAX; 
-		min1_addr[i] = min2_addr[i] = 32 ;
+		submin1[i] = submin2[i] = C2VMAX;
+		min_addr1[i] = min_addr2[i] = 0 ;
+		submin_addr1[i] = submin_addr2[i] = 0 ;
 		sign[i]  = 0;
+		sign0[i]  = 0;
 	}
-	for(int i = 0; i < 2048; i ++) {
+	for(int i = 0; i < COLNUMBER; i ++) {
 		//update checknode min1 min2   
-		for( int j = 0 ; j < 384 ; j ++) {
-			if(H[j][i] == 1) {
-				if(llrin[i] < 0) {
+		for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+			int j = CofV[i][jindex];
+			
+			if(llrin[i] < 0) {
+				if((i/BLKSIZE)%2==0){	
 					sign[j] = sign[j]^1;
+				}else {
+					sign0[j] = sign0[j]^1;
 				}
-				int llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
-				v2c[i][j/64] = llrin[i] < 0;
-				update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],llr_abs,i/64);
+									
+			}
+			Message llr_abs = llrin[i] < 0 ? -llrin[i] : llrin[i];
+			llr_abs = (llr_abs <= C2VMAX ? llr_abs : C2VMAX) ;
+			v2c[i][j] = llrin[i] < 0;
+			//update_min(min1[j],min2[j],min1_addr[j],llr_abs,i);
+			//两列同时做  相当于偶数列存min1  奇数列存Min2  从0开始
+			if((i/BLKSIZE)%2 == 0){
+				update_min_vss(min1[j],submin1[j],min_addr1[j],submin_addr1[j],llr_abs,i/BLKSIZE);
+			}else {
+				update_min_vss(min2[j],submin2[j],min_addr2[j],submin_addr2[j],llr_abs,i/BLKSIZE);
 			}
 		}
 		appout[i] = llrin[i];
 	}
-	// DecoderInitialization  
+	//Decoder Initialization
 	top->io_Start = 1;
 	top->io_IterInput = ITERMAX ;
-	clockntimes(1);
-	top->io_Start = 0;
-	//printf("hhh\n");
-	for(int i = 0 ; i < 32 ; i ++ ){
-		top->io_LLrin_0  = llrin[i*64+0 ];
-		top->io_LLrin_1  = llrin[i*64+1 ];
-		top->io_LLrin_2  = llrin[i*64+2 ];
-		top->io_LLrin_3  = llrin[i*64+3 ];
-		top->io_LLrin_4  = llrin[i*64+4 ];
-		top->io_LLrin_5  = llrin[i*64+5 ];
-		top->io_LLrin_6  = llrin[i*64+6 ];
-		top->io_LLrin_7  = llrin[i*64+7 ];
-		top->io_LLrin_8  = llrin[i*64+8 ];
-		top->io_LLrin_9  = llrin[i*64+9 ];
-		top->io_LLrin_10 = llrin[i*64+10];
-		top->io_LLrin_11 = llrin[i*64+11];
-		top->io_LLrin_12 = llrin[i*64+12];
-		top->io_LLrin_13 = llrin[i*64+13];
-		top->io_LLrin_14 = llrin[i*64+14];
-		top->io_LLrin_15 = llrin[i*64+15];
-		top->io_LLrin_16 = llrin[i*64+16];
-		top->io_LLrin_17 = llrin[i*64+17];
-		top->io_LLrin_18 = llrin[i*64+18];
-		top->io_LLrin_19 = llrin[i*64+19];
-		top->io_LLrin_20 = llrin[i*64+20];
-		top->io_LLrin_21 = llrin[i*64+21];
-		top->io_LLrin_22 = llrin[i*64+22];
-		top->io_LLrin_23 = llrin[i*64+23];
-		top->io_LLrin_24 = llrin[i*64+24];
-		top->io_LLrin_25 = llrin[i*64+25];
-		top->io_LLrin_26 = llrin[i*64+26];
-		top->io_LLrin_27 = llrin[i*64+27];
-		top->io_LLrin_28 = llrin[i*64+28];
-		top->io_LLrin_29 = llrin[i*64+29];
-		top->io_LLrin_30 = llrin[i*64+30];
-		top->io_LLrin_31 = llrin[i*64+31];
-		top->io_LLrin_32 = llrin[i*64+32];
-		top->io_LLrin_33 = llrin[i*64+33];
-		top->io_LLrin_34 = llrin[i*64+34];
-		top->io_LLrin_35 = llrin[i*64+35];
-		top->io_LLrin_36 = llrin[i*64+36];
-		top->io_LLrin_37 = llrin[i*64+37];
-		top->io_LLrin_38 = llrin[i*64+38];
-		top->io_LLrin_39 = llrin[i*64+39];
-		top->io_LLrin_40 = llrin[i*64+40];
-		top->io_LLrin_41 = llrin[i*64+41];
-		top->io_LLrin_42 = llrin[i*64+42];
-		top->io_LLrin_43 = llrin[i*64+43];
-		top->io_LLrin_44 = llrin[i*64+44];
-		top->io_LLrin_45 = llrin[i*64+45];
-		top->io_LLrin_46 = llrin[i*64+46];
-		top->io_LLrin_47 = llrin[i*64+47];
-		top->io_LLrin_48 = llrin[i*64+48];
-		top->io_LLrin_49 = llrin[i*64+49];
-		top->io_LLrin_50 = llrin[i*64+50];
-		top->io_LLrin_51 = llrin[i*64+51];
-		top->io_LLrin_52 = llrin[i*64+52];
-		top->io_LLrin_53 = llrin[i*64+53];
-		top->io_LLrin_54 = llrin[i*64+54];
-		top->io_LLrin_55 = llrin[i*64+55];
-		top->io_LLrin_56 = llrin[i*64+56];
-		top->io_LLrin_57 = llrin[i*64+57];
-		top->io_LLrin_58 = llrin[i*64+58];
-		top->io_LLrin_59 = llrin[i*64+59];
-		top->io_LLrin_60 = llrin[i*64+60];
-		top->io_LLrin_61 = llrin[i*64+61];
-		top->io_LLrin_62 = llrin[i*64+62];
-		top->io_LLrin_63 = llrin[i*64+63];
-		if(i >= 2) {
-			if(top->io_counter != (i-2)) {
-				Log("something wrong counter:%d i:%d",top->io_counter,i-2);
-				exit(0);
-			}
-		//跳入initial 两个周期后，可以拿到 appout  
-			AppoutFetch(dutappout,i-2);
-		}
-		clockntimes(1);
-	
-	}
 	//clockntimes(1);
- 	//Log("counter:%d ",top->io_counter);
-	AppoutFetch(dutappout,30);
+	//top->io_Start = 0;
+	//
+	for(int i = 0; i < 16;i++) {
+		top->io_LLrin_0 = llrin[i*128+0];
+		//printf("llrin:%x appout:%x\n",top->io_LLrin_0,top->io_appout_0);
+		top->io_LLrin_1 = llrin[i*128+1];
+		top->io_LLrin_2 = llrin[i*128+2];
+		top->io_LLrin_3 = llrin[i*128+3];
+		top->io_LLrin_4 = llrin[i*128+4];
+		top->io_LLrin_5 = llrin[i*128+5];
+		top->io_LLrin_6 = llrin[i*128+6];
+		top->io_LLrin_7 = llrin[i*128+7];
+		top->io_LLrin_8 = llrin[i*128+8];
+		top->io_LLrin_9 = llrin[i*128+9];
+		top->io_LLrin_10 = llrin[i*128+10];
+		top->io_LLrin_11 = llrin[i*128+11];
+		top->io_LLrin_12 = llrin[i*128+12];
+		top->io_LLrin_13 = llrin[i*128+13];
+		top->io_LLrin_14 = llrin[i*128+14];
+		top->io_LLrin_15 = llrin[i*128+15];
+		top->io_LLrin_16 = llrin[i*128+16];
+		top->io_LLrin_17 = llrin[i*128+17];
+		top->io_LLrin_18 = llrin[i*128+18];
+		top->io_LLrin_19 = llrin[i*128+19];
+		top->io_LLrin_20 = llrin[i*128+20];
+		top->io_LLrin_21 = llrin[i*128+21];
+		top->io_LLrin_22 = llrin[i*128+22];
+		top->io_LLrin_23 = llrin[i*128+23];
+		top->io_LLrin_24 = llrin[i*128+24];
+		top->io_LLrin_25 = llrin[i*128+25];
+		top->io_LLrin_26 = llrin[i*128+26];
+		top->io_LLrin_27 = llrin[i*128+27];
+		top->io_LLrin_28 = llrin[i*128+28];
+		top->io_LLrin_29 = llrin[i*128+29];
+		top->io_LLrin_30 = llrin[i*128+30];
+		top->io_LLrin_31 = llrin[i*128+31];
+		top->io_LLrin_32 = llrin[i*128+32];
+		top->io_LLrin_33 = llrin[i*128+33];
+		top->io_LLrin_34 = llrin[i*128+34];
+		top->io_LLrin_35 = llrin[i*128+35];
+		top->io_LLrin_36 = llrin[i*128+36];
+		top->io_LLrin_37 = llrin[i*128+37];
+		top->io_LLrin_38 = llrin[i*128+38];
+		top->io_LLrin_39 = llrin[i*128+39];
+		top->io_LLrin_40 = llrin[i*128+40];
+		top->io_LLrin_41 = llrin[i*128+41];
+		top->io_LLrin_42 = llrin[i*128+42];
+		top->io_LLrin_43 = llrin[i*128+43];
+		top->io_LLrin_44 = llrin[i*128+44];
+		top->io_LLrin_45 = llrin[i*128+45];
+		top->io_LLrin_46 = llrin[i*128+46];
+		top->io_LLrin_47 = llrin[i*128+47];
+		top->io_LLrin_48 = llrin[i*128+48];
+		top->io_LLrin_49 = llrin[i*128+49];
+		top->io_LLrin_50 = llrin[i*128+50];
+		top->io_LLrin_51 = llrin[i*128+51];
+		top->io_LLrin_52 = llrin[i*128+52];
+		top->io_LLrin_53 = llrin[i*128+53];
+		top->io_LLrin_54 = llrin[i*128+54];
+		top->io_LLrin_55 = llrin[i*128+55];
+		top->io_LLrin_56 = llrin[i*128+56];
+		top->io_LLrin_57 = llrin[i*128+57];
+		top->io_LLrin_58 = llrin[i*128+58];
+		top->io_LLrin_59 = llrin[i*128+59];
+		top->io_LLrin_60 = llrin[i*128+60];
+		top->io_LLrin_61 = llrin[i*128+61];
+		top->io_LLrin_62 = llrin[i*128+62];
+		top->io_LLrin_63 = llrin[i*128+63];
+		top->io_LLrin_64 = llrin[i*128+64];
+		top->io_LLrin_65 = llrin[i*128+65];
+		top->io_LLrin_66 = llrin[i*128+66];
+		top->io_LLrin_67 = llrin[i*128+67];
+		top->io_LLrin_68 = llrin[i*128+68];
+		top->io_LLrin_69 = llrin[i*128+69];
+		top->io_LLrin_70 = llrin[i*128+70];
+		top->io_LLrin_71 = llrin[i*128+71];
+		top->io_LLrin_72 = llrin[i*128+72];
+		top->io_LLrin_73 = llrin[i*128+73];
+		top->io_LLrin_74 = llrin[i*128+74];
+		top->io_LLrin_75 = llrin[i*128+75];
+		top->io_LLrin_76 = llrin[i*128+76];
+		top->io_LLrin_77 = llrin[i*128+77];
+		top->io_LLrin_78 = llrin[i*128+78];
+		top->io_LLrin_79 = llrin[i*128+79];
+		top->io_LLrin_80 = llrin[i*128+80];
+		top->io_LLrin_81 = llrin[i*128+81];
+		top->io_LLrin_82 = llrin[i*128+82];
+		top->io_LLrin_83 = llrin[i*128+83];
+		top->io_LLrin_84 = llrin[i*128+84];
+		top->io_LLrin_85 = llrin[i*128+85];
+		top->io_LLrin_86 = llrin[i*128+86];
+		top->io_LLrin_87 = llrin[i*128+87];
+		top->io_LLrin_88 = llrin[i*128+88];
+		top->io_LLrin_89 = llrin[i*128+89];
+		top->io_LLrin_90 = llrin[i*128+90];
+		top->io_LLrin_91 = llrin[i*128+91];
+		top->io_LLrin_92 = llrin[i*128+92];
+		top->io_LLrin_93 = llrin[i*128+93];
+		top->io_LLrin_94 = llrin[i*128+94];
+		top->io_LLrin_95 = llrin[i*128+95];
+		top->io_LLrin_96 = llrin[i*128+96];
+		top->io_LLrin_97 = llrin[i*128+97];
+		top->io_LLrin_98 = llrin[i*128+98];
+		top->io_LLrin_99 = llrin[i*128+99];
+		top->io_LLrin_100 = llrin[i*128+100];
+		top->io_LLrin_101 = llrin[i*128+101];
+		top->io_LLrin_102 = llrin[i*128+102];
+		top->io_LLrin_103 = llrin[i*128+103];
+		top->io_LLrin_104 = llrin[i*128+104];
+		top->io_LLrin_105 = llrin[i*128+105];
+		top->io_LLrin_106 = llrin[i*128+106];
+		top->io_LLrin_107 = llrin[i*128+107];
+		top->io_LLrin_108 = llrin[i*128+108];
+		top->io_LLrin_109 = llrin[i*128+109];
+		top->io_LLrin_110 = llrin[i*128+110];
+		top->io_LLrin_111 = llrin[i*128+111];
+		top->io_LLrin_112 = llrin[i*128+112];
+		top->io_LLrin_113 = llrin[i*128+113];
+		top->io_LLrin_114 = llrin[i*128+114];
+		top->io_LLrin_115 = llrin[i*128+115];
+		top->io_LLrin_116 = llrin[i*128+116];
+		top->io_LLrin_117 = llrin[i*128+117];
+		top->io_LLrin_118 = llrin[i*128+118];
+		top->io_LLrin_119 = llrin[i*128+119];
+		top->io_LLrin_120 = llrin[i*128+120];
+		top->io_LLrin_121 = llrin[i*128+121];
+		top->io_LLrin_122 = llrin[i*128+122];
+		top->io_LLrin_123 = llrin[i*128+123];
+		top->io_LLrin_124 = llrin[i*128+124];
+		top->io_LLrin_125 = llrin[i*128+125];
+		top->io_LLrin_126 = llrin[i*128+126];
+		top->io_LLrin_127 = llrin[i*128+127];
+		//AppoutFetch(dutappout,i);
+		//if(i == 15){
+		//	bool diff = AppOutdiff(appout,dutappout,0);
+		//	if(diff){
+		//		Log("**********App Initial Diff Pass*********\n");
+		//	}else {
+		//		Log("**********App Initial Diff Fail*********\n");
+		//		exit(0);
+		//	}
+		//}
+		clockntimes(1);
+		//printf("I:%d counter:%d\n",i,top->io_counter);
+		AppoutFetch(dutappout,i);
+	} 
+	top->io_Start = 0;
 	clockntimes(1);
-	AppoutFetch(dutappout,31);
-	clockntimes(1);
-	bool diff = 1; 
-	diff = AppOutdiff(appout,dutappout,0) ;
-	diffin = diff ;
-	if(!diff) return false ;
-	minfetch(dutmin1);
-	subminfecth(dutmin2);
-	minaddrfetch(dutmin1_addr) ;
-	subminaddrfetch(dutmin2_addr);
-	signfetch(dutsign) ;
-	v2csignfetch(dutv2c);
-
-	diff = mindiff(min1,dutmin1) ;
-	diffin = diff ;
-	if(!diff) return false ; 
-	//Log("mindifftest pass");
-	diff = submindiff(min2,dutmin2); 
-	diffin = diff ;
-	if(!diff) return false ;
-	//Log("submindifftest pass");
-	diff = minaddrdiff(min1_addr,dutmin1_addr);
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = subminaddrdiff(min2_addr,dutmin2_addr); 
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = signdiff(sign,dutsign) ;
-	diffin = diff ;
-	if(!diff) return false ; 
-	diff = v2csigndiff(v2c,dutv2c);
-	diffin = diff ;
-	if(!diff) return false ;
-	// 
+	//Decoder退出了initial态 进入decode
+	//printf("counter:%d\n",top->io_counter);
+	bool diff = AppOutdiff(appout,dutappout,0);
+	if(diff){
+		Log("**********App Initial Diff Pass*********");
+	}else {
+		Log("**********App Initial Diff Fail*********");
+		exit(0);
+	}
+	//printf("counter:%d\n",top->io_counter);
+	//此时decoder 已经跳入decode态 初始化完成
+	//更新各个信号的数值，并进行比较
+	valuefetch(dutmin1,dutmin2,dutsubmin1,dutsubmin2,
+	dutminaddr1,dutsubminaddr1,dutminaddr2,dutsubminaddr2,
+	dutsign ,dutsign0,dutc2v,dutc2v0,dutv2c);
+	diff = valuediff(dutmin1,dutmin2,dutsubmin1,dutsubmin2,
+	dutminaddr1,dutsubminaddr1,dutminaddr2, dutsubminaddr2,
+	dutsign ,dutsign0,dutv2c, v2c, 
+	min1,submin1,min_addr1,submin_addr1, 
+	min2,submin2,min_addr2,submin_addr2, 
+	sign , sign0 );
+	if(diff){
+		Log("**********Initial Diff Pass*********");
+	}else {
+		Log("**********Initial Diff Fail*********");
+		exit(0);
+	}
 	//Iteration 
-	Log("start Iteration ");
 	bool success = 1; 
 	for(int iter = 0 ; iter < ITERMAX; iter++) {
-		//CPP UPDATE 
-		for (int i = 0; i < 2048; i ++) {
+		
+		for (int iindex = 0; iindex < 16; iindex ++) {
 			//CNU 
-			int appval = llrin[i];
-			for ( int j = 0 ; j < 384; j ++) {
-				if(H[j][i] == 1) {
-					c2v[j] = i/64 == min1_addr[j] ? min2[j] : min1[j];
-					c2v[j] = c2v[j] * 3/4;
-					c2v[j] = c2v[j] <= C2VMAX ? c2v[j] : C2VMAX ;
-					if(sign[j] != v2c[i][j/64]){
-						c2v[j] = -c2v[j];	
-					}		
-					appval += c2v[j];
+			for (int id = 0 ; id < 128 ; id++ ){
+				int i = iindex*128+id;
+				Message appval = llrin[i];
+				for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+					int j = CofV[i][jindex];
+					Message minval ;Message subminval;
+					int minaddr;int subminaddr;
+
+					choose_true_min(min1[j],min2[j],submin1[j],submin2[j],
+					min_addr1 [j],min_addr2[j] ,submin_addr1[j] ,submin_addr2[j] ,
+					minval ,subminval,
+						minaddr,subminaddr );
+					//printf("minval:%d minaddr:%d\n",minval,minaddr);
+					Message c2v_val = ((i/BLKSIZE == minaddr) ? subminval : minval);
+
+					c2v_val = c2v_val * alpha;
+
+					if((i/BLKSIZE)%2==0){	
+						if(sign[j] != v2c[i][j]){
+							c2v_val = -c2v_val;	
+						}	
+						c2v[j] = c2v_val;
+					}else {
+						if(sign0[j] != v2c[i][j]){
+							c2v_val = -c2v_val;	
+						}	
+						c2v0[j] = c2v_val;
+					}
+
+					appval += c2v_val;
 				}
+				appout[i] = appval;
 			}
-			if(i%64 == 63) {
-				// 此时做完了一大列，更新完了c2v   
-				// 先对比c2v
-				Log("col %d",i/64);
-				c2vfetch(dutc2v);  
-				diff = c2vdiff(c2v,dutc2v);  
-				diffin = diff ; 
-				if(!diff) return false ;
+			//此时做完了两列 更新一下C2V diff一下  
+			c2vfetch(dutc2v,dutc2v0);
+			bool localdiff1 = 1;
+			bool localdiff2 = 1;
+			localdiff1 = c2vdiff(c2v,dutc2v);
+			localdiff2 = c2vdiff(c2v0,dutc2v0);
+			if((localdiff1)&&(localdiff2)){
+				Log("**********C2V Diff Pass*********");
+			}else {
+				Log("**********C2V Diff Fail*********");
+				exit(0);
 			}
 			//VNU   update v2c 
-			for (int j = 0 ; j < 384; j ++) {
-				if(H[j][i] == 1) {
-					int v2c_abs = appval - c2v[j];
+			for (int id = 0 ; id < 128 ; id++ ){
+				int i = iindex*128+id;
+				Message appval = appout[i];
+				for( int jindex = 0 ; jindex < ROWNUMBER/BLKSIZE ; jindex ++) {
+					
+					int j = CofV[i][jindex];
+					Message v2c_abs;
+					if((i/BLKSIZE)%2==0){
+						v2c_abs = appval - c2v[j];
+					}else{
+						v2c_abs = appval - c2v0[j];
+					}
 					int v2csign = 0 ; 
 					if(v2c_abs < 0 ) {
 						v2c_abs = -v2c_abs ;
 						v2csign = 1; 
 					}
-					v2c_abs = v2c_abs <= V2CMAX ? v2c_abs : V2CMAX;
-					if(v2csign != v2c[i][j/64]) {
-						sign[j] = sign[j] ^ 1; 
+
+					v2c_abs = v2c_abs <= C2VMAX ? v2c_abs : C2VMAX ;
+
+					if((i/BLKSIZE)%2==0){	
+						if(v2csign != v2c[i][j]) {
+							sign[j] = sign[j] ^ 1; 
+						}
+					}else {
+						if(v2csign != v2c[i][j]) {
+							sign0[j] = sign0[j] ^ 1; 
+						}	
 					}
-					v2c[i][j/64] = v2csign ; 
-					update_min_vss(min1[j],min2[j],min1_addr[j],min2_addr[j],v2c_abs,i/64);
-				}
-			}
-			appout[i] = appval;
-			// 接着校验其他的信号值
-			if(i%64 == 63 ){
-				Log("col %d",i/64);
-				AppoutFetch(dutappout,i/64);
-				if(top->io_counter != i/64){
-					Log("something wrong counter%d i%d",top->io_counter,i/64);
-				}
-				diff = AppOutdiff(appout,dutappout,1);  
-				diffin = diff ; 
-				if(!diff) return false ;
-		
-				clockntimes(1);
-				minfetch(dutmin1);
-				subminfecth(dutmin2);
-				minaddrfetch(dutmin1_addr) ;
-				subminaddrfetch(dutmin2_addr);
-				signfetch(dutsign) ;
+					v2c[i][j] = v2csign ;
+					if((i/BLKSIZE)%2 == 0){
+						update_min_vss(min1[j],submin1[j],min_addr1[j],submin_addr1[j],v2c_abs,i/BLKSIZE);
+					}else {
+						update_min_vss(min2[j],submin2[j],min_addr2[j],submin_addr2[j],v2c_abs,i/BLKSIZE);
+					} 
 
-				diff = mindiff(min1,dutmin1) ;
-				diffin = diff ;
-				if(!diff) return false ; 
-				diff = submindiff(min2,dutmin2); 
-				diffin = diff ;
-				if(!diff) return false ; 
-				diff = minaddrdiff(min1_addr,dutmin1_addr);
-				diffin = diff ;
-				if(!diff) return false ; 
-				diff = subminaddrdiff(min2_addr,dutmin2_addr); 
-				diffin = diff ;
-				if(!diff) return false ; 
-				diff = signdiff(sign,dutsign) ;
-				diffin = diff ;
-				if(!diff) return false ; 
-				v2csignfetch(dutv2c);
-				diff = v2csigndiff(v2c,dutv2c);
-				diffin = diff ;
-				if(!diff) return false ; 
+				}
 			}
-			
+			//此时min1 min2 更新 
+			//Decoder进下一个周期  min1 min2的值也更新
+			//保留本周期的appout输出
+			AppoutFetch(dutappout,iindex);
+			clockntimes(1);
+			//diff一下
+			valuefetch(dutmin1,dutmin2,dutsubmin1,dutsubmin2,
+			dutminaddr1,dutsubminaddr1,dutminaddr2,dutsubminaddr2,
+			dutsign ,dutsign0,dutc2v,dutc2v0,dutv2c);
+			bool difflocal = valuediff(dutmin1,dutmin2,dutsubmin1,dutsubmin2,
+			dutminaddr1,dutsubminaddr1,dutminaddr2, dutsubminaddr2,
+			dutsign ,dutsign0,dutv2c, v2c, 
+			min1,submin1,min_addr1,submin_addr1, 
+			min2,submin2,min_addr2,submin_addr2, 
+			sign , sign0 );
+			if(difflocal){
+				Log("**********Decode Diff Pass*********");
+			}else {
+				Log("**********Decode Diff Fail*********");
+				exit(0);
+			}
 		}
-		//DECODER UPDATE  
-
-	
-		bool decodersuccess = top->io_Success ;
-		
+		//检验appout
+		bool difflocal = AppOutdiff(appout,dutappout,1);
+		if(difflocal){
+			Log("**********APP Decode Diff Pass*********");
+		}else {
+			Log("**********APP Decode Diff Fail*********");
+			exit(0);
+		}
 		success = 1; 
-		for (int i = 0 ; i < 2048 ; i ++) {
+		for (int i = 0 ; i < COLNUMBER ; i ++) {
 			if(appout[i] < 0 ){
 				success = 0 ;
 				break;
 			}
 		}
 		if(success != top->io_Success) {
-			Log("success diff ref %d dut %d",success,decodersuccess);
+			Log("success diff ref %d dut %d",success,top->io_Success);
+			exit(0);
 		}
 		clockntimes(1);
 		if(success) {
-			break ; 
+			return success ; 
 		}
 	}
-	//if(top->io_OutValid){
-	//	clockntimes(1);
-	//}
 	return success ;
 }
-void diffDecoderTest(){
-	int H[384][2048];
+
+void cppDiffDecoderTest(){
+
+	//int H[ROWNUMBER][COLNUMBER];
+	//这里直接定义这个大矩阵会超内存
+	//导致C程序错误退出  
+	//用vector动态分配
+	vector<vector<int>> H;
+	H.resize(ROWNUMBER);
+	for (int i = 0 ; i < ROWNUMBER; i ++ ){
+		H[i].resize(COLNUMBER);
+	}
 	ifstream inr(BASE_MATRIX_FILENAME);
 	if(!inr) {
 		Log("No file %s",BASE_MATRIX_FILENAME) ;
 		return ; 
 	}
 	string r ;
-	for(int i = 0 ; i < 384; i ++) {
+	for(int i = 0 ; i < ROWNUMBER; i ++) {
 		string number ; 
 		getline(inr,r);
 		istringstream stream(r);
-		for (int j = 0 ; j < 2048 ; j ++) {
+		for (int j = 0 ; j < COLNUMBER ; j ++) {
 			stream >> number ; 
 			H[i][j] = stoi(number);
 		}
+	}
+
+	vector<vector<int>> VofC ;
+	VofC.resize(ROWNUMBER);
+	for(int i = 0; i < ROWNUMBER; i++){
+		VofC[i].resize(COLNUMBER/BLKSIZE);
+		for(int j = 0 ; j < COLNUMBER; j ++) {
+			if(H[i][j]==1) {
+				VofC[i][j/BLKSIZE] = j ;
+			}
+		}
+
+	}
+	vector<vector<int>> CofV ;
+	CofV.resize(COLNUMBER);
+	for(int i = 0; i < COLNUMBER; i++){
+		CofV[i].resize(ROWNUMBER/BLKSIZE);
+		for(int j = 0 ; j < ROWNUMBER; j ++) {
+			if(H[j][i]==1) {
+				CofV[i][j/BLKSIZE] = j ;
+			}
+		}
+
 	}
 	//printf("aaa\n");
 	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
 		int frame = 0 ;
 		int errorframe = 0; 
-		while(frame < maxtime || errorframe < maxerrortime) {
-			int llrin[2048]; 
-			int appout[2048];
-			bool v2c[2048][6]; 
-			int min1 [384];
-			int min2 [384];
-			int min1_addr[384];
-			int min2_addr[384]; 
-			bool sign[384] ;
-			int c2v[384] ;
-			for (int i = 0 ; i < 2048;i++ ){
+		//Log("hhhh");
+		while((frame < maxtime) || (errorframe < maxerrortime)) {
+			Message llrin[COLNUMBER]; 
+			Message appout[COLNUMBER];
+			//bool v2c[COLNUMBER][6]; 
+
+			bool v2c[2048][6];
+			Message c2v[ROWNUMBER] ;
+
+			Message min1 [ROWNUMBER];
+			Message min2 [ROWNUMBER]; 
+			bool sign[ROWNUMBER] ;
+			Message submin1 [ROWNUMBER];
+			Message submin2 [ROWNUMBER];
+			int min_addr1[ROWNUMBER];
+			int min_addr2[ROWNUMBER]; 
+			int submin_addr1[ROWNUMBER];
+			int submin_addr2[ROWNUMBER];
+			bool sign0[ROWNUMBER] ;
+			Message c2v0[ROWNUMBER] ;
+			//Log("hhhh");
+			for (int i = 0 ; i < COLNUMBER;i++ ){
 				llrin[i] = LLrInitial(RandomGen(sigma)); 
+//#if TYPE
+				llrin[i] = llrin[i] <= -APPMAX ? -APPMAX : llrin[i] >= APPMAX ? APPMAX : llrin[i];
+//#endif
 			}
-			bool diffin = 1; 
-			bool success = diffdecodekernel(H,llrin, appout , v2c, 
-		min1, min2,min1_addr, min2_addr,sign , c2v 
-		,diffin);
-			if(!diffin) return ;
+			bool success = cppdecodekernelFast2coldiff(VofC, CofV,  llrin, appout ,v2c, 
+		 min1, submin1,min_addr1, submin_addr1, 
+		 min2, submin2,min_addr2, submin_addr2, 
+				sign ,sign0, c2v,c2v0 
+		);
 			//printf("aaa\n");
-			if(!success) errorframe++;
+			if(!success) {
+				errorframe++;
+				//Log("fail frame %d",errorframe);
+			}
+			//else Log("success frame%d",frame);
 			frame++;
 		}
 		double fer = (double) errorframe / (double) frame;
-		double rate = (double)1723/(double)2048;
+		double rate = (double)1723/(double)COLNUMBER;
 		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
 		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
 	}

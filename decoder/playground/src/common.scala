@@ -28,7 +28,7 @@ trait COMMON{
   val ROWADDR = log2Ceil(ROWNUM)
   val BLKADDR = log2Ceil(BLKSIZE)
   //  噪声发生器的p0  的个数 
-  val PNUM    = 5 
+  val PNUM    = 3 
   //  量化区间的个数   
   val QuantiNUM   = log2Ceil(PNUM+1)
   val MAXSPACEIND = scala.math.pow(2,QuantiNUM).toInt-1   
@@ -85,35 +85,53 @@ object GenerateIO extends COMMON{
          } 
        }
        else if(module ==3) {
-         //for(i <- 0 until COLNUM){
-         //   writer.println("top->io_LLrin_"+i+" = LLrInital(RandomGen(sigma));")
+         for(i <- 0 until 2*BLKSIZE){
+            writer.println("top->io_LLrin_"+i+" = llrin[i*128+"+i+"];")
+         }
+         //for (i <- 0 until 2*BLKSIZE) {
+         //  writer.println("appout[i*128+"+i+"] = top->io_appout_"+i+";")  
          //}
-         for (i <- 0 until BLKSIZE) {
-           writer.println("appout[i*64+"+i+"] = top->io_appout_"+i+";")  
-         }
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("c2v["+i+"] = top->io_c2v_"+i+";")  
-         }
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("min["+i+"] = top->io_min_"+i+";")  
-         }
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("submin["+i+"] = top->io_submin_"+i+";")  
-         }
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("minaddr["+i+"] = top->io_minaddr_"+i+";")  
-         } 
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("subminaddr["+i+"] = top->io_subminaddr_"+i+";")  
-         }   
-         for (i <- 0 until BLKSIZE*ROWNUM) {
-           writer.println("sign["+i+"] = top->io_sign_"+i+";")  
-         } 
-         for (i <- 0 until BLKSIZE*COLNUM) {
-           for (j <- 0  until ROWNUM){
-             writer.println("v2c["+i+"]["+j+"] = top->io_v2csign_"+i+"_"+j+";")  
-           }
-         } 
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("c2v["+i+"] = top->io_c2v_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("c2v0["+i+"] = top->io_c2v0_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("min1["+i+"] = top->io_min_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("min2["+i+"] = top->io_min0_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("submin1["+i+"] = top->io_submin_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("submin2["+i+"] = top->io_submin0_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("minaddr1["+i+"] = top->io_minaddr_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("minaddr2["+i+"] = top->io_minaddr0_"+i+";")  
+         //} 
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("subminaddr1["+i+"] = top->io_subminaddr_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("subminaddr2["+i+"] = top->io_subminaddr0_"+i+";")  
+         //}   
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("sign["+i+"] = top->io_sign_"+i+";")  
+         //}
+         //for (i <- 0 until BLKSIZE*ROWNUM) {
+         //  writer.println("sign0["+i+"] = top->io_sign0_"+i+";")  
+         //} 
+         //for (i <- 0 until BLKSIZE*COLNUM) {
+         //  for (j <- 0  until ROWNUM){
+         //    writer.println("v2c["+i+"]["+j+"] = top->io_v2csign_"+i+"_"+j+";")  
+         //  }
+         //} 
        }
        else if (module == 4) {
          for (i <- 0 until BLKSIZE) {

@@ -12,7 +12,7 @@ object Elaborate extends App {
   //CheckNode2Col
   //Errorbits   
   //Decoder2Col  
-  def top = new rsdecodertop 
+  def top = new Decoder2Col 
 
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
