@@ -24,8 +24,10 @@ class VariableNode extends Module with COMMON {
   for(i <- 0 until ROWNUM){
     checkoutAPP(i) := io.LLrin + sum - Checklocal(i)
   }
- for(i <- 0 until ROWNUM) {
-   io.Checkout(i) :=Mux( checkoutAPP(i).asSInt <=(-MAXV2C.S),(-MAXV2C.U),Mux(checkoutAPP(i).asSInt>=MAXV2C.S,MAXV2C.U,checkoutAPP(i)(V2CWIDTH-1,0) ))  
+  val min = Wire(UInt(C2VWIDTHCOL.W))
+  min := ~(MAXC2V.U(C2VWIDTHCOL.W))+1.U
+  for(i <- 0 until ROWNUM) {
+   io.Checkout(i) :=Mux( checkoutAPP(i).asSInt <=(-MAXV2C.S),min,Mux(checkoutAPP(i).asSInt>=MAXV2C.S,MAXV2C.U,checkoutAPP(i)(V2CWIDTH-1,0) ))  
   }
   io.APPout := sum + io.LLrin
   //GenerateIO.Gen(1)

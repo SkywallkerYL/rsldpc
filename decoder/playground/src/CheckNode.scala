@@ -372,7 +372,8 @@ class CheckNode2Col  extends Module with COMMON {
   val subminaddr0 = RegInit(0.U((COLADDR).W))
   val sign0  = RegInit(0.U(1.W))
   val inputsign0 = io.input(0)(V2CWIDTHCOL-1)
-  val absdata0 = Mux(inputsign0 === 1.U,~io.input(0)+1.U ,io.input(0))
+  val absdataext0 = Mux(inputsign0 === 1.U,~io.input(0)+1.U ,io.input(0))
+  val absdata0 = absdataext0(C2VWIDTHCOL-2,0)
   val inputaddr0 = Wire(UInt(COLADDR.W))
   inputaddr0 := io.inputaddr##0.U  
   val min1 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
@@ -381,7 +382,8 @@ class CheckNode2Col  extends Module with COMMON {
   val subminaddr1 = RegInit(0.U((COLADDR).W))
   val sign1  = RegInit(0.U(1.W))
   val inputsign1 = io.input(1)(V2CWIDTHCOL-1)
-  val absdata1 = Mux(inputsign1 === 1.U,~io.input(1)+1.U ,io.input(1))
+  val absdataext1 = Mux(inputsign1 === 1.U,~io.input(1)+1.U ,io.input(1))
+  val absdata1 = absdataext1(C2VWIDTHCOL-2,0)
   val inputaddr1 = Wire(UInt(COLADDR.W))
   inputaddr1 := io.inputaddr##1.U  
  
@@ -403,64 +405,64 @@ class CheckNode2Col  extends Module with COMMON {
     }
     // updata min 
   
-      when(inputaddr0 === minaddr0) {
-        when(absdata0 <= submin0 ) {
-          min0 := absdata0  
-        }.otherwise{
-          min0 := submin0 
-          minaddr0 := subminaddr0 
-          submin0 := absdata0 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
-          subminaddr0 := inputaddr0  
-        }
-      }.elsewhen(inputaddr0 === subminaddr0){
-        when(absdata0 <= min0  ){
-          submin0 := min0 
-          subminaddr0 := minaddr0  
-          min0 := absdata0 
-          minaddr0 := inputaddr0 
-        }.otherwise {
-          submin0 :=  absdata0//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
-        }
+    when(inputaddr0 === minaddr0) {
+      when(absdata0 <= submin0 ) {
+        min0 := absdata0  
       }.otherwise{
-        when(absdata0 <= min0) {
-          submin0 := min0 
-          subminaddr0 := minaddr0 
-          min0 := absdata0 
-          minaddr0 := inputaddr0 
-        }.elsewhen(absdata0 <= submin0){
-          submin0 := absdata0 
-          subminaddr0 := inputaddr0
-        }
+        min0 := submin0 
+        minaddr0 := subminaddr0 
+        submin0 := absdata0 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+        subminaddr0 := inputaddr0  
       }
-      when(inputaddr1 === minaddr1) {
-        when(absdata1 <= submin1 ) {
-          min1 := absdata1  
-        }.otherwise{
-          min1 := submin1 
-          minaddr1 := subminaddr1 
-          submin1 := absdata1 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
-          subminaddr1 := inputaddr1  
-        }
-      }.elsewhen(inputaddr1 === subminaddr1){
-        when(absdata1 <= min1  ){
-          submin1 := min1 
-          subminaddr1 := minaddr1  
-          min1 := absdata1 
-          minaddr1 := inputaddr1 
-        }.otherwise {
-          submin1 :=  absdata1//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
-        }
+    }.elsewhen(inputaddr0 === subminaddr0){
+      when(absdata0 <= min0  ){
+        submin0 := min0 
+        subminaddr0 := minaddr0  
+        min0 := absdata0 
+        minaddr0 := inputaddr0 
+      }.otherwise {
+        submin0 :=  absdata0//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+      }
+    }.otherwise{
+      when(absdata0 <= min0) {
+        submin0 := min0 
+        subminaddr0 := minaddr0 
+        min0 := absdata0 
+        minaddr0 := inputaddr0 
+      }.elsewhen(absdata0 <= submin0){
+        submin0 := absdata0 
+        subminaddr0 := inputaddr0
+      }
+    }
+    when(inputaddr1 === minaddr1) {
+      when(absdata1 <= submin1 ) {
+        min1 := absdata1  
       }.otherwise{
-        when(absdata1 <= min1) {
-          submin1 := min1 
-          subminaddr1 := minaddr1 
-          min1 := absdata1 
-          minaddr1 := inputaddr1 
-        }.elsewhen(absdata1 <= submin1){
-          submin1 := absdata1 
-          subminaddr1 := inputaddr1
-        }
-      }     
+        min1 := submin1 
+        minaddr1 := subminaddr1 
+        submin1 := absdata1 //Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+        subminaddr1 := inputaddr1  
+      }
+    }.elsewhen(inputaddr1 === subminaddr1){
+      when(absdata1 <= min1  ){
+        submin1 := min1 
+        subminaddr1 := minaddr1  
+        min1 := absdata1 
+        minaddr1 := inputaddr1 
+      }.otherwise {
+        submin1 :=  absdata1//Mux( absdata <= MAXC2VCOL.U , absdata, MAXC2VCOL.U)  
+      }
+    }.otherwise{
+      when(absdata1 <= min1) {
+        submin1 := min1 
+        subminaddr1 := minaddr1 
+        min1 := absdata1 
+        minaddr1 := inputaddr1 
+      }.elsewhen(absdata1 <= submin1){
+        submin1 := absdata1 
+        subminaddr1 := inputaddr1
+      }
+    }     
   }
   when (io.signreset) {
     sign0 := 0.U 

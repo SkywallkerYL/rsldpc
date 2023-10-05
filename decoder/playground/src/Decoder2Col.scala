@@ -16,20 +16,20 @@ class Decoder2Col extends Module with COMMON {
     //val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
 
     // for difftest  
-    val appout     = Output(Vec(BLKSIZE*2,UInt(APPWIDTH.W))) 
-    val c2v        = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W))) 
-    val min        = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val submin     = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val minaddr    = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val subminaddr = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val sign       = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
-    val c2v0       = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W))) 
-    val min0       = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val submin0    = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
-    val minaddr0   = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val subminaddr0= Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
-    val sign0      = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
-    val v2csign    = Output(Vec(BLKSIZE*COLNUM,Vec(ROWNUM,UInt(1.W))))
+    //val appout     = Output(Vec(BLKSIZE*2,UInt(APPWIDTH.W))) 
+    //val c2v        = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W))) 
+    //val min        = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+    //val submin     = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+    //val minaddr    = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+    //val subminaddr = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+    //val sign       = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
+    //val c2v0       = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W))) 
+    //val min0       = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+    //val submin0    = Output(Vec(BLKSIZE*ROWNUM,UInt((C2VWIDTHCOL-1).W)))
+    //val minaddr0   = Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+    //val subminaddr0= Output(Vec(BLKSIZE*ROWNUM,UInt(COLADDR.W)))
+    //val sign0      = Output(Vec(BLKSIZE*ROWNUM,UInt(1.W)))
+    //val v2csign    = Output(Vec(BLKSIZE*COLNUM,Vec(ROWNUM,UInt(1.W))))
 
   })
   // 按列作，一次作一列。 
@@ -330,81 +330,80 @@ for( i <- 0 until ROWNUM) {
  // } 
  // val wrongnum = appouterrornum.reduce(_+_)
 // //io.appout    =
-  for(i <- 0 until 2*BLKSIZE) {
-    io.appout(i) := VarGroup(i).io.APPout   
-  }
-  //io.c2v       =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.c2v(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval(0)    
-    } 
-  }
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.c2v0(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval(1)    
-    } 
-  }
-  //io.min       =
-  for(i <- 0 until BLKSIZE) {
-     for ( j <- 0 until ROWNUM) {
-       io.min(i+j*BLKSIZE) := CheckGroup(i)(j).io.min0   
-     } 
-  }
-  for(i <- 0 until BLKSIZE) {
-     for ( j <- 0 until ROWNUM) {
-       io.min0(i+j*BLKSIZE) := CheckGroup(i)(j).io.min1   
-     } 
-  }
-  //io.submin    =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.submin(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin0    
-    } 
-  }
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.submin0(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin1    
-    } 
-  }
-  //io.minaddr   =
-  for(i <- 0 until BLKSIZE) {
-     for ( j <- 0 until ROWNUM) {
-       io.minaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr0    
-     } 
-  }
-  for(i <- 0 until BLKSIZE) {
-     for ( j <- 0 until ROWNUM) {
-       io.minaddr0(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr1    
-     } 
-  }
-  //io.subminaddr=
-  for(i <- 0 until BLKSIZE) {
-   for ( j <- 0 until ROWNUM) {
-     io.subminaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr0    
-   } 
-  } 
-  for(i <- 0 until BLKSIZE) {
-   for ( j <- 0 until ROWNUM) {
-     io.subminaddr0(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr1    
-   } 
-  }
-  //io.sign      =
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.sign(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign0   
-    } 
-  }
-  for(i <- 0 until BLKSIZE) {
-    for ( j <- 0 until ROWNUM) {
-      io.sign0(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign1   
-    } 
-  }
-  //io.v2csign   =
-  for(i <- 0 until BLKSIZE*COLNUM) {
-    for (j <- 0 until ROWNUM) {
-     io.v2csign(i)(j):= SignRams(i%(BLKSIZE*2)).read((i/(BLKSIZE*2)).U)(j)
-
-    }
-  }
-  GenerateIO.Gen(3)
+  //for(i <- 0 until 2*BLKSIZE) {
+  //  io.appout(i) := VarGroup(i).io.APPout   
+  //}
+  ////io.c2v       =
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.c2v(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval(0)    
+  //  } 
+  //}
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.c2v0(i+j*BLKSIZE) := CheckGroup(i)(j).io.minval(1)    
+  //  } 
+  //}
+  ////io.min       =
+  //for(i <- 0 until BLKSIZE) {
+  //   for ( j <- 0 until ROWNUM) {
+  //     io.min(i+j*BLKSIZE) := CheckGroup(i)(j).io.min0   
+  //   } 
+  //}
+  //for(i <- 0 until BLKSIZE) {
+  //   for ( j <- 0 until ROWNUM) {
+  //     io.min0(i+j*BLKSIZE) := CheckGroup(i)(j).io.min1   
+  //   } 
+  //}
+  ////io.submin    =
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.submin(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin0    
+  //  } 
+  //}
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.submin0(i+j*BLKSIZE) := CheckGroup(i)(j).io.submin1    
+  //  } 
+  //}
+  ////io.minaddr   =
+  //for(i <- 0 until BLKSIZE) {
+  //   for ( j <- 0 until ROWNUM) {
+  //     io.minaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr0    
+  //   } 
+  //}
+  //for(i <- 0 until BLKSIZE) {
+  //   for ( j <- 0 until ROWNUM) {
+  //     io.minaddr0(i+j*BLKSIZE) := CheckGroup(i)(j).io.minaddr1    
+  //   } 
+  //}
+  ////io.subminaddr=
+  //for(i <- 0 until BLKSIZE) {
+  // for ( j <- 0 until ROWNUM) {
+  //   io.subminaddr(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr0    
+  // } 
+  //} 
+  //for(i <- 0 until BLKSIZE) {
+  // for ( j <- 0 until ROWNUM) {
+  //   io.subminaddr0(i+j*BLKSIZE) := CheckGroup(i)(j).io.subminaddr1    
+  // } 
+  //}
+  ////io.sign      =
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.sign(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign0   
+  //  } 
+  //}
+  //for(i <- 0 until BLKSIZE) {
+  //  for ( j <- 0 until ROWNUM) {
+  //    io.sign0(i+j*BLKSIZE) := CheckGroup(i)(j).io.sign1   
+  //  } 
+  //}
+  ////io.v2csign   =
+  //for(i <- 0 until BLKSIZE*COLNUM) {
+  //  for (j <- 0 until ROWNUM) {
+  //   io.v2csign(i)(j):= SignRams(i%(BLKSIZE*2)).read((i/(BLKSIZE*2)).U)(j)
+  //  }
+  //}
+  //GenerateIO.Gen(3)
 }

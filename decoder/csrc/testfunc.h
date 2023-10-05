@@ -1376,6 +1376,7 @@ bool cppdecodekernelFast2coldiff(vector<vector<int>> VofC,vector<vector<int>> Co
 		Log("**********Initial Diff Pass*********");
 	}else {
 		Log("**********Initial Diff Fail*********");
+		sim_exit();
 		exit(0);
 	}
 	//Iteration 

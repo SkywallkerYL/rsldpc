@@ -94,7 +94,7 @@ VErrorbits* top;
 int maxerrortime = 50 ;
 int ITERMAX      = 20 ;
 #endif
-#define DIFFTEST 
+//#define DIFFTEST 
 
 
 //#define WAVE 

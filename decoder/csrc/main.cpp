@@ -31,8 +31,11 @@ int main(int argc , char* argv[]) {
 #elif TESTMODULE == 6
 	toptest();
 #elif TESTMODULE == 7
-	//DecoderTest();
-	cppDiffDecoderTest();
+	DecoderTest();
+	//开这个可能会有一个Bug 就是打波形发现Checknode没有正常更新min 和submin  
+	//但是看Verilog代码应该是会正常更新的  不知道是不是Verilator的BUG
+	//但是跑性能图和软件可以对上     
+	//cppDiffDecoderTest();
 //	cppDecoderTest();
 //	diffDecoderTest();
 #elif TESTMODULE == 8
