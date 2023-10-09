@@ -136,6 +136,11 @@ class rsdecoder2col extends Module with COMMON {
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
 
+
+    val postvalid = Input(Bool())
+    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val postIterInput = Input(UInt(ITERWITH.W))
     //错误比特记录 
     //val localvalid  = Input(Bool())
     //val updatevalid = Input(Bool())
@@ -171,6 +176,10 @@ class rsdecoder2col extends Module with COMMON {
   decoder.io.Start     := dinvalid  
   decoder.io.IterInput := io.IterInput 
 
+  decoder.io.postvalid     := io.postvalid
+  decoder.io.strongMessage     := io.strongMessage 
+  decoder.io.weakMessage     := io.weakMessage 
+  decoder.io.postIterInput     := io.postIterInput 
   //错误比特记录相关模块 
   //errorbit.io.appin := decoder.io.appout
   //errorbit.io.appvalid := decoder.io.appvalid  
@@ -261,6 +270,11 @@ class rsdecodertop extends Module with COMMON {
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
 
+
+    val postvalid = Input(Bool())
+    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val postIterInput = Input(UInt(ITERWITH.W))
     //val localvalid  = Input(Bool())
     //val updatevalid = Input(Bool())
     //val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
@@ -277,7 +291,11 @@ class rsdecodertop extends Module with COMMON {
     DecoderGroup(i).io.IterInput := io.IterInput
     DecoderGroup(i).io.nextready := io.nextready 
     DecoderGroup(i).io.maxError  := io.maxError  
-    DecoderGroup(i).io.p0        := io.p0     
+    DecoderGroup(i).io.p0        := io.p0   
+    DecoderGroup(i).io.postvalid     := io.postvalid
+    DecoderGroup(i).io.strongMessage := io.strongMessage 
+    DecoderGroup(i).io.weakMessage   := io.weakMessage 
+    DecoderGroup(i).io.postIterInput := io.postIterInput 
   }
   io.Framevalid := DecoderGroup(0).io.Framevalid 
   val totalframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))

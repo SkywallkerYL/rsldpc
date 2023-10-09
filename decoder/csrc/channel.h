@@ -17,10 +17,10 @@ double RandomGen(double sigma)
   return nd(channel);
 }
 /************Yn Initial Table*************/
-int LLrInitial(double Noise)
+int LLrInitial(double sigma)
 {
   //all zero code
-  double llr_init = 1.0 + Noise;
+  double llr_init = 1.0 + RandomGen(sigma);
 #if LLR_INIT_TABLE == 1
   if (llr_init < 0)
     return -1;
@@ -67,6 +67,26 @@ int LLrInitial(double Noise)
   }else{
     return 7;
   }
+#elif LLR_INIT_TABLE == 5 
+	double bound = sigma*sigma/2.0;
+
+		/*******均匀量化*******/
+	if 		(llr_init < -bound*6.5)		return -7	;
+	else if (llr_init < -bound*5.5) 	return -6	;
+	else if (llr_init < -bound*4.5) 	return -5	;
+	else if (llr_init < -bound*3.5) 	return -4	;
+	else if (llr_init < -bound*2.5) 	return -3	;
+	else if (llr_init < -bound*1.5) 	return -2	;
+	else if (llr_init < -bound*0.5) 	return -1	;
+	else if (llr_init < 0)        		return -0	;
+	else if (llr_init < bound*0.5)  	return 0	;
+	else if (llr_init < bound*1.5)  	return 1	;
+	else if (llr_init < bound*2.5)  	return 2	;
+	else if (llr_init < bound*3.5)  	return 3	;
+	else if (llr_init < bound*4.5)  	return 4	;
+	else if (llr_init < bound*5.5)  	return 5	;
+	else if (llr_init < bound*6.5)  	return 6	;
+	else                          		return 7	;
 #endif
 }
 

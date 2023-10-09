@@ -12,6 +12,10 @@ class Decoder2Col extends Module with COMMON {
     val Success   = Output(Bool())
     val IterOut   = Output(UInt(ITERWITH.W))
     val counter   = Output(UInt(BLKADDR.W))
+    val postvalid = Input(Bool())
+    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val postIterInput = Input(UInt(ITERWITH.W))
     //val appvalid  = Output(Bool())
     //val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
 
@@ -116,12 +120,23 @@ class Decoder2Col extends Module with COMMON {
   }
 
   val RowCounter  = RegInit(0.U(ROWADDR.W))
-  val rightreg    = RegInit(1.U(1.W)) 
-  val appoutjudge = VecInit(Seq.fill(BLKSIZE*2)(0.U(1.W)))
-  for(i <- 0 until BLKSIZE*2) {
-    appoutjudge(i) := ~VarGroup(i).io.APPout(APPWIDTHCOL-1)
+  //val rightreg    = RegInit(1.U(1.W)) 
+  //val appoutjudge = VecInit(Seq.fill(BLKSIZE*2)(0.U(1.W)))
+  //for(i <- 0 until BLKSIZE*2) {
+    //appoutjudge(i) := ~VarGroup(i).io.APPout(APPWIDTHCOL-1)
+  //}
+  val GroupCheck  = Seq.fill(ROWNUM)(Seq.fill(BLKSIZE)(Wire(UInt(1.W))))
+  for(i <- 0 until ROWNUM){
+    for(j <- 0 until BLKSIZE){
+      GroupCheck(i)(j) := CheckGroup(j)(i).io.Check
+    }
   }
-  val rightdecide = appoutjudge.reduce(_ & _)
+  val Checkjudge = VecInit(Seq.fill(ROWNUM)(0.U(1.W)))
+  for(i <- 0 until ROWNUM){
+    Checkjudge(i):= GroupCheck(i).reduce(_ | _)
+  }
+  val allcheck = Checkjudge.reduce(_ | _)
+  //val rightdecide = appoutjudge.reduce(_ & _)
 // read Matrix  
   val rsMatrix : Array[Array[Int]] = ReadMatrix.ReadM()
   //GenerateIO.Gen(2)
@@ -146,6 +161,8 @@ class Decoder2Col extends Module with COMMON {
 // Check input addr and data  
   // 这个信号在顶层是根dinvalid一块的，   可能会一直拉高，要限制一个处于idle态
   val start = Wire(Bool()) 
+  val postvalid = Wire(Bool()) 
+  postvalid := false.B
   for (i <- 0 until BLKSIZE) {
     for (j <- 0 until ROWNUM) {
      CheckGroup(i)(j).io.input(0) :=  VartoCheckMux(i)(j).io.output  
@@ -156,6 +173,9 @@ class Decoder2Col extends Module with COMMON {
      CheckGroup(i)(j).io.updatemin := updateen  
      CheckGroup(i)(j).io.initial   := initialen  
      CheckGroup(i)(j).io.signreset := start///io.Start
+     CheckGroup(i)(j).io.postvalid := postvalid
+     CheckGroup(i)(j).io.strongMessage := io.strongMessage
+     CheckGroup(i)(j).io.weakMessage := io.weakMessage
     }
   }
 //   VartoCheckMux 连线  一个有16个输入   来自16个变量节点的对应行的输出  选一个送给校验节点。
@@ -225,7 +245,7 @@ for( i <- 0 until ROWNUM) {
 
 // modeule connect   
 
- val idle :: initial:: decode :: Nil = Enum(3)
+ val idle :: initial:: decode :: postprocess :: Nil = Enum(4)
  // idle 等待  
  /****************************************/
  // initial: 初始化   
@@ -252,6 +272,10 @@ for( i <- 0 until ROWNUM) {
    如果此时 顶层有译码的信号，表示要继续进数据  
    那么就跳回initial态 ，并且把 check的reset拉高  
    */ 
+   /*
+   修改之后用io.check判断解码是否正确
+
+   */
 
 
   val currentState = RegInit(idle)
@@ -261,6 +285,7 @@ for( i <- 0 until ROWNUM) {
   //第一个周期V2C读，然后第二个周期
   //拿到数据，向V2C写回  
   val Iter    = RegInit(0.U(ITERWITH.W))
+  val postIter    = RegInit(0.U(ITERWITH.W))
   start := false.B //currentState === idle && io.Start
   switch(currentState){
     is(idle){
@@ -288,18 +313,48 @@ for( i <- 0 until ROWNUM) {
       signWriteEn := true.B 
     } 
     is(decode) {
-      
       updateen  := true.B  
       signWriteEn := true.B
       counter := counter + 1.U 
       counter1 := counter1 + 1.U 
-      rightreg := rightreg & rightdecide  
+      //rightreg := rightreg & rightdecide  
       when(counter === 15.U){
-        //提前终止 
-        when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
+        //提前终止 allcheck
+        when(((allcheck)===0.U)||Iter===1.U) {
+        //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
+          io.OutValid := Mux(io.postvalid,(allcheck) ===0.U,true.B) 
+          io.Success  := (allcheck) ===0.U
+          //rightreg := 1.U
+          when(io.postvalid&&(Iter===1.U)&&(allcheck === 1.U)){
+            currentState := postprocess
+            postIter := io.postIterInput
+          }.elsewhen(io.Start){
+            currentState := initial 
+            start := true.B 
+          }.otherwise{
+            currentState := idle  
+          }
+          counter1 := 0.U
+        }.otherwise{
+            //rightreg := 1.U
+            Iter := Iter - 1.U 
+            currentState := decode 
+        }
+      } 
+    }
+    is(postprocess){
+      updateen  := true.B  
+      signWriteEn := true.B
+      counter := counter + 1.U 
+      counter1 := counter1 + 1.U 
+      postvalid := true.B 
+      when(counter === 15.U){
+        //提前终止 allcheck
+        when(((allcheck)===0.U)||postIter===1.U) {
+        //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
           io.OutValid := true.B 
-          io.Success  := (rightreg & rightdecide) ===1.U
-          rightreg := 1.U
+          io.Success  := (allcheck) ===0.U
+          //rightreg := 1.U
           when(io.Start){
             currentState := initial 
             start := true.B 
@@ -308,8 +363,8 @@ for( i <- 0 until ROWNUM) {
           }
           counter1 := 0.U
         }.otherwise{
-            rightreg := 1.U
-            Iter := Iter - 1.U 
+            //rightreg := 1.U
+            postIter := postIter - 1.U 
             currentState := decode 
         }
       } 

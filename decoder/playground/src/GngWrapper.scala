@@ -27,6 +27,8 @@ class GngWrapper(num : Int = COMMON.COLNUM) extends Module with COMMON {
       io.dout(i) := table3(Gng(i).io.dout).asUInt
     }else if (PNUM == 5) {
       io.dout(i) := table5(Gng(i).io.dout).asUInt
+    }else if (PNUM == 15){
+      io.dout(i) := table15(Gng(i).io.dout).asUInt
     }
     io.doutvalid := Gng(i).io.doutvalid 
   }

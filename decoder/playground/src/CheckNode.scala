@@ -353,18 +353,22 @@ class CheckNode2Col  extends Module with COMMON {
     val inputaddr = Input(UInt((COLADDR-1).W))
     val inputsign = Input(Vec(2,UInt(1.W)))//来自Ram里存的信号 
     val minval = Output(Vec(2,UInt(C2VWIDTHCOL.W)))
-    
+    //post process
+    val postvalid = Input(Bool())
+    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
     // for difftest 
     val min0         = Output(UInt((C2VWIDTHCOL-1).W)) 
     val submin0      = Output(UInt((C2VWIDTHCOL-1).W)) 
     val minaddr0     = Output(UInt(COLADDR.W)) 
     val subminaddr0  = Output(UInt(COLADDR.W))  
-    val sign0        = Output(UInt(1.W)) 
+    //val sign         = Output(UInt(1.W)) 
+    val Check        = Output(UInt(1.W))
     val min1         = Output(UInt((C2VWIDTHCOL-1).W)) 
     val submin1      = Output(UInt((C2VWIDTHCOL-1).W)) 
     val minaddr1     = Output(UInt(COLADDR.W)) 
     val subminaddr1  = Output(UInt(COLADDR.W))  
-    val sign1        = Output(UInt(1.W)) 
+    //val sign1        = Output(UInt(1.W)) 
   })
   val min0 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
   val minaddr0 = RegInit(0.U((COLADDR).W))
@@ -380,30 +384,32 @@ class CheckNode2Col  extends Module with COMMON {
   val minaddr1 = RegInit(0.U((COLADDR).W))
   val submin1 = RegInit(MAXC2VCOL.U((C2VWIDTHCOL-1).W))
   val subminaddr1 = RegInit(0.U((COLADDR).W))
-  val sign1  = RegInit(0.U(1.W))
+  //val sign1  = RegInit(0.U(1.W))
   val inputsign1 = io.input(1)(V2CWIDTHCOL-1)
   val absdataext1 = Mux(inputsign1 === 1.U,~io.input(1)+1.U ,io.input(1))
   val absdata1 = absdataext1(C2VWIDTHCOL-2,0)
   val inputaddr1 = Wire(UInt(COLADDR.W))
   inputaddr1 := io.inputaddr##1.U  
- 
+  io.Check := sign0
   //val absdata = Mux(absdata <= MAXC2VCOL.U,absdata,MAXC2VCOL)
   when(io.updatemin) {
+    //when(io.initial) {
+    //  when(inputsign1===1.U) {
+    //    sign1 := sign1 ^ 1.U 
+    //  }
+    //}.elsewhen(io.inputsign(1) =/= inputsign1){
+    //  sign1 := sign1 ^ 1.U
+    //}
     when(io.initial) {
-      when(inputsign1 === 1.U) {
-        sign1 := sign1 ^ 1.U 
-      }
-    }.elsewhen(io.inputsign(1) =/= inputsign1){
-      sign1 := sign1 ^ 1.U
-    }
-    when(io.initial) {
-      when(inputsign0 === 1.U) {
+      when((inputsign0^inputsign1)===1.U) {
         sign0 := sign0 ^ 1.U 
+        io.Check := ~sign0
       }
-    }.elsewhen(io.inputsign(0) =/= inputsign0){
+    }.elsewhen(((io.inputsign(0) =/= inputsign0)^(io.inputsign(1) =/= inputsign1))){
       sign0 := sign0 ^ 1.U
+      io.Check := ~sign0
     }
-    // updata min 
+     //updata min 
   
     when(inputaddr0 === minaddr0) {
       when(absdata0 <= submin0 ) {
@@ -470,7 +476,7 @@ class CheckNode2Col  extends Module with COMMON {
     submin0 := MAXC2VCOL.U
     minaddr0 := 0.U  
     subminaddr0 := 0.U
-    sign1 := 0.U 
+    //sign1 := 0.U 
     min1 := MAXC2VCOL.U
     submin1 := MAXC2VCOL.U
     minaddr1 := 0.U  
@@ -487,10 +493,11 @@ class CheckNode2Col  extends Module with COMMON {
   minmux.io.inputindex(1) := minaddr1 
   minmux.io.inputindex(2) := subminaddr0 
   minmux.io.inputindex(3) := subminaddr1 
-
-  val min = minmux.io.minVal 
+  //加强不满足的，削弱满足的，让其跳出陷阱集
+  val postout = Mux(sign0===0.U,io.weakMessage,io.strongMessage)
+  val min = Mux(io.postvalid,postout,minmux.io.minVal) 
   val minaddr = minmux.io.minIdx 
-  val submin = minmux.io.subminVal 
+  val submin = Mux(io.postvalid,postout,minmux.io.subminVal)
   val subminaddr = minmux.io.subminIdx
 // scale  
   val c2v0 = Wire(UInt(C2VWIDTHCOL.W)) 
@@ -513,7 +520,7 @@ class CheckNode2Col  extends Module with COMMON {
 
   val scaledc2v1 =( c2vext1+c2vext1+c2vext1) >> 2.U 
 
-  val c2vval1 = Mux(sign1 === io.inputsign(1) , scaledc2v1 , ~scaledc2v1+1.U )
+  val c2vval1 = Mux(sign0 === io.inputsign(1) , scaledc2v1 , ~scaledc2v1+1.U )
 
   io.minval(1) := Mux(io.initial,0.U,c2vval1) 
  
@@ -522,12 +529,12 @@ class CheckNode2Col  extends Module with COMMON {
   io.submin0 := submin0 
   io.minaddr0 := minaddr0 
   io.subminaddr0 := subminaddr0 
-  io.sign0 := sign0 
+  //io.sign := sign0 
   io.min1 := min1 
   io.submin1 := submin1 
   io.minaddr1 := minaddr1 
   io.subminaddr1 := subminaddr1 
-  io.sign1 := sign1 
+  //io.sign1 := sign0 
 
 
 }

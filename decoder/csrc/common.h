@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include "verilated_vcd_c.h"
 
-#define LLR_INIT_TABLE 3
+#define LLR_INIT_TABLE 5
 
 
 #define TESTMODULE 7 
@@ -57,12 +57,12 @@ int ITERMAX      = 6 ;
 #include "VDecoder2Col.h"
 #include "VDecoder2Col___024root.h"
 VDecoder2Col* top;
-double sigmastart = 0.60;
+double sigmastart = 0.55;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
 int maxtime			= 1000;
 int maxerrortime	= 50 ;
-int ITERMAX		  = 6 ;
+int ITERMAX		  = 5;
 int APPWIDTH = 7 ;
 int V2CWIDTH = 4; 
 int C2VWIDTH = 4 ; 
