@@ -357,8 +357,9 @@ void DecoderTest(){
 		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
 		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
 	}
-	//Log("if there is no other output, it means the module works right");
 }
+
+
 void Mux32MinSecmin(int *array , int * minval,int*subminval,int * minidx,int * subminidx){
 	int absarray [32];
 	for(int i=0;i < 32 ; i ++ ){
@@ -550,6 +551,10 @@ void toptest(){
 #elif TESTMODULE == 7 
 bool decodeonetime(double sigma){
 	top->io_Start = 1;
+	top->io_postvalid = 1;
+	top->io_strongMessage = 5;
+	top->io_weakMessage = 3;
+	top->io_postIterInput = 6;
 	top->io_IterInput = ITERMAX ;
 	clockntimes(1);
 	top->io_Start = 0;
@@ -704,8 +709,37 @@ bool decodeonetime(double sigma){
 	clockntimes(1);
 	return flag ;
 }
-
-
+bool ReadllrDecoder(int * llrin);
+void ReadfileDecode(){
+	
+	int frame = 0 ;
+	int errorframe = 0; 
+	ifstream file(WRONG_FILENAME);
+	if(!file) {
+		Log("NO file\n");
+		return ;
+	}
+	string line;
+	int llrin[2048];
+	while(getline(file,line)){
+		for (int i = 0;i < 2048;i++){
+			string hex = line.substr(i,1);
+			int value = stoi(hex,nullptr,16);
+			if(value&0x8){
+				value |= 0xfffffff0;
+			}
+			llrin[i] = value;
+		}
+		bool success = ReadllrDecoder(llrin);
+		if(!success) errorframe++;
+		frame++;
+		double fer = (double) errorframe / (double) frame;
+		//double rate = (double)errorframe/(double)frame;
+		//double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
+		Log("errorframe:%d frame:%d rate:%f",errorframe,frame,fer);
+	}
+	//Log("if there is no other output, it means the module works right");
+}
 
 void DecoderTest(){
 	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
@@ -1092,6 +1126,170 @@ void cppDecoderTest(){
 	}
 
 	//Log("if there is no other output, it means the module works right");
+}
+bool ReadllrDecoder(Message * llrin
+		){
+	//Decoder Initialization
+	top->io_Start = 1;
+	top->io_IterInput = ITERMAX ;
+#if POSTPROCESS 
+	top->io_postvalid = 1;
+
+	top->io_strongMessage = strongMessage;
+	top->io_weakMessage   = weakMessage ;
+	top->io_postIterInput = postInter;
+#endif
+	clockntimes(1);
+	top->io_Start = 0;
+	//
+	for(int i = 0; i < 16;i++) {
+		top->io_LLrin_0 = llrin[i*128+0];
+		//printf("llrin:%x appout:%x\n",top->io_LLrin_0,top->io_appout_0);
+		top->io_LLrin_1 = llrin[i*128+1];
+		top->io_LLrin_2 = llrin[i*128+2];
+		top->io_LLrin_3 = llrin[i*128+3];
+		top->io_LLrin_4 = llrin[i*128+4];
+		top->io_LLrin_5 = llrin[i*128+5];
+		top->io_LLrin_6 = llrin[i*128+6];
+		top->io_LLrin_7 = llrin[i*128+7];
+		top->io_LLrin_8 = llrin[i*128+8];
+		top->io_LLrin_9 = llrin[i*128+9];
+		top->io_LLrin_10 = llrin[i*128+10];
+		top->io_LLrin_11 = llrin[i*128+11];
+		top->io_LLrin_12 = llrin[i*128+12];
+		top->io_LLrin_13 = llrin[i*128+13];
+		top->io_LLrin_14 = llrin[i*128+14];
+		top->io_LLrin_15 = llrin[i*128+15];
+		top->io_LLrin_16 = llrin[i*128+16];
+		top->io_LLrin_17 = llrin[i*128+17];
+		top->io_LLrin_18 = llrin[i*128+18];
+		top->io_LLrin_19 = llrin[i*128+19];
+		top->io_LLrin_20 = llrin[i*128+20];
+		top->io_LLrin_21 = llrin[i*128+21];
+		top->io_LLrin_22 = llrin[i*128+22];
+		top->io_LLrin_23 = llrin[i*128+23];
+		top->io_LLrin_24 = llrin[i*128+24];
+		top->io_LLrin_25 = llrin[i*128+25];
+		top->io_LLrin_26 = llrin[i*128+26];
+		top->io_LLrin_27 = llrin[i*128+27];
+		top->io_LLrin_28 = llrin[i*128+28];
+		top->io_LLrin_29 = llrin[i*128+29];
+		top->io_LLrin_30 = llrin[i*128+30];
+		top->io_LLrin_31 = llrin[i*128+31];
+		top->io_LLrin_32 = llrin[i*128+32];
+		top->io_LLrin_33 = llrin[i*128+33];
+		top->io_LLrin_34 = llrin[i*128+34];
+		top->io_LLrin_35 = llrin[i*128+35];
+		top->io_LLrin_36 = llrin[i*128+36];
+		top->io_LLrin_37 = llrin[i*128+37];
+		top->io_LLrin_38 = llrin[i*128+38];
+		top->io_LLrin_39 = llrin[i*128+39];
+		top->io_LLrin_40 = llrin[i*128+40];
+		top->io_LLrin_41 = llrin[i*128+41];
+		top->io_LLrin_42 = llrin[i*128+42];
+		top->io_LLrin_43 = llrin[i*128+43];
+		top->io_LLrin_44 = llrin[i*128+44];
+		top->io_LLrin_45 = llrin[i*128+45];
+		top->io_LLrin_46 = llrin[i*128+46];
+		top->io_LLrin_47 = llrin[i*128+47];
+		top->io_LLrin_48 = llrin[i*128+48];
+		top->io_LLrin_49 = llrin[i*128+49];
+		top->io_LLrin_50 = llrin[i*128+50];
+		top->io_LLrin_51 = llrin[i*128+51];
+		top->io_LLrin_52 = llrin[i*128+52];
+		top->io_LLrin_53 = llrin[i*128+53];
+		top->io_LLrin_54 = llrin[i*128+54];
+		top->io_LLrin_55 = llrin[i*128+55];
+		top->io_LLrin_56 = llrin[i*128+56];
+		top->io_LLrin_57 = llrin[i*128+57];
+		top->io_LLrin_58 = llrin[i*128+58];
+		top->io_LLrin_59 = llrin[i*128+59];
+		top->io_LLrin_60 = llrin[i*128+60];
+		top->io_LLrin_61 = llrin[i*128+61];
+		top->io_LLrin_62 = llrin[i*128+62];
+		top->io_LLrin_63 = llrin[i*128+63];
+		top->io_LLrin_64 = llrin[i*128+64];
+		top->io_LLrin_65 = llrin[i*128+65];
+		top->io_LLrin_66 = llrin[i*128+66];
+		top->io_LLrin_67 = llrin[i*128+67];
+		top->io_LLrin_68 = llrin[i*128+68];
+		top->io_LLrin_69 = llrin[i*128+69];
+		top->io_LLrin_70 = llrin[i*128+70];
+		top->io_LLrin_71 = llrin[i*128+71];
+		top->io_LLrin_72 = llrin[i*128+72];
+		top->io_LLrin_73 = llrin[i*128+73];
+		top->io_LLrin_74 = llrin[i*128+74];
+		top->io_LLrin_75 = llrin[i*128+75];
+		top->io_LLrin_76 = llrin[i*128+76];
+		top->io_LLrin_77 = llrin[i*128+77];
+		top->io_LLrin_78 = llrin[i*128+78];
+		top->io_LLrin_79 = llrin[i*128+79];
+		top->io_LLrin_80 = llrin[i*128+80];
+		top->io_LLrin_81 = llrin[i*128+81];
+		top->io_LLrin_82 = llrin[i*128+82];
+		top->io_LLrin_83 = llrin[i*128+83];
+		top->io_LLrin_84 = llrin[i*128+84];
+		top->io_LLrin_85 = llrin[i*128+85];
+		top->io_LLrin_86 = llrin[i*128+86];
+		top->io_LLrin_87 = llrin[i*128+87];
+		top->io_LLrin_88 = llrin[i*128+88];
+		top->io_LLrin_89 = llrin[i*128+89];
+		top->io_LLrin_90 = llrin[i*128+90];
+		top->io_LLrin_91 = llrin[i*128+91];
+		top->io_LLrin_92 = llrin[i*128+92];
+		top->io_LLrin_93 = llrin[i*128+93];
+		top->io_LLrin_94 = llrin[i*128+94];
+		top->io_LLrin_95 = llrin[i*128+95];
+		top->io_LLrin_96 = llrin[i*128+96];
+		top->io_LLrin_97 = llrin[i*128+97];
+		top->io_LLrin_98 = llrin[i*128+98];
+		top->io_LLrin_99 = llrin[i*128+99];
+		top->io_LLrin_100 = llrin[i*128+100];
+		top->io_LLrin_101 = llrin[i*128+101];
+		top->io_LLrin_102 = llrin[i*128+102];
+		top->io_LLrin_103 = llrin[i*128+103];
+		top->io_LLrin_104 = llrin[i*128+104];
+		top->io_LLrin_105 = llrin[i*128+105];
+		top->io_LLrin_106 = llrin[i*128+106];
+		top->io_LLrin_107 = llrin[i*128+107];
+		top->io_LLrin_108 = llrin[i*128+108];
+		top->io_LLrin_109 = llrin[i*128+109];
+		top->io_LLrin_110 = llrin[i*128+110];
+		top->io_LLrin_111 = llrin[i*128+111];
+		top->io_LLrin_112 = llrin[i*128+112];
+		top->io_LLrin_113 = llrin[i*128+113];
+		top->io_LLrin_114 = llrin[i*128+114];
+		top->io_LLrin_115 = llrin[i*128+115];
+		top->io_LLrin_116 = llrin[i*128+116];
+		top->io_LLrin_117 = llrin[i*128+117];
+		top->io_LLrin_118 = llrin[i*128+118];
+		top->io_LLrin_119 = llrin[i*128+119];
+		top->io_LLrin_120 = llrin[i*128+120];
+		top->io_LLrin_121 = llrin[i*128+121];
+		top->io_LLrin_122 = llrin[i*128+122];
+		top->io_LLrin_123 = llrin[i*128+123];
+		top->io_LLrin_124 = llrin[i*128+124];
+		top->io_LLrin_125 = llrin[i*128+125];
+		top->io_LLrin_126 = llrin[i*128+126];
+		top->io_LLrin_127 = llrin[i*128+127];
+		clockntimes(1);
+		
+	} 
+	top->io_Start = 0;
+	//clockntimes(1);
+	while(!top->io_OutValid) {
+		clockntimes(1);
+	//	i++;
+	}
+    //	printf("i:%d\n",i);
+	bool flag = top->io_Success; 
+//	if(flag) printf("success\n");
+	//printf("Iter remain:%d\n",top->io_IterOut);
+	clockntimes(1);
+	return flag ;
+	//Decoder退出了initial态 进入decode
+	//printf("counter:%d\n",top->io_counter);
+	
 }
 
 #ifdef DIFFTEST 

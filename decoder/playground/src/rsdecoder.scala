@@ -141,6 +141,12 @@ class rsdecoder2col extends Module with COMMON {
     val strongMessage = Input(UInt(C2VWIDTHCOL.W))
     val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
+
+    val llrout      = Output(Vec(32,UInt(256.W)))
+    //val llroutcheck = Output((Vec(32,UInt(256.W))))
+    //val llrou      = Output(Vec(32,UInt(256.W)))
+    val errorflush  = Input(Bool())
+    val errorvalid  = Output(Bool())
     //错误比特记录 
     //val localvalid  = Input(Bool())
     //val updatevalid = Input(Bool())
@@ -179,7 +185,12 @@ class rsdecoder2col extends Module with COMMON {
   decoder.io.postvalid     := io.postvalid
   decoder.io.strongMessage     := io.strongMessage 
   decoder.io.weakMessage     := io.weakMessage 
-  decoder.io.postIterInput     := io.postIterInput 
+  decoder.io.postIterInput   := io.postIterInput 
+  //io.llrou          := decoder.io.llrou   
+  io.llrout          := decoder.io.llrout     
+  //io.llroutcheck     := decoder.io.llroutcheck
+  decoder.io.errorflush      := io.errorflush 
+  io.errorvalid      := decoder.io.errorvalid 
   //错误比特记录相关模块 
   //errorbit.io.appin := decoder.io.appout
   //errorbit.io.appvalid := decoder.io.appvalid  
@@ -275,6 +286,12 @@ class rsdecodertop extends Module with COMMON {
     val strongMessage = Input(UInt(C2VWIDTHCOL.W))
     val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
+
+    val llrout      = Output(Vec(32,UInt(256.W)))
+    //val llroutcheck = Output((Vec(32,UInt(256.W))))
+    //val llrou      = Output(Vec(32,UInt(256.W)))
+    val errorflush  = Input(Bool())
+    val errorvalid  = Output(Bool())
     //val localvalid  = Input(Bool())
     //val updatevalid = Input(Bool())
     //val Errorcol    = Output(Vec(MAXERRORNUM,UInt((COLADDR).W))) 
@@ -296,6 +313,11 @@ class rsdecodertop extends Module with COMMON {
     DecoderGroup(i).io.strongMessage := io.strongMessage 
     DecoderGroup(i).io.weakMessage   := io.weakMessage 
     DecoderGroup(i).io.postIterInput := io.postIterInput 
+    io.llrout        := DecoderGroup(i).io.llrout  
+    //io.llrou        := DecoderGroup(i).io.llrou  
+    //io.llroutcheck   := DecoderGroup(i).io.llroutcheck      
+    DecoderGroup(i).io.errorflush    := io.errorflush    
+    io.errorvalid    := DecoderGroup(i).io.errorvalid    
   }
   io.Framevalid := DecoderGroup(0).io.Framevalid 
   val totalframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))

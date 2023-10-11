@@ -495,16 +495,35 @@ class CheckNode2Col  extends Module with COMMON {
   minmux.io.inputindex(3) := subminaddr1 
   //加强不满足的，削弱满足的，让其跳出陷阱集
   val postout = Mux(sign0===0.U,io.weakMessage,io.strongMessage)
-  val min = Mux(io.postvalid,postout,minmux.io.minVal) 
+  val realminpost = postout
+  val realsubminpost = postout
+  val min = minmux.io.minVal
   val minaddr = minmux.io.minIdx 
-  val submin = Mux(io.postvalid,postout,minmux.io.subminVal)
+  val submin = minmux.io.subminVal
   val subminaddr = minmux.io.subminIdx
+  //post Message 
+  //val minpost = Wire(UInt((C2VWIDTHCOL).W))
+  //minpost := min 
+  //val minpostweak = Mux(minpost >= io.weakMessage,io.weakMessage,minpost)
+  //val minpoststrong = Mux(minpost >= ((MAXC2VCOL).U-io.strongMessage),io.strongMessage,minpost+io.strongMessage)
+  //val realminpost = Mux(sign0===0.U,minpostweak,minpoststrong)
+//
+  //val subminpost = Wire(UInt((C2VWIDTHCOL).W))
+  //subminpost := submin 
+  //val subminpostweak = Mux(subminpost >= io.weakMessage,io.weakMessage,subminpost)
+  //val subminpoststrong = Mux(subminpost >= ((MAXC2VCOL).U-io.strongMessage),io.strongMessage,subminpost+io.strongMessage)
+  //val realsubminpost = Mux(sign0===0.U,minpostweak,minpoststrong)
+//
+  val realmin = Mux(io.postvalid,realminpost,min)
+  val realsubmin  = Mux(io.postvalid,realsubminpost,submin)
 // scale  
+
   val c2v0 = Wire(UInt(C2VWIDTHCOL.W)) 
-  c2v0 := Mux(inputaddr0 === minaddr , submin ,min) 
+  c2v0 := Mux(inputaddr0 === minaddr , realsubmin ,realmin) 
 
   val c2vext0 = Wire(UInt((C2VWIDTHCOL+2).W))
   c2vext0 := Fill(2,0.U)##c2v0 
+  
 
   val scaledc2v0 =( c2vext0+c2vext0+c2vext0) >> 2.U 
 
@@ -513,7 +532,7 @@ class CheckNode2Col  extends Module with COMMON {
   io.minval(0) := Mux(io.initial,0.U,c2vval0) 
   
   val c2v1 = Wire(UInt(C2VWIDTHCOL.W)) 
-  c2v1 := Mux(inputaddr1 === minaddr , submin ,min) 
+  c2v1 := Mux(inputaddr1 === minaddr , realsubmin ,realmin) 
 
   val c2vext1 = Wire(UInt((C2VWIDTHCOL+2).W))
   c2vext1 := Fill(2,0.U)##c2v1

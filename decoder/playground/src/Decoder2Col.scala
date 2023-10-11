@@ -18,7 +18,13 @@ class Decoder2Col extends Module with COMMON {
     val postIterInput = Input(UInt(ITERWITH.W))
     //val appvalid  = Output(Bool())
     //val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
+    val llrout    = Output(Vec(32,UInt(256.W)))
+    val errorflush  = Input(Bool())
+    val errorvalid  = Output(Bool())
 
+    //for vio_check 
+    //val llroutcheck = Output((Vec(32,UInt(256.W))))
+    //val llrou       = Output((Vec(32,UInt(256.W))))
     // for difftest  
     //val appout     = Output(Vec(BLKSIZE*2,UInt(APPWIDTH.W))) 
     //val c2v        = Output(Vec(BLKSIZE*ROWNUM,UInt(C2VWIDTHCOL.W))) 
@@ -77,7 +83,12 @@ class Decoder2Col extends Module with COMMON {
   LLrWriteEn := false.B
   //Seq.fill(COLNUM)(SyncReadMem(BLKSIZE,UInt(APPWIDTH.W)))
   //Seq.fill(COLNUM)(Mem(BLKSIZE,UInt(APPWIDTH.W)))
-
+//error record 
+  val errorrecord = RegInit(0.U(1.W))
+  when(io.errorflush){
+    errorrecord := 0.U
+  }
+  io.errorvalid := errorrecord === 1.U
 // Wire Connect 
   val counter     = RegInit(0.U((COLADDR-1).W))
   val counter1    = RegInit(0.U((COLADDR-1).W))  
@@ -324,6 +335,9 @@ for( i <- 0 until ROWNUM) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
           io.OutValid := Mux(io.postvalid,(allcheck) ===0.U,true.B) 
           io.Success  := (allcheck) ===0.U
+          when((Iter===1.U)&&(allcheck === 1.U)){
+            errorrecord := 1.U
+          }
           //rightreg := 1.U
           when(io.postvalid&&(Iter===1.U)&&(allcheck === 1.U)){
             currentState := postprocess
@@ -365,7 +379,7 @@ for( i <- 0 until ROWNUM) {
         }.otherwise{
             //rightreg := 1.U
             postIter := postIter - 1.U 
-            currentState := decode 
+            currentState := postprocess 
         }
       } 
     }
@@ -461,4 +475,32 @@ for( i <- 0 until ROWNUM) {
   //  }
   //}
   //GenerateIO.Gen(3)
+  //记录错误帧的LLR的寄存器
+  val recorden = Wire(Bool())
+  recorden := (errorrecord === 0.U)&&(currentState === initial)
+  val registersLLR = Seq.fill(32)(RegInit(VecInit(Seq.fill(64)(0.U(4.W)))))
+  when(recorden){
+    for(i<-0 until 32){
+      when (i.U === counter##(0.U(1.W))){
+        for(j <- 0 until 64){
+          registersLLR(i)(j) := io.LLrin(j)
+        }
+      }
+      when (i.U === counter##(1.U(1.W))){
+        for(j <- 0 until 64){
+          registersLLR(i)(j) := io.LLrin(j+64)
+        }
+      }
+    }
+  }
+  for(i <-0 until 32) {
+    io.llrout(i) := Cat(registersLLR(i).map(_.asUInt()))
+  }
+
+  //for(i <-0 until 32) {
+  //  io.llroutcheck(i) := RegNext(io.llrout(i))//Cat(registersLLR(i).map(_.asUInt()))
+  //}
+  //for(i <-0 until 32) {
+  //  io.llrou(i) := RegNext(io.llroutcheck(i))//Cat(registersLLR(i).map(_.asUInt()))
+  //}
 }
