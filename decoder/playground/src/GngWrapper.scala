@@ -8,7 +8,7 @@ class GngWrapper(num : Int = COMMON.COLNUM) extends Module with COMMON {
     val din = Input(Vec(num,UInt(1.W))) 
     val dinvalid = Input (Bool()) 
     val p0  = Input(Vec(PNUM,UInt(64.W)))
-    val dout = Output(Vec(num,UInt(APPWIDTH.W))) 
+    val dout = Output(Vec(num,UInt(LLRWIDTH.W))) 
     val doutvalid = Output(Bool()) 
   })
   val upperBond = BigInt(2).pow(64) - 1 

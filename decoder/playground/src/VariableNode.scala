@@ -4,11 +4,12 @@ import chisel3.util._
 
 class VariableNode extends Module with COMMON {
   val io = IO(new Bundle {
-    val LLrin    = Input(UInt(APPWIDTH.W))
+    val LLrin    = Input(UInt(LLRWIDTH.W))
     val Checkin  = Input(Vec(ROWNUM, UInt(C2VWIDTH.W)))
     val Checkout = Output(Vec(ROWNUM,UInt(V2CWIDTH.W)))
     val APPout   = Output(UInt(APPWIDTH.W)) 
   })
+  val LLrinext = Fill(APPWIDTH-LLRWIDTH,io.LLrin(LLRWIDTH-1))##io.LLrin
   val Checklocal = VecInit(Seq.fill(ROWNUM)(0.U(APPWIDTH.W)))
   val checkoutAPP = VecInit(Seq.fill(ROWNUM)(0.U(APPWIDTH.W)))
   //val checkinsign = VecInit(Seq.fill(ROWNUM)(0.U(1.W)))
@@ -22,13 +23,13 @@ class VariableNode extends Module with COMMON {
   val sum = Wire(UInt(APPWIDTH.W))
   sum := Checklocal.reduce(_+_)
   for(i <- 0 until ROWNUM){
-    checkoutAPP(i) := io.LLrin + sum - Checklocal(i)
+    checkoutAPP(i) := LLrinext + sum - Checklocal(i)
   }
   val min = Wire(UInt(C2VWIDTHCOL.W))
   min := ~(MAXC2V.U(C2VWIDTHCOL.W))+1.U
   for(i <- 0 until ROWNUM) {
    io.Checkout(i) :=Mux( checkoutAPP(i).asSInt <=(-MAXV2C.S),min,Mux(checkoutAPP(i).asSInt>=MAXV2C.S,MAXV2C.U,checkoutAPP(i)(V2CWIDTH-1,0) ))  
   }
-  io.APPout := sum + io.LLrin
+  io.APPout := sum + LLrinext
   //GenerateIO.Gen(1)
 }

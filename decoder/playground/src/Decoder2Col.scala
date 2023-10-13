@@ -12,13 +12,14 @@ class Decoder2Col extends Module with COMMON {
     val Success   = Output(Bool())
     val IterOut   = Output(UInt(ITERWITH.W))
     val counter   = Output(UInt(BLKADDR.W))
+    val errorbit  = Output(UInt(11.W))
     val postvalid = Input(Bool())
     val strongMessage = Input(UInt(C2VWIDTHCOL.W))
     val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
     //val appvalid  = Output(Bool())
     //val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
-    val llrout    = Output(Vec(32,UInt(256.W)))
+    //val llrout    = Output(Vec(32,UInt(256.W)))
     val errorflush  = Input(Bool())
     val errorvalid  = Output(Bool())
 
@@ -48,7 +49,7 @@ class Decoder2Col extends Module with COMMON {
   // 64*6个校验节点   
   val CheckGroup = Seq.fill(BLKSIZE)(Seq.fill(ROWNUM)(Module (new CheckNode2Col))) 
   // 128 个ram 存LLR 消息 深度16  
-  val LLrRams = Seq.fill(BLKSIZE*2)(SyncReadMem(COLNUM/2,UInt(APPWIDTH.W)))
+  val LLrRams = Seq.fill(BLKSIZE*2)(SyncReadMem(COLNUM/2,UInt(LLRWIDTH.W)))
   // 128 个ram 存v2c符号 深度16  数据位宽 rownum   
   val SignRams = Seq.fill(BLKSIZE*2)(SyncReadMem(COLNUM/2,UInt(ROWNUM.W)))
   //  Var 的out data 给CheckNode 的RAM
@@ -132,10 +133,18 @@ class Decoder2Col extends Module with COMMON {
 
   val RowCounter  = RegInit(0.U(ROWADDR.W))
   //val rightreg    = RegInit(1.U(1.W)) 
-  //val appoutjudge = VecInit(Seq.fill(BLKSIZE*2)(0.U(1.W)))
-  //for(i <- 0 until BLKSIZE*2) {
-    //appoutjudge(i) := ~VarGroup(i).io.APPout(APPWIDTHCOL-1)
-  //}
+  val appoutjudge = VecInit(Seq.fill(BLKSIZE*2)(0.U(11.W)))
+  for(i <- 0 until BLKSIZE*2) {
+    appoutjudge(i) := VarGroup(i).io.APPout(APPWIDTHCOL-1)
+  }
+  val errorcount = RegInit(0.U(11.W))
+  val counten = Wire(Bool())
+  counten := false.B
+  val localerror = appoutjudge.reduce(_+_)
+  when(counten){
+    errorcount := errorcount + localerror
+  }
+  io.errorbit := errorcount + localerror
   val GroupCheck  = Seq.fill(ROWNUM)(Seq.fill(BLKSIZE)(Wire(UInt(1.W))))
   for(i <- 0 until ROWNUM){
     for(j <- 0 until BLKSIZE){
@@ -256,7 +265,7 @@ for( i <- 0 until ROWNUM) {
 
 // modeule connect   
 
- val idle :: initial:: decode :: postprocess :: Nil = Enum(4)
+ val idle :: initial:: decode :: postcheck ::postprocess :: Nil = Enum(5)
  // idle 等待  
  /****************************************/
  // initial: 初始化   
@@ -329,8 +338,11 @@ for( i <- 0 until ROWNUM) {
       counter := counter + 1.U 
       counter1 := counter1 + 1.U 
       //rightreg := rightreg & rightdecide  
+      counten := true.B
       when(counter === 15.U){
         //提前终止 allcheck
+        counten := false.B
+        errorcount := 0.U
         when(((allcheck)===0.U)||Iter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
           io.OutValid := Mux(io.postvalid,(allcheck) ===0.U,true.B) 
@@ -340,8 +352,10 @@ for( i <- 0 until ROWNUM) {
           }
           //rightreg := 1.U
           when(io.postvalid&&(Iter===1.U)&&(allcheck === 1.U)){
-            currentState := postprocess
+            currentState := postcheck
             postIter := io.postIterInput
+            counter := 0.U 
+            counter1 := 0.U
           }.elsewhen(io.Start){
             currentState := initial 
             start := true.B 
@@ -356,14 +370,24 @@ for( i <- 0 until ROWNUM) {
         }
       } 
     }
+    is (postcheck) {
+      currentState := postprocess
+      postvalid := true.B
+      counter := 0.U 
+      counter1 := 1.U
+    }
     is(postprocess){
       updateen  := true.B  
       signWriteEn := true.B
       counter := counter + 1.U 
       counter1 := counter1 + 1.U 
-      postvalid := true.B 
+      //when(postIter === io.postIterInput){
+      //  postvalid := true.B
+      //}
       when(counter === 15.U){
         //提前终止 allcheck
+        counten := false.B
+        errorcount := 0.U
         when(((allcheck)===0.U)||postIter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
           io.OutValid := true.B 
@@ -476,26 +500,26 @@ for( i <- 0 until ROWNUM) {
   //}
   //GenerateIO.Gen(3)
   //记录错误帧的LLR的寄存器
-  val recorden = Wire(Bool())
-  recorden := (errorrecord === 0.U)&&(currentState === initial)
-  val registersLLR = Seq.fill(32)(RegInit(VecInit(Seq.fill(64)(0.U(4.W)))))
-  when(recorden){
-    for(i<-0 until 32){
-      when (i.U === counter##(0.U(1.W))){
-        for(j <- 0 until 64){
-          registersLLR(i)(j) := io.LLrin(j)
-        }
-      }
-      when (i.U === counter##(1.U(1.W))){
-        for(j <- 0 until 64){
-          registersLLR(i)(j) := io.LLrin(j+64)
-        }
-      }
-    }
-  }
-  for(i <-0 until 32) {
-    io.llrout(i) := Cat(registersLLR(i).map(_.asUInt()))
-  }
+  //val recorden = Wire(Bool())
+  //recorden := (errorrecord === 0.U)&&(currentState === initial)
+  //val registersLLR = Seq.fill(32)(RegInit(VecInit(Seq.fill(64)(0.U(4.W)))))
+  //when(recorden){
+  //  for(i<-0 until 32){
+  //    when (i.U === counter##(0.U(1.W))){
+  //      for(j <- 0 until 64){
+  //        registersLLR(i)(j) := io.LLrin(j)
+  //      }
+  //    }
+  //    when (i.U === counter##(1.U(1.W))){
+  //      for(j <- 0 until 64){
+  //        registersLLR(i)(j) := io.LLrin(j+64)
+  //      }
+  //    }
+  //  }
+  //}
+  //or(i <-0 until 32) {
+  // io.llrout(i) := Cat(registersLLR(i).map(_.asUInt()))
+  //
 
   //for(i <-0 until 32) {
   //  io.llroutcheck(i) := RegNext(io.llrout(i))//Cat(registersLLR(i).map(_.asUInt()))

@@ -1275,7 +1275,7 @@ bool ReadllrDecoder(Message * llrin
 		clockntimes(1);
 		
 	} 
-	top->io_Start = 0;
+	//top->io_Start = 0;
 	//clockntimes(1);
 	while(!top->io_OutValid) {
 		clockntimes(1);

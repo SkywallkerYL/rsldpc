@@ -8,6 +8,7 @@ trait COMMON{
   val C2VWIDTH = 4
   val APPWIDTH = 7
 
+  val LLRWIDTH = 4
   val V2CWIDTHCOL = 4
   val C2VWIDTHCOL = 4
   val APPWIDTHCOL = 7
@@ -34,36 +35,36 @@ trait COMMON{
   val MAXSPACEIND = scala.math.pow(2,QuantiNUM).toInt-1   
   //  量化表  
   val table3 = VecInit(Seq(
-      4.S(APPWIDTH.W),
-      1.S(APPWIDTH.W) ,
-     -1.S(APPWIDTH.W)   ,
-     -4.S(APPWIDTH.W)
+      4.S(LLRWIDTH.W),
+      1.S(LLRWIDTH.W) ,
+     -1.S(LLRWIDTH.W)   ,
+     -4.S(LLRWIDTH.W)
     ))
   val table5 = VecInit(Seq(
-      7.S(APPWIDTH.W),
-      3.S(APPWIDTH.W),
-      1.S(APPWIDTH.W),
-      -1.S(APPWIDTH.W),
-      -3.S(APPWIDTH.W),
-      -7.S(APPWIDTH.W)
+      7.S(LLRWIDTH.W),
+      3.S(LLRWIDTH.W),
+      1.S(LLRWIDTH.W),
+      -1.S(LLRWIDTH.W),
+      -3.S(LLRWIDTH.W),
+      -7.S(LLRWIDTH.W)
     ))
   val table15 = VecInit(Seq(
-      7.S(APPWIDTH.W),
-      6.S(APPWIDTH.W),
-      5.S(APPWIDTH.W),
-      4.S(APPWIDTH.W),
-      3.S(APPWIDTH.W),
-      2.S(APPWIDTH.W),
-      1.S(APPWIDTH.W),
-      0.S(APPWIDTH.W),
-      -0.S(APPWIDTH.W),
-      -1.S(APPWIDTH.W),
-      -2.S(APPWIDTH.W),
-      -3.S(APPWIDTH.W),
-      -4.S(APPWIDTH.W),
-      -5.S(APPWIDTH.W),
-      -6.S(APPWIDTH.W),
-      -7.S(APPWIDTH.W)
+      7.S(LLRWIDTH.W),
+      6.S(LLRWIDTH.W),
+      5.S(LLRWIDTH.W),
+      4.S(LLRWIDTH.W),
+      3.S(LLRWIDTH.W),
+      2.S(LLRWIDTH.W),
+      1.S(LLRWIDTH.W),
+      0.S(LLRWIDTH.W),
+      -0.S(LLRWIDTH.W),
+      -1.S(LLRWIDTH.W),
+      -2.S(LLRWIDTH.W),
+      -3.S(LLRWIDTH.W),
+      -4.S(LLRWIDTH.W),
+      -5.S(LLRWIDTH.W),
+      -6.S(LLRWIDTH.W),
+      -7.S(LLRWIDTH.W)
     ))
   //ITER 的宽度 
   val ITERWITH = 5  
@@ -73,7 +74,7 @@ trait COMMON{
   val FilePath        : String    = "../matrix/2048_1723.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
-  val PARRELNUM  = 1
+  val PARRELNUM  = 10
 // 最多记录的错误比特的个数   
   val MAXERRORNUM = 10
 }
