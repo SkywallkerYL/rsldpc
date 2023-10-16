@@ -98,10 +98,14 @@ int ITERMAX      = 20 ;
 
 
 #define POSTPROCESS 1
-int strongMessage = 6 ;
-int weakMessage = 2;
-int postInter = 6;
-const char WRONG_FILENAME[] = "/home/yangli/rsldpc/decoder/csrc/error_llr_final.txt";
+int strongMessage_0 = 6;
+int weakMessage_0 = 1;
+int strongMessage_1 = 7;
+int weakMessage_1 = 2;
+int strongMessage_2 = 7;
+int weakMessage_2 = 2;
+int postInter = 12;
+const char WRONG_FILENAME[] = "/home/yangli/rsldpc/decoder/csrc/error_llr_base.txt";
 #define READLLR 1
 //#define WAVE 
 #define WAVE_BEGIN 0 

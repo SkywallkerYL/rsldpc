@@ -74,9 +74,16 @@ trait COMMON{
   val FilePath        : String    = "../matrix/2048_1723.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
-  val PARRELNUM  = 10
+  val PARRELNUM  = 5
 // 最多记录的错误比特的个数   
   val MAXERRORNUM = 10
+  // 后处理参数  
+  val strongMessage = 6
+  val weakMessage   = 2
+  val strongMessage0 = 7
+  val weakMessage0   = 2
+  val postIterInput      = 8
+  val maxpostnum  = 2
 }
 object COMMON extends COMMON {}
 

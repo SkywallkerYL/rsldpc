@@ -552,8 +552,8 @@ void toptest(){
 bool decodeonetime(double sigma){
 	top->io_Start = 1;
 	top->io_postvalid = 1;
-	top->io_strongMessage = 5;
-	top->io_weakMessage = 3;
+	//top->io_strongMessage = 5;
+	//top->io_weakMessage = 3;
 	top->io_postIterInput = 6;
 	top->io_IterInput = ITERMAX ;
 	clockntimes(1);
@@ -709,7 +709,7 @@ bool decodeonetime(double sigma){
 	clockntimes(1);
 	return flag ;
 }
-bool ReadllrDecoder(int * llrin);
+bool ReadllrDecoder(int * llrin,int & errorbit,int &checknum);
 void ReadfileDecode(){
 	
 	int frame = 0 ;
@@ -721,7 +721,12 @@ void ReadfileDecode(){
 	}
 	string line;
 	int llrin[2048];
+	int targetframe =1;
 	while(getline(file,line)){
+		//if(frame != targetframe-1) {
+		//frame++;
+		//continue;
+		//}
 		for (int i = 0;i < 2048;i++){
 			string hex = line.substr(i,1);
 			int value = stoi(hex,nullptr,16);
@@ -730,13 +735,15 @@ void ReadfileDecode(){
 			}
 			llrin[i] = value;
 		}
-		bool success = ReadllrDecoder(llrin);
+		int errorbit = 0;
+		int checknum = 0;
+		bool success = ReadllrDecoder(llrin,errorbit,checknum);
 		if(!success) errorframe++;
 		frame++;
 		double fer = (double) errorframe / (double) frame;
 		//double rate = (double)errorframe/(double)frame;
 		//double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
-		Log("errorframe:%d frame:%d rate:%f",errorframe,frame,fer);
+		Log("check:%d errorbit:%d errorframe:%d frame:%d rate:%f",checknum,errorbit,errorframe,frame,fer);
 	}
 	//Log("if there is no other output, it means the module works right");
 }
@@ -1127,7 +1134,7 @@ void cppDecoderTest(){
 
 	//Log("if there is no other output, it means the module works right");
 }
-bool ReadllrDecoder(Message * llrin
+bool ReadllrDecoder(Message * llrin ,int & errorbit,int &checknum
 		){
 	//Decoder Initialization
 	top->io_Start = 1;
@@ -1135,8 +1142,12 @@ bool ReadllrDecoder(Message * llrin
 #if POSTPROCESS 
 	top->io_postvalid = 1;
 
-	top->io_strongMessage = strongMessage;
-	top->io_weakMessage   = weakMessage ;
+	top->io_strongMessage_0 = strongMessage_0 ;
+	top->io_weakMessage_0   =   weakMessage_0 ;
+	top->io_strongMessage_1 = strongMessage_1 ;
+	top->io_weakMessage_1   =   weakMessage_1 ;
+	top->io_strongMessage_2 = strongMessage_2 ;
+	top->io_weakMessage_2   =   weakMessage_2 ;
 	top->io_postIterInput = postInter;
 #endif
 	clockntimes(1);
@@ -1283,6 +1294,8 @@ bool ReadllrDecoder(Message * llrin
 	}
     //	printf("i:%d\n",i);
 	bool flag = top->io_Success; 
+	errorbit = top->io_errorbit;
+	checknum = top->io_check;
 //	if(flag) printf("success\n");
 	//printf("Iter remain:%d\n",top->io_IterOut);
 	clockntimes(1);

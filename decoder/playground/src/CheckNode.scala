@@ -347,8 +347,10 @@ class CheckNodeCOL  extends Module with COMMON {
 class CheckNode2Col extends Module with COMMON {
   val io = IO(new Bundle {
     val input = Input(Vec(2, UInt(V2CWIDTHCOL.W)) )
+    val appsign = Input(Vec(2,UInt(1.W)))
     val updatemin = Input(Bool())
     val signreset  = Input(Bool())
+    val checkreset = Input(Bool())
     val initial   = Input(Bool())
     val inputaddr = Input(UInt((COLADDR-1).W))
     val inputsign = Input(Vec(2,UInt(1.W)))//来自Ram里存的信号 
@@ -390,8 +392,9 @@ class CheckNode2Col extends Module with COMMON {
   val absdata1 = absdataext1(C2VWIDTHCOL-2,0)
   val inputaddr1 = Wire(UInt(COLADDR.W))
   inputaddr1 := io.inputaddr##1.U  
-  io.Check := sign0
-
+  //io.Check := sign0
+  val check = RegInit(0.U(1.W))
+  io.Check := check
   //加强不满足的，削弱满足的，让其跳出陷阱集
   val check0 = sign0 ^ (io.inputsign(1) =/= inputsign1)
   val check1 = sign0 //^ (io.inputsign(0) =/= inputsign0)
@@ -408,11 +411,21 @@ class CheckNode2Col extends Module with COMMON {
     when(io.initial) {
       when((inputsign0^inputsign1)===1.U) {
         sign0 := sign0 ^ 1.U 
-        io.Check := ~sign0
+        //io.Check := ~sign0
       }
     }.elsewhen(((io.inputsign(0) =/= inputsign0)^(io.inputsign(1) =/= inputsign1))){
       sign0 := sign0 ^ 1.U
-      io.Check := ~sign0
+      //io.Check := ~sign0
+    }
+    when(((io.appsign(0)===1.U )^(io.appsign(1)===1.U ))){
+      //check := check ^ 1.U
+      io.Check := check ^ 1.U
+    }
+    when(io.checkreset){
+      //check := check ^ 1.U
+      check := 0.U
+    }.elsewhen(((io.appsign(0)===1.U )^(io.appsign(1)===1.U ))){
+      check := check ^ 1.U
     }
      //updata min 
   }
@@ -487,10 +500,11 @@ class CheckNode2Col extends Module with COMMON {
       }
     }     
   }.elsewhen(io.postvalid){
-      min0    := Mux(sign0===0.U,io.weakMessage,io.strongMessage)
-      submin0 := Mux(sign0===0.U,io.weakMessage,io.strongMessage)
-      min1    := Mux(sign0===0.U,io.weakMessage,io.strongMessage)
-      submin1 := Mux(sign0===0.U,io.weakMessage,io.strongMessage)
+      min0    := Mux(check===0.U,io.weakMessage,io.strongMessage)
+      submin0 := Mux(check===0.U,io.weakMessage,io.strongMessage)
+      min1    := Mux(check===0.U,io.weakMessage,io.strongMessage)
+      submin1 := Mux(check===0.U,io.weakMessage,io.strongMessage)
+      check   := 0.U
   }
   
   // choose mux  
@@ -548,8 +562,8 @@ class CheckNode2Col extends Module with COMMON {
   
 
   val scaledc2v0 =( c2vext0+c2vext0+c2vext0) >> 2.U 
-//val c2vval0 = Mux(check1 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
-  val c2vval0 = Mux(check0 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
+  val c2vval0 = Mux(check1 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
+  //val c2vval0 = Mux(check0 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
 
   io.minval(0) := Mux(io.initial,0.U,c2vval0) 
   

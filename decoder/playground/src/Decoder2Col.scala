@@ -13,9 +13,16 @@ class Decoder2Col extends Module with COMMON {
     val IterOut   = Output(UInt(ITERWITH.W))
     val counter   = Output(UInt(BLKADDR.W))
     val errorbit  = Output(UInt(11.W))
+    val check     = Output(UInt(8.W))
     val postvalid = Input(Bool())
-    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
-    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val strongMessage  = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    val weakMessage    = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    //val strongMessage  = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage    = Input(UInt(C2VWIDTHCOL.W))
+    //val strongMessage0 = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage0   = Input(UInt(C2VWIDTHCOL.W))
+    //val strongMessage1 = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage1   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
     //val appvalid  = Output(Bool())
     //val appout    = Output(Vec(BLKSIZE,UInt(1.W)))
@@ -54,6 +61,7 @@ class Decoder2Col extends Module with COMMON {
   val SignRams = Seq.fill(BLKSIZE*2)(SyncReadMem(COLNUM/2,UInt(ROWNUM.W)))
   //  Var 的out data 给CheckNode 的RAM
   val VartoCheckMux = Seq.fill(BLKSIZE*2)(Seq.fill(ROWNUM)(Module(new Mux16to1(V2CWIDTHCOL))))
+  val apptoCheckMux = Seq.fill(BLKSIZE*2)(Seq.fill(ROWNUM)(Module(new Mux16to1(1))))
   // Var 的符号给CheckNode的RAM  
   val SigntoCheckMux = Seq.fill(BLKSIZE*2)(Seq.fill(ROWNUM)(Module(new Mux16to1(1))))
   //  CheckNode 的output 送给这个mux ,mux从16个里选一个，送给Var的一个input  
@@ -66,6 +74,7 @@ class Decoder2Col extends Module with COMMON {
   val C2VFlush    = Wire(Bool())
   val updateen    = Wire(Bool()) 
   val initialen   = Wire(Bool())
+  val checkreset  = Wire(Bool())
   V2CReadEn := false.B 
   C2VWriteEn := false.B
   C2VReadEn := false.B
@@ -75,6 +84,7 @@ class Decoder2Col extends Module with COMMON {
   io.Success := false.B
   updateen := false.B 
   initialen := false.B
+  checkreset := false.B
 // LLR_RAM  
   val LLrReadEn = Wire(Bool())
   val LLrWriteEn = Wire(Bool())
@@ -145,17 +155,21 @@ class Decoder2Col extends Module with COMMON {
     errorcount := errorcount + localerror
   }
   io.errorbit := errorcount + localerror
-  val GroupCheck  = Seq.fill(ROWNUM)(Seq.fill(BLKSIZE)(Wire(UInt(1.W))))
+  val postcount = RegInit(0.U(4.W))
+  val GroupCheck  = Seq.fill(ROWNUM)(Seq.fill(BLKSIZE)(Wire(UInt(8.W))))
   for(i <- 0 until ROWNUM){
     for(j <- 0 until BLKSIZE){
       GroupCheck(i)(j) := CheckGroup(j)(i).io.Check
     }
   }
-  val Checkjudge = VecInit(Seq.fill(ROWNUM)(0.U(1.W)))
+  val Checkjudge = VecInit(Seq.fill(ROWNUM)(0.U(8.W)))
   for(i <- 0 until ROWNUM){
-    Checkjudge(i):= GroupCheck(i).reduce(_ | _)
+    Checkjudge(i):= GroupCheck(i).reduce(_ + _)
   }
-  val allcheck = Checkjudge.reduce(_ | _)
+  val allcheck = Checkjudge.reduce(_+_)
+  //io.errorbit
+  //Checkjudge.reduce(_+_)
+  io.check := allcheck
   //val rightdecide = appoutjudge.reduce(_ & _)
 // read Matrix  
   val rsMatrix : Array[Array[Int]] = ReadMatrix.ReadM()
@@ -187,6 +201,8 @@ class Decoder2Col extends Module with COMMON {
     for (j <- 0 until ROWNUM) {
      CheckGroup(i)(j).io.input(0) :=  VartoCheckMux(i)(j).io.output  
      CheckGroup(i)(j).io.input(1) :=  VartoCheckMux(i+BLKSIZE)(j).io.output  
+     CheckGroup(i)(j).io.appsign(0) :=  apptoCheckMux(i)(j).io.output  
+     CheckGroup(i)(j).io.appsign(1) :=  apptoCheckMux(i+BLKSIZE)(j).io.output  
      CheckGroup(i)(j).io.inputaddr := CheckAddr 
      CheckGroup(i)(j).io.inputsign(0) := SigntoCheckMux(i)(j).io.output  
      CheckGroup(i)(j).io.inputsign(1) := SigntoCheckMux(i+BLKSIZE)(j).io.output  
@@ -194,8 +210,13 @@ class Decoder2Col extends Module with COMMON {
      CheckGroup(i)(j).io.initial   := initialen  
      CheckGroup(i)(j).io.signreset := start///io.Start
      CheckGroup(i)(j).io.postvalid := postvalid
-     CheckGroup(i)(j).io.strongMessage := io.strongMessage
-     CheckGroup(i)(j).io.weakMessage := io.weakMessage
+     CheckGroup(i)(j).io.checkreset := checkreset
+     //CheckGroup(i)(j).io.strongMessage := Mux(postcount===0.U,io.strongMessage,io.strongMessage0)
+     //CheckGroup(i)(j).io.weakMessage := Mux(postcount===0.U,io.weakMessage,io.weakMessage0)
+     CheckGroup(i)(j).io.strongMessage := io.strongMessage(postcount)
+     CheckGroup(i)(j).io.weakMessage := io.weakMessage(postcount)
+     //CheckGroup(i)(j).io.strongMessage  := Mux(postcount===0.U,strongMessage.U ,strongMessage0.U)
+     //CheckGroup(i)(j).io.weakMessage    := Mux(postcount===0.U,weakMessage.U   ,weakMessage0.U)
     }
   }
 //   VartoCheckMux 连线  一个有16个输入   来自16个变量节点的对应行的输出  选一个送给校验节点。
@@ -209,14 +230,18 @@ class Decoder2Col extends Module with COMMON {
             //横向第j个,对应纵向第m个 
             if(m < BLKSIZE) {
               VartoCheckMux(j)(i).io.input(k) := VarGroup(m).io.Checkout(i) 
+              apptoCheckMux(j)(i).io.input(k) := VarGroup(m).io.APPout(APPWIDTHCOL-1)
             }else {
               VartoCheckMux(j+BLKSIZE)(i).io.input(k) := VarGroup(m).io.Checkout(i) 
+              apptoCheckMux(j+BLKSIZE)(i).io.input(k) := VarGroup(m).io.APPout(APPWIDTHCOL-1)
             }
           }
         }
       }
       VartoCheckMux(j)(i).io.sel := VartoCheckSel   
       VartoCheckMux(j+BLKSIZE)(i).io.sel := VartoCheckSel   
+      apptoCheckMux(j)(i).io.sel := VartoCheckSel   
+      apptoCheckMux(j+BLKSIZE)(i).io.sel := VartoCheckSel  
     }
   }
 // ChecktoVarMux  连线  一个有16个输入，来自16个校验节点的输出   ，选一个送给 对应的变量节点对应的input  
@@ -343,17 +368,18 @@ for( i <- 0 until ROWNUM) {
         //提前终止 allcheck
         counten := false.B
         errorcount := 0.U
+        checkreset := true.B
         when(((allcheck)===0.U)||Iter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
           io.OutValid := Mux(io.postvalid,(allcheck) ===0.U,true.B) 
           io.Success  := (allcheck) ===0.U
-          when((Iter===1.U)&&(allcheck === 1.U)){
+          when((Iter===1.U)&&(allcheck =/= 0.U)&&(!io.postvalid)){
             errorrecord := 1.U
           }
           //rightreg := 1.U
-          when(io.postvalid&&(Iter===1.U)&&(allcheck === 1.U)){
+          when(io.postvalid&&(Iter===1.U)&&(allcheck =/= 0.U)){
             currentState := postcheck
-            postIter := io.postIterInput
+            checkreset := false.B
             counter := 0.U 
             counter1 := 0.U
           }.elsewhen(io.Start){
@@ -373,6 +399,8 @@ for( i <- 0 until ROWNUM) {
     is (postcheck) {
       currentState := postprocess
       postvalid := true.B
+      //checkreset := true.B
+      postIter := io.postIterInput
       counter := 0.U 
       counter1 := 1.U
     }
@@ -384,22 +412,34 @@ for( i <- 0 until ROWNUM) {
       //when(postIter === io.postIterInput){
       //  postvalid := true.B
       //}
+      counten := true.B
       when(counter === 15.U){
         //提前终止 allcheck
         counten := false.B
+        checkreset := true.B
         errorcount := 0.U
         when(((allcheck)===0.U)||postIter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
-          io.OutValid := true.B 
+          io.OutValid :=  Mux(postcount=/=maxpostnum.U,(allcheck) ===0.U,true.B)
           io.Success  := (allcheck) ===0.U
           //rightreg := 1.U
-          when(io.Start){
+          when((postIter===1.U)&&(allcheck =/= 0.U)&&(postcount === maxpostnum.U)){
+            errorrecord := 1.U
+          }
+          when((postcount =/= maxpostnum.U)&&(allcheck =/= 0.U)){
+            currentState := postcheck
+            checkreset := false.B
+            //postIter := io.postIterInput
+            counter := 0.U 
+            counter1 := 0.U
+          }.elsewhen(io.Start){
             currentState := initial 
             start := true.B 
           }.otherwise{
             currentState := idle  
           }
           counter1 := 0.U
+          postcount := postcount + 1.U
         }.otherwise{
             //rightreg := 1.U
             postIter := postIter - 1.U 
@@ -517,9 +557,9 @@ for( i <- 0 until ROWNUM) {
   //    }
   //  }
   //}
-  //or(i <-0 until 32) {
-  // io.llrout(i) := Cat(registersLLR(i).map(_.asUInt()))
-  //
+  //for(i <-0 until 32) {
+  //  io.llrout(i) := Cat(registersLLR(i).map(_.asUInt()))
+  //}
 
   //for(i <-0 until 32) {
   //  io.llroutcheck(i) := RegNext(io.llrout(i))//Cat(registersLLR(i).map(_.asUInt()))

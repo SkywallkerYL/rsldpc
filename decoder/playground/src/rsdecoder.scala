@@ -138,8 +138,12 @@ class rsdecoder2col extends Module with COMMON {
     val errorbit  = Output(UInt(FRAMEWITH.W))
 
     val postvalid = Input(Bool())
-    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
-    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val strongMessage  = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    val weakMessage    = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    //val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    //val strongMessage0 = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage0   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
     //val errorbit  = Output(UInt(11.W))
     //val llrout      = Output(Vec(32,UInt(256.W)))
@@ -187,6 +191,8 @@ class rsdecoder2col extends Module with COMMON {
   decoder.io.postvalid     := io.postvalid
   decoder.io.strongMessage     := io.strongMessage 
   decoder.io.weakMessage     := io.weakMessage 
+  //decoder.io.strongMessage0     := io.strongMessage0
+  //decoder.io.weakMessage0     := io.weakMessage0 
   decoder.io.postIterInput   := io.postIterInput 
   //io.llrou          := decoder.io.llrou   
   //io.llrout          := decoder.io.llrout     
@@ -287,8 +293,12 @@ class rsdecodertop extends Module with COMMON {
     val errorbit    = Output(UInt(FRAMEWITH.W))
 
     val postvalid = Input(Bool())
-    val strongMessage = Input(UInt(C2VWIDTHCOL.W))
-    val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    val strongMessage  = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    val weakMessage    = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
+    //val strongMessage = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage   = Input(UInt(C2VWIDTHCOL.W))
+    //val strongMessage0 = Input(UInt(C2VWIDTHCOL.W))
+    //val weakMessage0   = Input(UInt(C2VWIDTHCOL.W))
     val postIterInput = Input(UInt(ITERWITH.W))
 
     //val llrout      = Output(Vec(32,UInt(256.W)))
@@ -316,7 +326,10 @@ class rsdecodertop extends Module with COMMON {
     DecoderGroup(i).io.postvalid     := io.postvalid
     DecoderGroup(i).io.strongMessage := io.strongMessage 
     DecoderGroup(i).io.weakMessage   := io.weakMessage 
+    //DecoderGroup(i).io.strongMessage0 := io.strongMessage0 
+    //DecoderGroup(i).io.weakMessage0   := io.weakMessage0 
     DecoderGroup(i).io.postIterInput := io.postIterInput 
+    //DecoderGroup(i).io.postIterInput := io.postIterInput
     //io.llrout        := DecoderGroup(i).io.llrout  
     //io.llrou        := DecoderGroup(i).io.llrou  
     //io.llroutcheck   := DecoderGroup(i).io.llroutcheck      
