@@ -57,10 +57,10 @@ int ITERMAX      = 6 ;
 #include "VDecoder2Col.h"
 #include "VDecoder2Col___024root.h"
 VDecoder2Col* top;
-double sigmastart = 0.55;
+double sigmastart = 0.43;
 double sigmaend   = 0.35;
 double sigmastep  = 0.01; 
-int maxtime			= 1000;
+int maxtime			= 10000;
 int maxerrortime	= 50 ;
 int ITERMAX		  = 5;
 int APPWIDTH = 7 ;
@@ -99,7 +99,7 @@ int ITERMAX      = 20 ;
 
 #define POSTPROCESS 1
 int strongMessage_0 = 6;
-int weakMessage_0 = 1;
+int weakMessage_0 = 2;
 int strongMessage_1 = 7;
 int weakMessage_1 = 2;
 int strongMessage_2 = 7;

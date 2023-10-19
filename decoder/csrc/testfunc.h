@@ -706,7 +706,7 @@ bool decodeonetime(double sigma){
 	bool flag = top->io_Success; 
 //	if(flag) printf("success\n");
 	//printf("Iter remain:%d\n",top->io_IterOut);
-	clockntimes(1);
+	//clockntimes(1);
 	return flag ;
 }
 bool ReadllrDecoder(int * llrin,int & errorbit,int &checknum);
@@ -721,11 +721,11 @@ void ReadfileDecode(){
 	}
 	string line;
 	int llrin[2048];
-	int targetframe =1;
+	int targetframe =126;
 	while(getline(file,line)){
 		//if(frame != targetframe-1) {
-		//frame++;
-		//continue;
+		//	frame++;
+		//	continue;
 		//}
 		for (int i = 0;i < 2048;i++){
 			string hex = line.substr(i,1);
@@ -752,15 +752,19 @@ void DecoderTest(){
 	for (double sigma = sigmastart; sigma >= sigmaend ; sigma = sigma-sigmastep ){
 		int frame = 0 ;
 		int errorframe = 0; 
+		int iter = 0;
 		while(frame < maxtime || errorframe < maxerrortime) {
 			bool success = decodeonetime(sigma);
+			iter = iter + top->io_IterOut;
 			if(!success) errorframe++;
 			frame++;
+			clockntimes(1);
 		}
 		double fer = (double) errorframe / (double) frame;
 		double rate = (double)1723/(double)2048;
 		double snr  = 10*log10(1.0/(2.0*rate*sigma*sigma));
-		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma,errorframe,frame,fer);
+		double iter_u = (double) iter / (double) frame;
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f Iter:%f",snr,sigma,errorframe,frame,fer,iter_u);
 	}
 
 	//Log("if there is no other output, it means the module works right");

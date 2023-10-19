@@ -75,6 +75,7 @@ class Decoder2Col extends Module with COMMON {
   val updateen    = Wire(Bool()) 
   val initialen   = Wire(Bool())
   val checkreset  = Wire(Bool())
+  val updatecheck = Wire(Bool())
   V2CReadEn := false.B 
   C2VWriteEn := false.B
   C2VReadEn := false.B
@@ -85,6 +86,7 @@ class Decoder2Col extends Module with COMMON {
   updateen := false.B 
   initialen := false.B
   checkreset := false.B
+  updatecheck := false.B
 // LLR_RAM  
   val LLrReadEn = Wire(Bool())
   val LLrWriteEn = Wire(Bool())
@@ -108,17 +110,25 @@ class Decoder2Col extends Module with COMMON {
   io.OutValid := false.B
   LLrAddrWrite := counter 
   LLrAddrRead  := counter1 
-  val ChecktoVarSel = Wire(UInt(COLADDR.W)) 
-  ChecktoVarSel := counter  
+  //为了解决counter的高扇出问题  将寄存器复制
+  //
+  val ChecktoVarSel = RegInit(VecInit(Seq.fill(ROWNUM)(0.U((COLADDR-1).W)))) 
+  //Wire(UInt(COLADDR.W)) 
+  //ChecktoVarSel := counter  
 
-  val VartoCheckSel = Wire(UInt(COLADDR.W)) 
-  VartoCheckSel := counter 
+  val VartoCheckSel = RegInit(VecInit(Seq.fill(ROWNUM)(0.U((COLADDR-1).W)))) 
+  //Wire(UInt(COLADDR.W)) 
 
-  val SignMuxSel = Wire(UInt(COLADDR.W)) 
-  SignMuxSel := counter
+  //VartoCheckSel := counter 
+  val apptoCheckSel = RegInit(VecInit(Seq.fill(ROWNUM)(0.U((COLADDR-1).W)))) 
+  
+  val SignMuxSel = RegInit(VecInit(Seq.fill(ROWNUM)(0.U((COLADDR-1).W)))) 
+  //Wire(UInt(COLADDR.W)) 
+  //SignMuxSel := counter
 
-  val CheckAddr = Wire(UInt(COLADDR.W))
-  CheckAddr := counter 
+  val CheckAddr = RegInit(VecInit(Seq.fill(ROWNUM)(0.U((COLADDR-1).W)))) 
+  //Wire(UInt(COLADDR.W))
+  //CheckAddr := counter 
 
   val signReadAddr = Wire(UInt(COLADDR.W)) 
   signReadAddr := counter1
@@ -167,6 +177,7 @@ class Decoder2Col extends Module with COMMON {
     Checkjudge(i):= GroupCheck(i).reduce(_ + _)
   }
   val allcheck = Checkjudge.reduce(_+_)
+  val allcheck1 = allcheck
   //io.errorbit
   //Checkjudge.reduce(_+_)
   io.check := allcheck
@@ -189,7 +200,7 @@ class Decoder2Col extends Module with COMMON {
     for (j <- 0 until ROWNUM) {
       VarGroup(i).io.Checkin(j) := ChecktoVarMux(i)(j).io.output   
     
-      ChecktoVarMux(i)(j).io.sel := ChecktoVarSel
+      ChecktoVarMux(i)(j).io.sel := ChecktoVarSel(j)
     }
   }
 // Check input addr and data  
@@ -203,7 +214,7 @@ class Decoder2Col extends Module with COMMON {
      CheckGroup(i)(j).io.input(1) :=  VartoCheckMux(i+BLKSIZE)(j).io.output  
      CheckGroup(i)(j).io.appsign(0) :=  apptoCheckMux(i)(j).io.output  
      CheckGroup(i)(j).io.appsign(1) :=  apptoCheckMux(i+BLKSIZE)(j).io.output  
-     CheckGroup(i)(j).io.inputaddr := CheckAddr 
+     CheckGroup(i)(j).io.inputaddr := CheckAddr(j)
      CheckGroup(i)(j).io.inputsign(0) := SigntoCheckMux(i)(j).io.output  
      CheckGroup(i)(j).io.inputsign(1) := SigntoCheckMux(i+BLKSIZE)(j).io.output  
      CheckGroup(i)(j).io.updatemin := updateen  
@@ -211,6 +222,7 @@ class Decoder2Col extends Module with COMMON {
      CheckGroup(i)(j).io.signreset := start///io.Start
      CheckGroup(i)(j).io.postvalid := postvalid
      CheckGroup(i)(j).io.checkreset := checkreset
+     CheckGroup(i)(j).io.updatecheck := updatecheck
      //CheckGroup(i)(j).io.strongMessage := Mux(postcount===0.U,io.strongMessage,io.strongMessage0)
      //CheckGroup(i)(j).io.weakMessage := Mux(postcount===0.U,io.weakMessage,io.weakMessage0)
      CheckGroup(i)(j).io.strongMessage := io.strongMessage(postcount)
@@ -238,10 +250,10 @@ class Decoder2Col extends Module with COMMON {
           }
         }
       }
-      VartoCheckMux(j)(i).io.sel := VartoCheckSel   
-      VartoCheckMux(j+BLKSIZE)(i).io.sel := VartoCheckSel   
-      apptoCheckMux(j)(i).io.sel := VartoCheckSel   
-      apptoCheckMux(j+BLKSIZE)(i).io.sel := VartoCheckSel  
+      VartoCheckMux(j)(i).io.sel := VartoCheckSel(i)   
+      VartoCheckMux(j+BLKSIZE)(i).io.sel := VartoCheckSel(i)   
+      apptoCheckMux(j)(i).io.sel := apptoCheckSel(i)  
+      apptoCheckMux(j+BLKSIZE)(i).io.sel := apptoCheckSel(i)
     }
   }
 // ChecktoVarMux  连线  一个有16个输入，来自16个校验节点的输出   ，选一个送给 对应的变量节点对应的input  
@@ -262,7 +274,7 @@ class Decoder2Col extends Module with COMMON {
             } 
           }
         }
-        ChecktoVarMux(j)(i).io.sel := ChecktoVarSel  
+        ChecktoVarMux(j)(i).io.sel := ChecktoVarSel(i) 
       }
     }
   }
@@ -281,8 +293,8 @@ for( i <- 0 until ROWNUM) {
           }
         }
       }
-      SigntoCheckMux(j)(i).io.sel := SignMuxSel   
-      SigntoCheckMux(j+BLKSIZE)(i).io.sel := SignMuxSel   
+      SigntoCheckMux(j)(i).io.sel := SignMuxSel(i)   
+      SigntoCheckMux(j+BLKSIZE)(i).io.sel := SignMuxSel(i)  
     }
   }
 } 
@@ -290,7 +302,7 @@ for( i <- 0 until ROWNUM) {
 
 // modeule connect   
 
- val idle :: initial:: decode :: postcheck ::postprocess :: Nil = Enum(5)
+ val idle :: initial:: decode :: postcheck::postinitial::postprocess :: Nil = Enum(6)
  // idle 等待  
  /****************************************/
  // initial: 初始化   
@@ -337,6 +349,13 @@ for( i <- 0 until ROWNUM) {
       when(io.Start) {
         currentState := initial 
         counter := 0.U
+        for (i <- 0 until ROWNUM) {
+          ChecktoVarSel(i) := 0.U 
+          VartoCheckSel(i) := 0.U 
+          apptoCheckSel(i) := 0.U 
+          SignMuxSel(i)    := 0.U 
+          CheckAddr(i)     := 0.U
+        }
         counter1 := 0.U
         start := true.B
         //Iter := io.IterInput 
@@ -348,19 +367,36 @@ for( i <- 0 until ROWNUM) {
       }
       when(counter === 15.U) {
         Iter := io.IterInput
+        checkreset := true.B
         currentState := decode 
         counter1 := counter1 + 1.U 
       }
       counter := counter + 1.U 
+      for (i <- 0 until ROWNUM) {
+        ChecktoVarSel(i) :=ChecktoVarSel(i) + 1.U 
+        VartoCheckSel(i) :=VartoCheckSel(i) + 1.U 
+        apptoCheckSel(i) :=apptoCheckSel(i) + 1.U 
+        SignMuxSel(i)    :=SignMuxSel(i)    + 1.U 
+        CheckAddr(i)     :=CheckAddr(i)     + 1.U
+      }
       LLrWriteEn := true.B  
       initialen := true.B  
       updateen  := true.B  
+      updatecheck := true.B
       signWriteEn := true.B 
     } 
     is(decode) {
       updateen  := true.B  
+      updatecheck := true.B
       signWriteEn := true.B
       counter := counter + 1.U 
+      for (i <- 0 until ROWNUM) {
+        ChecktoVarSel(i) :=ChecktoVarSel(i) + 1.U 
+        VartoCheckSel(i) :=VartoCheckSel(i) + 1.U 
+        apptoCheckSel(i) :=apptoCheckSel(i) + 1.U 
+        SignMuxSel(i)    :=SignMuxSel(i)    + 1.U 
+        CheckAddr(i)     :=CheckAddr(i)     + 1.U
+      }
       counter1 := counter1 + 1.U 
       //rightreg := rightreg & rightdecide  
       counten := true.B
@@ -369,26 +405,33 @@ for( i <- 0 until ROWNUM) {
         counten := false.B
         errorcount := 0.U
         checkreset := true.B
-        when(((allcheck)===0.U)||Iter===1.U) {
+        when(((allcheck1)===0.U)||Iter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
-          io.OutValid := Mux(io.postvalid,(allcheck) ===0.U,true.B) 
-          io.Success  := (allcheck) ===0.U
-          when((Iter===1.U)&&(allcheck =/= 0.U)&&(!io.postvalid)){
+          io.OutValid := Mux(io.postvalid,(allcheck1) ===0.U,true.B) 
+          io.Success  := (io.errorbit) ===0.U
+          when((Iter===1.U)&&(io.errorbit =/= 0.U)&&(!io.postvalid)){
             errorrecord := 1.U
           }
           //rightreg := 1.U
-          when(io.postvalid&&(Iter===1.U)&&(allcheck =/= 0.U)){
+          when(io.postvalid&&(Iter===1.U)&&(allcheck1 =/= 0.U)){
             currentState := postcheck
             checkreset := false.B
             counter := 0.U 
-            counter1 := 0.U
+            for (i <- 0 until ROWNUM) {
+              ChecktoVarSel(i) := 0.U 
+              VartoCheckSel(i) := 0.U 
+              apptoCheckSel(i) := 0.U 
+              SignMuxSel(i)    := 0.U 
+              CheckAddr(i)     := 0.U
+            }
+            counter1 := 1.U
           }.elsewhen(io.Start){
             currentState := initial 
             start := true.B 
           }.otherwise{
             currentState := idle  
           }
-          counter1 := 0.U
+          //counter1 := 0.U
         }.otherwise{
             //rightreg := 1.U
             Iter := Iter - 1.U 
@@ -397,17 +440,38 @@ for( i <- 0 until ROWNUM) {
       } 
     }
     is (postcheck) {
-      currentState := postprocess
       postvalid := true.B
       //checkreset := true.B
-      postIter := io.postIterInput
-      counter := 0.U 
-      counter1 := 1.U
+      counter := counter + 1.U
+      for (i <- 0 until ROWNUM) {
+        ChecktoVarSel(i) :=ChecktoVarSel(i) + 1.U 
+        VartoCheckSel(i) :=VartoCheckSel(i) + 1.U 
+        apptoCheckSel(i) :=apptoCheckSel(i) + 1.U 
+        SignMuxSel(i)    :=SignMuxSel(i)    + 1.U 
+        CheckAddr(i)     :=CheckAddr(i)     + 1.U
+      }
+      counter1 := counter1 + 1.U
+      when(counter === 15.U) {
+        postIter := io.postIterInput
+        checkreset := true.B
+        currentState := postprocess 
+      }
+      updateen  := true.B  
+      signWriteEn := true.B 
     }
+    //校验节点的check维持不变，postvalid
     is(postprocess){
       updateen  := true.B  
       signWriteEn := true.B
+      updatecheck := true.B
       counter := counter + 1.U 
+      for (i <- 0 until ROWNUM) {
+        ChecktoVarSel(i) :=ChecktoVarSel(i) + 1.U 
+        VartoCheckSel(i) :=VartoCheckSel(i) + 1.U 
+        apptoCheckSel(i) :=apptoCheckSel(i) + 1.U 
+        SignMuxSel(i)    :=SignMuxSel(i)    + 1.U 
+        CheckAddr(i)     :=CheckAddr(i)     + 1.U
+      }
       counter1 := counter1 + 1.U 
       //when(postIter === io.postIterInput){
       //  postvalid := true.B
@@ -418,27 +482,34 @@ for( i <- 0 until ROWNUM) {
         counten := false.B
         checkreset := true.B
         errorcount := 0.U
-        when(((allcheck)===0.U)||postIter===1.U) {
+        when(((allcheck1)===0.U)||postIter===1.U) {
         //when(((rightreg & rightdecide)===1.U)||Iter===1.U) {
-          io.OutValid :=  Mux(postcount=/=maxpostnum.U,(allcheck) ===0.U,true.B)
-          io.Success  := (allcheck) ===0.U
+          io.OutValid :=  Mux(postcount=/=maxpostnum.U,(allcheck1) ===0.U,true.B)
+          io.Success  := (io.errorbit) ===0.U
           //rightreg := 1.U
-          when((postIter===1.U)&&(allcheck =/= 0.U)&&(postcount === maxpostnum.U)){
+          when((postIter===1.U)&&(io.errorbit =/= 0.U)&&(postcount === maxpostnum.U)){
             errorrecord := 1.U
           }
-          when((postcount =/= maxpostnum.U)&&(allcheck =/= 0.U)){
+          when((postcount =/= maxpostnum.U)&&(allcheck1 =/= 0.U)){
             currentState := postcheck
             checkreset := false.B
             //postIter := io.postIterInput
             counter := 0.U 
-            counter1 := 0.U
+            for (i <- 0 until ROWNUM) {
+              ChecktoVarSel(i) := 0.U 
+              VartoCheckSel(i) := 0.U 
+              apptoCheckSel(i) := 0.U 
+              SignMuxSel(i)    := 0.U 
+              CheckAddr(i)     := 0.U
+            }
+            counter1 := 1.U
           }.elsewhen(io.Start){
             currentState := initial 
             start := true.B 
           }.otherwise{
             currentState := idle  
           }
-          counter1 := 0.U
+          //counter1 := 0.U
           postcount := postcount + 1.U
         }.otherwise{
             //rightreg := 1.U

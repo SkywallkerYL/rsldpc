@@ -37,8 +37,8 @@ doit:
 	sbt run
 #Makefile for Verilator
 
-
-TOP?=rsdecodertop
+#rsdecodertop
+TOP?=Decoder2Col
 TOPNAME?=$(TOP)
 TOPNAMETEST?=$(TOP)
 #FSM_m #keyboard_top #top

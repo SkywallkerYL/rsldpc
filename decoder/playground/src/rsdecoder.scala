@@ -136,7 +136,7 @@ class rsdecoder2col extends Module with COMMON {
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
     val errorbit  = Output(UInt(FRAMEWITH.W))
-
+    val iter      = Output(UInt(FRAMEWITH.W))
     val postvalid = Input(Bool())
     val strongMessage  = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
     val weakMessage    = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
@@ -164,11 +164,14 @@ class rsdecoder2col extends Module with COMMON {
   val errorframe = RegInit(0.U(FRAMEWITH.W))
   val maxerror   = RegInit(0.U(FRAMEWITH.W))
   val totalframe = RegInit(0.U(FRAMEWITH.W)) 
-  val errorbit   = RegInit(0.U(FRAMEWITH.W))   
+  val errorbit   = RegInit(0.U(FRAMEWITH.W))
+  val itercount  = RegInit(0.U(FRAMEWITH.W))
+
   io.totalframe := totalframe 
   io.errorframe := errorframe 
   io.Framevalid := false.B
   io.errorbit := errorbit
+  io.iter     := itercount
 
   // 模块例化
   val decoder   = Module(new Decoder2Col)  
@@ -231,6 +234,7 @@ class rsdecoder2col extends Module with COMMON {
         totalframe := 0.U 
         errorframe := 0.U  
         errorbit   := 0.U
+        itercount  := 0.U
         maxerror   := io.maxError 
       }
     }
@@ -251,6 +255,7 @@ class rsdecoder2col extends Module with COMMON {
     is(decode) {
       when(decoder.io.OutValid){
         totalframe := totalframe + 1.U 
+        itercount  := itercount + decoder.io.IterOut
         when(!(decoder.io.Success)) {
           errorframe := errorframe + 1.U 
           errorbit   := errorbit + decoder.io.errorbit
@@ -291,7 +296,7 @@ class rsdecodertop extends Module with COMMON {
     val totalframe  = Output(UInt(FRAMEWITH.W))
     val errorframe  = Output(UInt(FRAMEWITH.W)) 
     val errorbit    = Output(UInt(FRAMEWITH.W))
-
+    val iter        = Output(UInt(FRAMEWITH.W))
     val postvalid = Input(Bool())
     val strongMessage  = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
     val weakMessage    = Input(Vec(maxpostnum+1, UInt(C2VWIDTHCOL.W)))
@@ -340,12 +345,14 @@ class rsdecodertop extends Module with COMMON {
   val totalframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
   val errorframenum = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
   val errorbitnum   = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
+  val iternum       = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
   //val outvalidnum   = VecInit(Seq.fill(PARRELNUM)(0.U(FRAMEWITH.W)))
   //val outvalidsign  = Wire(UInt(PARRELNUM.W))
   for( i <- 0 until PARRELNUM) {
     totalframenum(i) := DecoderGroup(i).io.totalframe 
     errorframenum(i) := DecoderGroup(i).io.errorframe 
     errorbitnum(i)   := DecoderGroup(i).io.errorbit
+    iternum(i)       := DecoderGroup(i).io.iter
     //outvalidnum(i)   := DecoderGroup(i).io.outvalid
     //DecoderGroup(i).io.updatevalid := io.updatevalid  
     //DecoderGroup(i).io.localvalid := io.localvalid 
@@ -354,6 +361,7 @@ class rsdecodertop extends Module with COMMON {
   io.totalframe := totalframenum.reduce(_+_)
   io.errorframe := errorframenum.reduce(_+_)
   io.errorbit   := errorbitnum.reduce(_+_)
+  io.iter       := iternum.reduce(_+_)
   //io.outvalid   := outvalidnum.reduce(_|_) 
   //io.Errorcol := MuxCase(VecInit(Seq.fill(MAXERRORNUM)(0.U(COLADDR.W))),Seq.tabulate(PARRELNUM){
   //  i => (outvalidnum(i) === 1.U) ->DecoderGroup(i).io.Errorcol 
