@@ -66,15 +66,35 @@ trait COMMON{
       -6.S(LLRWIDTH.W),
       -7.S(LLRWIDTH.W)
     ))
+  val table15_new = VecInit(Seq(
+      0.S(LLRWIDTH.W),
+      1.S(LLRWIDTH.W),
+      2.S(LLRWIDTH.W),
+      3.S(LLRWIDTH.W),
+      4.S(LLRWIDTH.W),
+      5.S(LLRWIDTH.W),
+      6.S(LLRWIDTH.W),
+      7.S(LLRWIDTH.W),
+      -0.S(LLRWIDTH.W),
+      -7.S(LLRWIDTH.W),
+      -6.S(LLRWIDTH.W),
+      -5.S(LLRWIDTH.W),
+      -4.S(LLRWIDTH.W),
+      -3.S(LLRWIDTH.W),
+      -2.S(LLRWIDTH.W),
+      -1.S(LLRWIDTH.W)
+    ))
   //ITER 的宽度 
   val ITERWITH = 5  
   val FRAMEWITH = 64
 //这个相对路径是根据makefile所在的文件夹决定的
   val IOTablePath     : String    = "./build/Table.h"
-  val FilePath        : String    = "../matrix/2048_1723.txt"
+  val FilePath        : String    = "../matrix/2048_1723_1.txt"
+  val CodePath          : String    = "../matrix/codeword.txt"
+  val UncodePath        : String    = "../matrix/uncodedbits.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
-  val PARRELNUM  = 5
+  val PARRELNUM  = 10
 // 最多记录的错误比特的个数   
   val MAXERRORNUM = 10
   // 后处理参数  
@@ -84,6 +104,9 @@ trait COMMON{
   val weakMessage0   = 2
   val postIterInput      = 8
   val maxpostnum  = 2
+  
+  
+  val PWITH = 16
 }
 object COMMON extends COMMON {}
 
@@ -200,3 +223,61 @@ object ReadMatrix extends COMMON {
   }
 
 }
+object ReadCoded extends COMMON {
+  def ReadC() : Array[Int] = {
+    val file = Source.fromFile(CodePath)
+    val Code : Array[Int] = file.getLines().next().split(" ").map(_.toInt) 
+    //check if read right 
+   /* 
+    for (i <- 0 until ROWNUM*BLKSIZE ){
+      for ( j <- 0 until COLNUM*BLKSIZE ) {
+        print(Matrix(i)(j))
+        print(" ")
+      }
+      print("\n")
+    }
+    */
+   /* 
+    val checkfile = new File("check.txt")
+    val bw = new BufferedWriter(new FileWriter(checkfile))
+    for(row <- Matrix){
+      val line = row.mkString("\t")
+      bw.write(line)
+      bw.newLine
+    }
+    bw.close()
+    */ 
+    file.close()
+    return Code 
+  }
+}
+object ReadunCoded extends COMMON {
+  def ReadU() : Array[Int] = {
+    val file = Source.fromFile(UncodePath)
+    val Code : Array[Int] = file.getLines().next().split(" ").map(_.toInt) 
+    //check if read right 
+   /* 
+    for (i <- 0 until ROWNUM*BLKSIZE ){
+      for ( j <- 0 until COLNUM*BLKSIZE ) {
+        print(Matrix(i)(j))
+        print(" ")
+      }
+      print("\n")
+    }
+    */
+   /* 
+    val checkfile = new File("check.txt")
+    val bw = new BufferedWriter(new FileWriter(checkfile))
+    for(row <- Matrix){
+      val line = row.mkString("\t")
+      bw.write(line)
+      bw.newLine
+    }
+    bw.close()
+    */ 
+    file.close()
+    return Code 
+  }
+
+}
+

@@ -5,15 +5,14 @@ import decoder._
 object Elaborate extends App {
   // CheckNode VariableNode ProcessingUnit
   // V2CMux  Decoder Noisegen gng(RandSeedParams())    
-  // GngWrapper Topdecoder  
+  // GngWrapper(1) Topdecoder  
   //Muxminandsecmin 
   //CheckNodeCOL  DecoderCol
   //rsdecoder  rsdecodertop 
   //CheckNode2Col
   //Errorbits   
   //Decoder2Col  
-  def top = new rsdecodertop 
-
+  def top = new boxmullerout
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
     chisel3.stage.ChiselGeneratorAnnotation(() => top),

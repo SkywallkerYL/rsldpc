@@ -548,14 +548,14 @@ class CheckNode2Col extends Module with COMMON {
   //val subminpoststrong = Mux(subminpost >= ((MAXC2VCOL).U-io.strongMessage),io.strongMessage,subminpost+io.strongMessage)
   //val realsubminpost = Mux(sign0===0.U,minpostweak,minpoststrong)
 //
-  val realmin0      =    Mux(io.postvalid,realminpost0,min)
-  val realsubmin0   =    Mux(io.postvalid,realsubminpost0,submin)
-  val realmin1      =    Mux(io.postvalid,realminpost1,min)
-  val realsubmin1   =    Mux(io.postvalid,realsubminpost1,submin)
-  //val realmin0      =    min
-  //val realsubmin0   =    submin
-  //val realmin1      =    min
-  //val realsubmin1   =    submin
+  //val realmin0      =    Mux(io.postvalid,realminpost0,min)
+  //val realsubmin0   =    Mux(io.postvalid,realsubminpost0,submin)
+  //val realmin1      =    Mux(io.postvalid,realminpost1,min)
+  //val realsubmin1   =    Mux(io.postvalid,realsubminpost1,submin)
+  val realmin0      =    min
+  val realsubmin0   =    submin
+  val realmin1      =    min
+  val realsubmin1   =    submin
 // scale  
 
   val c2v0 = Wire(UInt(C2VWIDTHCOL.W)) 
@@ -565,7 +565,7 @@ class CheckNode2Col extends Module with COMMON {
   c2vext0 := Fill(2,0.U)##c2v0 
   
 
-  val scaledc2v0 =( c2vext0+c2vext0+c2vext0) >> 2.U 
+  val scaledc2v0 =Mux(io.postvalid,postout0,( c2vext0+c2vext0+c2vext0) >> 2.U )
   val minusc2v0 = ~scaledc2v0+1.U((C2VWIDTHCOL+2).W)
   val c2vval0 = Mux(check1 === io.inputsign(0) , scaledc2v0 , minusc2v0 )
   //val c2vval0 = Mux(check0 === io.inputsign(0) , scaledc2v0 , ~scaledc2v0+1.U )
@@ -578,7 +578,7 @@ class CheckNode2Col extends Module with COMMON {
   val c2vext1 = Wire(UInt((C2VWIDTHCOL+2).W))
   c2vext1 := Fill(2,0.U)##c2v1
 
-  val scaledc2v1 =( c2vext1+c2vext1+c2vext1) >> 2.U 
+  val scaledc2v1 =Mux(io.postvalid,postout1,( c2vext1+c2vext1+c2vext1) >> 2.U )
   val minusc2v1 = ~scaledc2v1+1.U((C2VWIDTHCOL+2).W)
   val c2vval1 = Mux(check1 === io.inputsign(1) , scaledc2v1 , minusc2v1 )
 

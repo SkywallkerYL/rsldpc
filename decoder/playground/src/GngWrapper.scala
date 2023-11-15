@@ -7,7 +7,7 @@ class GngWrapper(num : Int = COMMON.COLNUM) extends Module with COMMON {
   val io = IO(new Bundle{
     val din = Input(Vec(num,UInt(1.W))) 
     val dinvalid = Input (Bool()) 
-    val p0  = Input(Vec(PNUM,UInt(64.W)))
+    val p0  = Input(Vec(PNUM,UInt(PWITH.W)))
     val dout = Output(Vec(num,UInt(LLRWIDTH.W))) 
     val doutvalid = Output(Bool()) 
   })
@@ -28,7 +28,7 @@ class GngWrapper(num : Int = COMMON.COLNUM) extends Module with COMMON {
     }else if (PNUM == 5) {
       io.dout(i) := table5(Gng(i).io.dout).asUInt
     }else if (PNUM == 15){
-      io.dout(i) := table15(Gng(i).io.dout).asUInt
+      io.dout(i) := Gng(i).io.dout//table15(Gng(i).io.dout).asUInt
     }
     io.doutvalid := Gng(i).io.doutvalid 
   }
