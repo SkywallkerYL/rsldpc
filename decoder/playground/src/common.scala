@@ -94,7 +94,7 @@ trait COMMON{
   val UncodePath        : String    = "../matrix/uncodedbits.txt"
 //RAM的类型 ，是用syncreadmem 或者 mem  
 //并行路数
-  val PARRELNUM  = 10
+  val PARRELNUM  = 1
 // 最多记录的错误比特的个数   
   val MAXERRORNUM = 10
   // 后处理参数  
@@ -228,15 +228,15 @@ object ReadCoded extends COMMON {
     val file = Source.fromFile(CodePath)
     val Code : Array[Int] = file.getLines().next().split(" ").map(_.toInt) 
     //check if read right 
-   /* 
-    for (i <- 0 until ROWNUM*BLKSIZE ){
-      for ( j <- 0 until COLNUM*BLKSIZE ) {
-        print(Matrix(i)(j))
-        print(" ")
-      }
-      print("\n")
-    }
-    */
+    
+    //for (i <- 0 until ROWNUM*BLKSIZE ){
+      //for ( j <- 0 until 2048 ) {
+      //  print(Code(i))
+      //  print(" ")
+      //}
+      //print("\n")
+    //}
+    
    /* 
     val checkfile = new File("check.txt")
     val bw = new BufferedWriter(new FileWriter(checkfile))

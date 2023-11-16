@@ -89,9 +89,9 @@ assign u0 = s0 ^ s1 ^ s2;
 always @(posedge clock or negedge rst_n)
   if(!rst_n)
   begin
-    s0 <= 32'h0;
-    s1 <= 32'h0;
-    s2 <= 32'h0;
+    s0 <= seed0;
+    s1 <= seed1;
+    s2 <= seed2;
   end
   else if(init)
   begin

@@ -22,9 +22,9 @@ class boxmuller extends BlackBox with HasBlackBoxInline {
     val ce    = Input(Bool())   
     val seed0 = Input(UInt(32.W))
     val seed1 = Input(UInt(32.W))
-    val x_en  = Input(Bool()) 
-    val x0    = Output(Bool())   
-    val x1    = Output(Bool())
+    val x_en  = Output(Bool()) 
+    val x0    = Output(UInt(18.W))   
+    val x1    = Output(UInt(18.W))
   })
   //addResource("/home/yangli/rsldpc/decoder/vsrc/boxmuller.v")//不能写成“./dut.v”
   setInline("/boxmuller.v",
@@ -686,15 +686,16 @@ class boxmuller extends BlackBox with HasBlackBoxInline {
 }
 class boxmullerout extends Module {
   val io = IO(new Bundle {
-    val clock = Input(Clock())
-    val rst_n = Input(Bool())
+    //val clock = Input(Clock())
+    //val rst_n = Input(Bool())
     val init  = Input(Bool()) 
     val ce    = Input(Bool())   
     val seed0 = Input(UInt(32.W))
     val seed1 = Input(UInt(32.W))
-    val x_en  = Input(Bool()) 
-    val x0    = Output(UInt(18.W))   
-    val x1    = Output(UInt(18.W))
+    val x_en  = Output(Bool()) 
+    val sigma = Input(UInt(16.W))
+    val x0    = Output(UInt(19.W))   
+    val x1    = Output(UInt(19.W))
   })
   val boxmu = Module(new boxmuller)
   boxmu.io.clock := clock
@@ -704,7 +705,18 @@ class boxmullerout extends Module {
   boxmu.io.ce    := io.ce   
   boxmu.io.seed0 := io.seed0
   boxmu.io.seed1 := io.seed1
-  boxmu.io.x_en  := io.x_en 
-  io.x0    := boxmu.io.x0   
-  io.x1    := boxmu.io.x1   
+  io.x_en  := boxmu.io.x_en 
+
+  val signextx0 = Fill(17,boxmu.io.x0(17)) ## boxmu.io.x0
+  val signextx1 = Fill(17,boxmu.io.x1(17)) ## boxmu.io.x1
+
+  val out0 = Wire(UInt(35.W))
+  val out1 = Wire(UInt(35.W))
+  out0 := io.sigma * signextx0
+  out1 := io.sigma * signextx1
+
+  val real0 = out0(34,16)
+  val real1 = out1(34,16)
+  io.x0    := real0 
+  io.x1    := real1   
 }

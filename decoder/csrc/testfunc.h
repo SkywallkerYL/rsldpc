@@ -721,7 +721,7 @@ void ReadfileDecode(){
 	}
 	string line;
 	int llrin[2048];
-	int targetframe =126;
+	int targetframe =82;
 	while(getline(file,line)){
 		//if(frame != targetframe-1) {
 		//	frame++;
@@ -2071,8 +2071,144 @@ void toptest(){
 		top->io_updatevalid = 0;
 	}
 }
+#elif TESTMODULE == 11
+void toptest(){
+	//printf("hhhh\n");
+	uint64_t sigmatable[11] = {
+    49152,
+	48496,
+	47841,
+	47185,
+	46530,
+	45875,
+	45219,
+	44564,
+	43909,
+	43253,
+	42598
+};
+	double sigma_table[11] = {
+    0.75,
+	0.74,
+	0.73,
+	0.72,
+	0.71,
+	0.70,
+	0.69,
+	0.68,
+	0.67,
+	0.66,
+	0.65
+};
+#if POSTPROCESS 
+	top->io_postvalid = 0;
 
+	top->io_strongMessage_0 = strongMessage_0 ;
+	top->io_weakMessage_0   =   weakMessage_0 ;
+	top->io_strongMessage_1 = strongMessage_1 ;
+	top->io_weakMessage_1   =   weakMessage_1 ;
+	top->io_strongMessage_2 = strongMessage_2 ;
+	top->io_weakMessage_2   =   weakMessage_2 ;
+	top->io_postIterInput = postInter;
+#endif
+	for (int i = 0; i < 11 ; i ++) {
+		int sigma = sigmatable[i];
+		double sigma_ = sigma_table[i];
+		top->io_IterInput = ITERMAX;
+		top->io_maxError  = maxerrortime; 
+		top->io_sigma= sigmatable[i];
 
+		//printf("hhhh\n");
+		top->io_start = 1;
+		top->io_nextready = 0;
+		clockntimes(1); 
+		top->io_start = 0;
+		while(top->io_errorframe < maxerrortime) {
+			clockntimes(1);
+		//	printf("error:%d\n",top->io_errorframe);
+		}
+		int frame =(int) top->io_totalframe ;
+		int errorframe = (int )top->io_errorframe ; 
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(85.0/(1.0*sigma_*sigma_));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma_,errorframe,frame,fer);
+		reset(10);
+		top->io_start = 0;
+		clockntimes(10);
+		//top->io_nextready = 1; 
+		//clockntimes(10);
+		//top->io_nextready = 0;
+	}
+  
+}
+#elif TESTMODULE == 12
+
+void toptest(){
+	uint64_t sigmatable[11] = {
+    49152,
+	48496,
+	47841,
+	47185,
+	46530,
+	45875,
+	45219,
+	44564,
+	43909,
+	43253,
+	42598
+};
+	double sigma_table[11] = {
+    0.75,
+	0.74,
+	0.73,
+	0.72,
+	0.71,
+	0.70,
+	0.69,
+	0.68,
+	0.67,
+	0.66,
+	0.65
+};
+#if POSTPROCESS 
+	top->io_postvalid = 0;
+
+	top->io_strongMessage_0 = strongMessage_0 ;
+	top->io_weakMessage_0   =   weakMessage_0 ;
+	top->io_strongMessage_1 = strongMessage_1 ;
+	top->io_weakMessage_1   =   weakMessage_1 ;
+	top->io_strongMessage_2 = strongMessage_2 ;
+	top->io_weakMessage_2   =   weakMessage_2 ;
+	top->io_postIterInput = postInter;
+#endif
+	for (int i = 0; i < 11 ; i ++) {
+		int sigma = sigmatable[i];
+		double sigma_ = sigma_table[i];
+		top->io_IterInput = ITERMAX;
+		top->io_maxError  = maxerrortime; 
+		top->io_sigma = sigma;
+		top->io_start = 1;
+		top->io_nextready = 0;
+		clockntimes(1); 
+		top->io_start = 0;
+		while(!top->io_Framevalid) {
+			clockntimes(1); 
+		}
+		int frame =(int) top->io_totalframe ;
+		int errorframe = (int )top->io_errorframe ; 
+		double fer = (double) errorframe / (double) frame;
+		double rate = (double)1723/(double)2048;
+		double snr  = 10*log10(85.0/(1.0*sigma_*sigma_));
+		Log("snr:%f sigma:%f errorframe:%d frame:%d Fer:%f",snr,sigma_,errorframe,frame,fer);
+		
+		clockntimes(10);
+		top->io_nextready = 1; 
+		clockntimes(10);
+		top->io_nextready = 0;
+	}
+  
+}
 
 
 

@@ -53,6 +53,10 @@ void sim_init(){
   top = new Vrsdecodertop ;
 #elif TESTMODULE == 10 
   top = new VErrorbits;
+#elif TESTMODULE == 11 
+  top = new VrsdecodertopGauss;
+#elif TESTMODULE == 12
+  top = new Vrsdecoder2colGauss;
 #endif 
 #ifdef WAVE
   contextp->traceEverOn(true);

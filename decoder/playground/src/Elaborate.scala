@@ -11,8 +11,8 @@ object Elaborate extends App {
   //rsdecoder  rsdecodertop 
   //CheckNode2Col
   //Errorbits   
-  //Decoder2Col  
-  def top = new boxmullerout
+  //Decoder2Col rsdecoder2colGauss   rsdecodertopGauss
+  def top = new rsdecodertopGauss
   val useMFC = false // use MLIR-based firrtl compiler
   val generator = Seq(
     chisel3.stage.ChiselGeneratorAnnotation(() => top),

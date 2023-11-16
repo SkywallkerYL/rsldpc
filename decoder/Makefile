@@ -37,8 +37,8 @@ doit:
 	sbt run
 #Makefile for Verilator
 
-#rsdecodertop
-TOP?=Decoder2Col
+#rsdecodertop Decoder2Col rsdecodertopGauss rsdecoder2colGauss
+TOP?=rsdecodertopGauss
 TOPNAME?=$(TOP)
 TOPNAMETEST?=$(TOP)
 #FSM_m #keyboard_top #top
@@ -65,7 +65,7 @@ VERILATOR_CFLAGS +=  --build
 VERILATOR_CFLAGS += -Wno-fatal -O3 
 VERILATOR_CFLAGS += -DVL_DEBUG
 VERILATOR_CFLAGS += -j 8
-
+VERILATOR_CFLAGS += --no-timing
 VERILATOR_CFLAGS += --top-module $(TOPNAMETEST)
 #VERILATOR_CFLAGS += --x-initial fast --noassert
 #VERILATOR_CFLAGS += --timing
@@ -91,6 +91,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 	
 VSRC = $(shell find $(abspath ./build) -name "*.v")
+VSRC += $(shell find $(abspath ./vsrc ) -name "*.v")
 CSRC = $(shell find $(abspath ./csrc) -name "*.c" -or -name "main.cpp" -or -name "*.cc" )
 CSRC += $(SRC_AUTO_BIND)
 #VSRC += $(shell find $(abspath ./generated) -name "*.v")

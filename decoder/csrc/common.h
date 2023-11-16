@@ -17,7 +17,7 @@
 #define LLR_INIT_TABLE 5
 
 
-#define TESTMODULE 7 
+#define TESTMODULE 11
 #if TESTMODULE == 1 
 // CheckNode Test 
 #include "VCheckNode.h"
@@ -93,17 +93,29 @@ int ITERMAX      = 6 ;
 VErrorbits* top;
 int maxerrortime = 50 ;
 int ITERMAX      = 20 ;
+#elif TESTMODULE == 11
+#include "VrsdecodertopGauss.h"
+#include "VrsdecodertopGauss___024root.h"
+VrsdecodertopGauss* top;
+int maxerrortime = 50 ;
+int ITERMAX      = 5 ;
+#elif TESTMODULE == 12
+#include "Vrsdecoder2colGauss.h"
+#include "Vrsdecoder2colGauss___024root.h"
+Vrsdecoder2colGauss* top;
+int maxerrortime = 50;
+int ITERMAX      = 5 ;
 #endif
 //#define DIFFTEST 
 
 
 #define POSTPROCESS 1
-int strongMessage_0 = 6;
-int weakMessage_0 = 2;
-int strongMessage_1 = 7;
-int weakMessage_1 = 2;
-int strongMessage_2 = 7;
-int weakMessage_2 = 2;
+int strongMessage_0 = 5;
+int weakMessage_0 = 1;
+int strongMessage_1 = 5;
+int weakMessage_1 = 1;
+int strongMessage_2 = 5;
+int weakMessage_2 = 1;
 int postInter = 12;
 const char WRONG_FILENAME[] = "/home/yangli/rsldpc/decoder/csrc/error_llr_base.txt";
 #define READLLR 1

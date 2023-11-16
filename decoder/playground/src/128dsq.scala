@@ -150,56 +150,109 @@ class llrquanti extends Module with COMMON {
     val llrin  = Input(UInt(19.W)) 
     val llrout = Output(UInt(4.W))  
   })
-  val signed = io.llrin.asSInt()
-
-  val bound1  : SInt = "b1111111111011011011".U.asSInt
-  val bound2  : SInt = "b1111111110010010010".U.asSInt
-  val bound3  : SInt = "b1111111101001001001".U.asSInt
-  val bound4  : SInt = "b1111111100000000000".U.asSInt
-  val bound5  : SInt = "b1111111010110110111".U.asSInt
-  val bound6  : SInt = "b1111111001101101110".U.asSInt
-  val bound7  : SInt = "b1111111000100100101".U.asSInt
-  val bound11 : SInt = "b0000000000100100100".U.asSInt
-  val bound22 : SInt = "b0000000001101101101".U.asSInt
-  val bound33 : SInt = "b0000000010110110110".U.asSInt
-  val bound44 : SInt = "b0000000100000000000".U.asSInt
-  val bound55 : SInt = "b0000000101001001001".U.asSInt
-  val bound66 : SInt = "b0000000110010010010".U.asSInt
-  val bound77 : SInt = "b0000000111011011011".U.asSInt
-
-  when(signed <= bound7){
-    io.llrout := -7.S.asUInt
-  }.elsewhen(signed <= bound6){
-    io.llrout := -6.S.asUInt
-  }.elsewhen(signed <= bound5){
-    io.llrout := -5.S.asUInt
-  }.elsewhen(signed <= bound4){
-    io.llrout := -4.S.asUInt
-  }.elsewhen(signed <= bound3){
-    io.llrout := -3.S.asUInt
-  }.elsewhen(signed <= bound2){
-    io.llrout := -2.S.asUInt
-  }.elsewhen(signed <= bound1){
-    io.llrout := -1.S.asUInt
-  }.elsewhen(signed <= 0.S){
-    io.llrout := 0.S.asUInt
-  }.elsewhen(signed <= bound11){
-    io.llrout := 0.S.asUInt
-  }.elsewhen(signed <= bound22){
-    io.llrout := 1.S.asUInt
-  }.elsewhen(signed <= bound33){
-    io.llrout := 2.S.asUInt
-  }.elsewhen(signed <= bound44){
-    io.llrout := 3.S.asUInt
-  }.elsewhen(signed <= bound55){
-    io.llrout := 4.S.asUInt
-  }.elsewhen(signed <= bound66){
-    io.llrout := 5.S.asUInt
-  }.elsewhen(signed <= bound77){
-    io.llrout := 6.S.asUInt
+  val value = io.llrin.asUInt()
+  val signed = io.llrin(18)
+  val out = Wire(UInt(19.W))
+  val bound1  = Wire(UInt(19.W))
+  val bound2  = Wire(UInt(19.W))
+  val bound3  = Wire(UInt(19.W))
+  val bound4  = Wire(UInt(19.W))
+  val bound5  = Wire(UInt(19.W))
+  val bound6  = Wire(UInt(19.W))
+  val bound7  = Wire(UInt(19.W))
+  val bound_1 = Wire(UInt(19.W))
+  val bound_2 = Wire(UInt(19.W))
+  val bound_3 = Wire(UInt(19.W))
+  val bound_4 = Wire(UInt(19.W))
+  val bound_5 = Wire(UInt(19.W))
+  val bound_6 = Wire(UInt(19.W))
+  val bound_7 = Wire(UInt(19.W))
+  bound1  := "b1111111111011011011".U
+  bound2  := "b1111111110010010010".U
+  bound3  := "b1111111101001001001".U
+  bound4  := "b1111111100000000000".U
+  bound5  := "b1111111010110110111".U
+  bound6  := "b1111111001101101110".U
+  bound7  := "b1111111000100100101".U
+  bound_1 := "b0000000000100100100".U
+  bound_2 := "b0000000001101101101".U
+  bound_3 := "b0000000010110110110".U
+  bound_4 := "b0000000100000000000".U
+  bound_5 := "b0000000101001001001".U
+  bound_6 := "b0000000110010010010".U
+  bound_7 := "b0000000111011011011".U
+  val minusvalue1  = Wire(UInt(4.W))
+  val minusvalue2  = Wire(UInt(4.W))
+  val minusvalue3  = Wire(UInt(4.W))
+  val minusvalue4  = Wire(UInt(4.W))
+  val minusvalue5  = Wire(UInt(4.W))
+  val minusvalue6  = Wire(UInt(4.W))
+  val minusvalue7  = Wire(UInt(4.W))
+  minusvalue1   := (15).S.asUInt
+  minusvalue2   := (14).S.asUInt
+  minusvalue3   := (13).S.asUInt
+  minusvalue4   := (12).S.asUInt
+  minusvalue5   := (11).S.asUInt
+  minusvalue6   := (10).S.asUInt
+  minusvalue7   := (9).S.asUInt
+  when(signed === 1.U){
+    when(value <= bound7) {
+      out := minusvalue7
+    }.elsewhen(value <= bound6){
+      out := minusvalue6
+    }.elsewhen(value <= bound5){
+      out := minusvalue5
+    }.elsewhen(value <= bound4){
+      out := minusvalue4
+    }.elsewhen(value <= bound3){
+      out := minusvalue3
+    }.elsewhen(value <= bound2){
+      out := minusvalue2
+    }.elsewhen(value <= bound1){
+      out := minusvalue1
+    }.otherwise{
+      out := (0.S).asUInt
+    }
   }.otherwise{
-    io.llrout := 7.S.asUInt
+    when(value >= bound_7) {
+      out := (7.S).asUInt
+    }.elsewhen(value >= bound_6){
+      out := (6.S).asUInt
+    }.elsewhen(value >= bound_5){
+      out := (5.S).asUInt
+    }.elsewhen(value >= bound_4){
+      out := (4.S).asUInt
+    }.elsewhen(value >= bound_3){
+      out := (3.S).asUInt
+    }.elsewhen(value >= bound_2){
+      out := (2.S).asUInt
+    }.elsewhen(value >= bound_1){
+      out := (1.S).asUInt
+    }.otherwise{
+      out := (0.S).asUInt
+    }
   }
+
+
+
+  //when(signed <= bound7.asSInt){
+  //  io.llrout := (-7.S).asUInt
+  //}.elsewhen(signed <= bound6.asSInt){
+  //  io.llrout := (-6.S).asUInt
+  //}.elsewhen(signed <= bound5.asSInt){
+  //  io.llrout := (-5.S).asUInt
+  //}.elsewhen(signed <= bound4.asSInt){
+  //  io.llrout := (-4.S).asUInt
+  //}.elsewhen(signed <= bound3.asSInt){
+  //  io.llrout := (-3.S).asUInt
+  //}.elsewhen(signed <= bound2.asSInt){
+  //  io.llrout := (-2.S).asUInt
+  //}.elsewhen(signed <= bound1.asSInt){
+  //  io.llrout := (-1.S).asUInt
+  //}.elsewhen(signed <= 0.S){
+  //  io.llrout := 0.S.asUInt
+  //}.else
+  io.llrout := out
   //val sum1 = (Seq.fill(512)(Wire(UInt(6.W))))
 }
 
